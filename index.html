@@ -1809,8 +1809,20 @@
         }
 
         waitlistMsg.textContent = "You're on the beta list 🌊";
-        waitlistMsg.style.color = "var(--success)";
-        waitlistEmail.value = "";
+waitlistMsg.style.color = "var(--success)";
+waitlistEmail.value = "";
+
+fetch("/api/send-message", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: email
+  })
+}).catch(error => {
+  console.error("Welcome email failed:", error);
+});
 
       } catch (error) {
         console.error("Waitlist crash:", error);
