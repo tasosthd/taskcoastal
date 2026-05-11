@@ -1799,7 +1799,7 @@ body {
       setWaitlistLoading(true);
 
       try {
-        cconst { data, error } = await supabaseClient
+        const { data, error } = await supabaseClient
   .from("waitlist")
   .insert([
     {
