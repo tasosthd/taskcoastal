@@ -1161,415 +1161,446 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_Wdm1IiIqoF6LaBbT0kAbUQ_AmMZPs_U";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
 
-    const body = document.body;
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const prelaunchPage = document.getElementById("prelaunchPage");
-    const appPage = document.getElementById("appPage");
-    const bottomBar = document.getElementById("bottomBar");
+  const body = document.body;
 
-    const themeBtnLaunch = document.getElementById("themeBtnLaunch");
-    const themeBtnApp = document.getElementById("themeBtnApp");
+  const prelaunchPage = document.getElementById("prelaunchPage");
+  const appPage = document.getElementById("appPage");
+  const bottomBar = document.getElementById("bottomBar");
 
-    const openAppBtn = document.getElementById("openAppBtn");
-    const backLaunchBtn = document.getElementById("backLaunchBtn");
+  const themeBtnLaunch = document.getElementById("themeBtnLaunch");
+  const themeBtnApp = document.getElementById("themeBtnApp");
 
-    const waitlistForm = document.getElementById("waitlistForm");
-    const waitlistEmail = document.getElementById("waitlistEmail");
-    const waitlistMsg = document.getElementById("waitlistMsg");
-    const waitlistCount = document.getElementById("waitlistCount");
+  const openAppBtn = document.getElementById("openAppBtn");
+  const backLaunchBtn = document.getElementById("backLaunchBtn");
 
-    const dateText = document.getElementById("dateText");
-    const greeting = document.getElementById("greeting");
+  const waitlistForm = document.getElementById("waitlistForm");
+  const waitlistEmail = document.getElementById("waitlistEmail");
+  const waitlistMsg = document.getElementById("waitlistMsg");
+  const waitlistCount = document.getElementById("waitlistCount");
 
-    const taskForm = document.getElementById("taskForm");
-    const taskInput = document.getElementById("taskInput");
-    const tasksContainer = document.getElementById("tasks");
-    const emptyState = document.getElementById("emptyState");
+  const dateText = document.getElementById("dateText");
+  const greeting = document.getElementById("greeting");
 
-    const totalCount = document.getElementById("totalCount");
-    const activeCount = document.getElementById("activeCount");
-    const doneCount = document.getElementById("doneCount");
+  const taskForm = document.getElementById("taskForm");
+  const taskInput = document.getElementById("taskInput");
+  const tasksContainer = document.getElementById("tasks");
+  const emptyState = document.getElementById("emptyState");
 
-    const filterButtons = document.querySelectorAll("[data-filter]");
-    const clearCompletedBtn = document.getElementById("clearCompleted");
+  const totalCount = document.getElementById("totalCount");
+  const activeCount = document.getElementById("activeCount");
+  const doneCount = document.getElementById("doneCount");
 
-    const editModal = document.getElementById("editModal");
-    const editInput = document.getElementById("editInput");
-    const saveEdit = document.getElementById("saveEdit");
-    const cancelEdit = document.getElementById("cancelEdit");
+  const filterButtons = document.querySelectorAll("[data-filter]");
+  const clearCompletedBtn = document.getElementById("clearCompleted");
 
-    const toast = document.getElementById("toast");
+  const editModal = document.getElementById("editModal");
+  const editInput = document.getElementById("editInput");
+  const saveEdit = document.getElementById("saveEdit");
+  const cancelEdit = document.getElementById("cancelEdit");
 
-    let tasks = JSON.parse(localStorage.getItem("coastalTasks")) || [];
-    let currentFilter = "all";
-    let editingTaskId = null;
+  const toast = document.getElementById("toast");
 
-    let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
+  let tasks = JSON.parse(localStorage.getItem("coastalTasks")) || [];
+  let currentFilter = "all";
+  let editingTaskId = null;
 
-    waitlistCount.textContent = currentWaitlistCount;
+  let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
 
-    const today = new Date();
+  waitlistCount.textContent = currentWaitlistCount;
 
-    dateText.textContent = today.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric"
-    });
+  const today = new Date();
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
+  dateText.textContent = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric"
+  });
 
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2200);
+  }
+
+  function setGreeting() {
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      greeting.textContent = "Morning flow. Big wins only.";
+    } else if (hour < 18) {
+      greeting.textContent = "Afternoon focus. Execute clean.";
+    } else {
+      greeting.textContent = "Evening reset. Finish strong.";
+    }
+  }
+
+  setGreeting();
+
+  function saveTasks() {
+    localStorage.setItem("coastalTasks", JSON.stringify(tasks));
+  }
+
+  function saveTheme(isDark) {
+    localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
+  }
+
+  function updateThemeButtons() {
+    const isDark = body.classList.contains("dark");
+    themeBtnLaunch.textContent = isDark ? "☀" : "☾";
+    themeBtnApp.textContent = isDark ? "☀" : "☾";
+  }
+
+  function toggleTheme() {
+    body.classList.toggle("dark");
+
+    const isDark = body.classList.contains("dark");
+
+    saveTheme(isDark);
+    updateThemeButtons();
+  }
+
+  function loadTheme() {
+    const theme = localStorage.getItem("coastalTheme");
+
+    if (theme === "dark") {
+      body.classList.add("dark");
+    }
+
+    updateThemeButtons();
+  }
+
+  loadTheme();
+
+  themeBtnLaunch.addEventListener("click", toggleTheme);
+  themeBtnApp.addEventListener("click", toggleTheme);
+
+  function openApp() {
+    prelaunchPage.classList.add("hidden");
+    appPage.classList.remove("hidden");
+    bottomBar.classList.remove("hidden");
+
+    localStorage.setItem("coastalLastView", "app");
+
+    const hasVisited = localStorage.getItem("coastalHasVisited");
+
+    if (!hasVisited) {
       setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2200);
+        showToast("Welcome 🌊 Add 3 high-value tasks and execute clean.");
+      }, 450);
+
+      localStorage.setItem("coastalHasVisited", "true");
     }
-
-    function setGreeting() {
-      const hour = new Date().getHours();
-
-      if (hour < 12) {
-        greeting.textContent = "Morning flow. Big wins only.";
-      } else if (hour < 18) {
-        greeting.textContent = "Afternoon focus. Execute clean.";
-      } else {
-        greeting.textContent = "Evening reset. Finish strong.";
-      }
-    }
-
-    setGreeting();
-
-    function saveTasks() {
-      localStorage.setItem("coastalTasks", JSON.stringify(tasks));
-    }
-
-    function saveTheme(isDark) {
-      localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
-    }
-
-    function updateThemeButtons() {
-      const isDark = body.classList.contains("dark");
-      themeBtnLaunch.textContent = isDark ? "☀" : "☾";
-      themeBtnApp.textContent = isDark ? "☀" : "☾";
-    }
-
-    function toggleTheme() {
-      body.classList.toggle("dark");
-      const isDark = body.classList.contains("dark");
-      saveTheme(isDark);
-      updateThemeButtons();
-    }
-
-    function loadTheme() {
-      const theme = localStorage.getItem("coastalTheme");
-
-      if (theme === "dark") {
-        body.classList.add("dark");
-      }
-
-      updateThemeButtons();
-    }
-
-    loadTheme();
-
-    themeBtnLaunch.addEventListener("click", toggleTheme);
-    themeBtnApp.addEventListener("click", toggleTheme);
-
-    function openApp() {
-      prelaunchPage.classList.add("hidden");
-      appPage.classList.remove("hidden");
-      bottomBar.classList.remove("hidden");
-
-      localStorage.setItem("coastalLastView", "app");
-
-      const hasVisited = localStorage.getItem("coastalHasVisited");
-
-      if (!hasVisited) {
-        setTimeout(() => {
-          showToast("Welcome 🌊 Add 3 high-value tasks and execute clean.");
-        }, 450);
-
-        localStorage.setItem("coastalHasVisited", "true");
-      }
-
-      renderTasks();
-    }
-
-    function openPrelaunch() {
-      appPage.classList.add("hidden");
-      bottomBar.classList.add("hidden");
-      prelaunchPage.classList.remove("hidden");
-
-      localStorage.setItem("coastalLastView", "prelaunch");
-    }
-
-    openAppBtn.addEventListener("click", openApp);
-    backLaunchBtn.addEventListener("click", openPrelaunch);
-
-    const lastView = localStorage.getItem("coastalLastView");
-
-    if (lastView === "app") {
-      openApp();
-    }
-
-    waitlistForm.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      const email = waitlistEmail.value.trim().toLowerCase();
-
-      if (!email) return;
-
-      waitlistMsg.textContent = "Adding you to the beta list...";
-      waitlistMsg.style.color = "var(--muted)";
-
-      const { error } = await supabaseClient
-        .from("waitlist")
-        .insert([
-          {
-            email: email,
-            source: "coastal-flow-prelaunch"
-          }
-        ]);
-
-      if (error) {
-        if (error.code === "23505") {
-          waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
-          waitlistMsg.style.color = "var(--success)";
-          waitlistEmail.value = "";
-          return;
-        }
-
-        console.error(error);
-        waitlistMsg.textContent = "Something went wrong. Try again in a moment.";
-        waitlistMsg.style.color = "var(--danger)";
-        return;
-      }
-
-      currentWaitlistCount++;
-      localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
-
-      waitlistCount.textContent = currentWaitlistCount;
-      waitlistMsg.textContent = "You're on the list. Big moves coming 🚀";
-      waitlistMsg.style.color = "var(--success)";
-      waitlistEmail.value = "";
-    });
-
-    document.querySelectorAll(".pro-lock").forEach(button => {
-      button.addEventListener("click", () => {
-        showToast("This is coming in Coastal Flow Pro 🔒");
-      });
-    });
-
-    function getFilteredTasks() {
-      if (currentFilter === "active") {
-        return tasks.filter(task => !task.done);
-      }
-
-      if (currentFilter === "done") {
-        return tasks.filter(task => task.done);
-      }
-
-      return tasks;
-    }
-
-    function updateStats() {
-      const done = tasks.filter(task => task.done).length;
-      const active = tasks.length - done;
-
-      totalCount.textContent = tasks.length;
-      activeCount.textContent = active;
-      doneCount.textContent = done;
-    }
-
-    function renderTasks() {
-      tasksContainer.innerHTML = "";
-
-      const filteredTasks = getFilteredTasks();
-
-      emptyState.classList.toggle("show", filteredTasks.length === 0);
-
-      filteredTasks.forEach(task => {
-        const taskElement = document.createElement("article");
-
-        taskElement.className = `task ${task.done ? "done" : ""}`;
-        taskElement.dataset.id = task.id;
-
-        taskElement.innerHTML = `
-          <button class="check" aria-label="Complete task">✓</button>
-
-          <div class="task-text"></div>
-
-          <div class="task-actions">
-            <button class="mini-btn edit" aria-label="Edit task">✎</button>
-            <button class="mini-btn delete" aria-label="Delete task">×</button>
-          </div>
-        `;
-
-        taskElement.querySelector(".task-text").textContent = task.text;
-
-        taskElement.querySelector(".check").addEventListener("click", () => {
-          toggleTask(task.id);
-        });
-
-        taskElement.querySelector(".edit").addEventListener("click", () => {
-          openEditModal(task.id);
-        });
-
-        taskElement.querySelector(".delete").addEventListener("click", () => {
-          deleteTask(task.id);
-        });
-
-        tasksContainer.appendChild(taskElement);
-      });
-
-      updateStats();
-    }
-
-    function addTask(text) {
-      const cleanText = text.trim();
-
-      if (!cleanText) return;
-
-      tasks.unshift({
-        id: Date.now(),
-        text: cleanText,
-        done: false,
-        createdAt: new Date().toISOString()
-      });
-
-      saveTasks();
-      renderTasks();
-      showToast("Task added. Now execute 😎");
-    }
-
-    function toggleTask(id) {
-      tasks = tasks.map(task => {
-        if (task.id === id) {
-          return {
-            ...task,
-            done: !task.done
-          };
-        }
-
-        return task;
-      });
-
-      saveTasks();
-      renderTasks();
-    }
-
-    function deleteTask(id) {
-      tasks = tasks.filter(task => task.id !== id);
-      saveTasks();
-      renderTasks();
-      showToast("Task deleted.");
-    }
-
-    function openEditModal(id) {
-      const task = tasks.find(item => item.id === id);
-
-      if (!task) return;
-
-      editingTaskId = id;
-      editInput.value = task.text;
-      editModal.classList.add("show");
-
-      setTimeout(() => {
-        editInput.focus();
-      }, 80);
-    }
-
-    function closeEditModal() {
-      editingTaskId = null;
-      editInput.value = "";
-      editModal.classList.remove("show");
-    }
-
-    function updateTask() {
-      const cleanText = editInput.value.trim();
-
-      if (!cleanText || editingTaskId === null) return;
-
-      tasks = tasks.map(task => {
-        if (task.id === editingTaskId) {
-          return {
-            ...task,
-            text: cleanText
-          };
-        }
-
-        return task;
-      });
-
-      saveTasks();
-      renderTasks();
-      closeEditModal();
-      showToast("Task updated.");
-    }
-
-    taskForm.addEventListener("submit", event => {
-      event.preventDefault();
-
-      addTask(taskInput.value);
-
-      taskInput.value = "";
-      taskInput.focus();
-    });
-
-    filterButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        if (!button.dataset.filter) return;
-
-        currentFilter = button.dataset.filter;
-
-        filterButtons.forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.filter === currentFilter);
-        });
-
-        renderTasks();
-      });
-    });
-
-    clearCompletedBtn.addEventListener("click", () => {
-      const completedCount = tasks.filter(task => task.done).length;
-
-      if (completedCount === 0) {
-        showToast("No completed tasks to clear yet.");
-        return;
-      }
-
-      tasks = tasks.filter(task => !task.done);
-      saveTasks();
-      renderTasks();
-      showToast("Completed tasks cleared. Clean board 🧼");
-    });
-
-    saveEdit.addEventListener("click", updateTask);
-    cancelEdit.addEventListener("click", closeEditModal);
-
-    editInput.addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        updateTask();
-      }
-
-      if (event.key === "Escape") {
-        closeEditModal();
-      }
-    });
-
-    editModal.addEventListener("click", event => {
-      if (event.target === editModal) {
-        closeEditModal();
-      }
-    });
 
     renderTasks();
-  </script>
+  }
+
+  function openPrelaunch() {
+    appPage.classList.add("hidden");
+    bottomBar.classList.add("hidden");
+    prelaunchPage.classList.remove("hidden");
+
+    localStorage.setItem("coastalLastView", "prelaunch");
+  }
+
+  openAppBtn.addEventListener("click", openApp);
+  backLaunchBtn.addEventListener("click", openPrelaunch);
+
+  const lastView = localStorage.getItem("coastalLastView");
+
+  if (lastView === "app") {
+    openApp();
+  }
+
+  waitlistForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const email = waitlistEmail.value.trim().toLowerCase();
+
+    if (!email) return;
+
+    waitlistMsg.textContent = "Adding you to the beta list...";
+    waitlistMsg.style.color = "var(--muted)";
+
+    const { error } = await supabaseClient
+      .from("waitlist")
+      .insert([
+        {
+          email: email,
+          source: "coastal-flow-prelaunch"
+        }
+      ]);
+
+    if (error) {
+      if (error.code === "23505") {
+        waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
+        waitlistMsg.style.color = "var(--success)";
+        waitlistEmail.value = "";
+        return;
+      }
+
+      console.error("Supabase waitlist error:", error);
+      waitlistMsg.textContent = error.message || "Something went wrong. Try again in a moment.";
+      waitlistMsg.style.color = "var(--danger)";
+      return;
+    }
+
+    currentWaitlistCount++;
+    localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+
+    waitlistCount.textContent = currentWaitlistCount;
+    waitlistMsg.textContent = "You're on the list. Sending your welcome email 🌊";
+    waitlistMsg.style.color = "var(--success)";
+
+    try {
+      const emailResponse = await fetch("/api/send-welcome", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: email
+        })
+      });
+
+      const emailData = await emailResponse.json();
+
+      if (!emailResponse.ok) {
+        console.error("Welcome email API error:", emailData);
+        waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
+      } else {
+        waitlistMsg.textContent = "You're on the list. Check your email 🌊";
+      }
+    } catch (emailError) {
+      console.error("Welcome email failed:", emailError);
+      waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
+    }
+
+    waitlistEmail.value = "";
+  });
+
+  document.querySelectorAll(".pro-lock").forEach(button => {
+    button.addEventListener("click", () => {
+      showToast("This is coming in Coastal Flow Pro 🔒");
+    });
+  });
+
+  function getFilteredTasks() {
+    if (currentFilter === "active") {
+      return tasks.filter(task => !task.done);
+    }
+
+    if (currentFilter === "done") {
+      return tasks.filter(task => task.done);
+    }
+
+    return tasks;
+  }
+
+  function updateStats() {
+    const done = tasks.filter(task => task.done).length;
+    const active = tasks.length - done;
+
+    totalCount.textContent = tasks.length;
+    activeCount.textContent = active;
+    doneCount.textContent = done;
+  }
+
+  function renderTasks() {
+    tasksContainer.innerHTML = "";
+
+    const filteredTasks = getFilteredTasks();
+
+    emptyState.classList.toggle("show", filteredTasks.length === 0);
+
+    filteredTasks.forEach(task => {
+      const taskElement = document.createElement("article");
+
+      taskElement.className = `task ${task.done ? "done" : ""}`;
+      taskElement.dataset.id = task.id;
+
+      taskElement.innerHTML = `
+        <button class="check" aria-label="Complete task">✓</button>
+
+        <div class="task-text"></div>
+
+        <div class="task-actions">
+          <button class="mini-btn edit" aria-label="Edit task">✎</button>
+          <button class="mini-btn delete" aria-label="Delete task">×</button>
+        </div>
+      `;
+
+      taskElement.querySelector(".task-text").textContent = task.text;
+
+      taskElement.querySelector(".check").addEventListener("click", () => {
+        toggleTask(task.id);
+      });
+
+      taskElement.querySelector(".edit").addEventListener("click", () => {
+        openEditModal(task.id);
+      });
+
+      taskElement.querySelector(".delete").addEventListener("click", () => {
+        deleteTask(task.id);
+      });
+
+      tasksContainer.appendChild(taskElement);
+    });
+
+    updateStats();
+  }
+
+  function addTask(text) {
+    const cleanText = text.trim();
+
+    if (!cleanText) return;
+
+    tasks.unshift({
+      id: Date.now(),
+      text: cleanText,
+      done: false,
+      createdAt: new Date().toISOString()
+    });
+
+    saveTasks();
+    renderTasks();
+    showToast("Task added. Now execute 😎");
+  }
+
+  function toggleTask(id) {
+    tasks = tasks.map(task => {
+      if (task.id === id) {
+        return {
+          ...task,
+          done: !task.done
+        };
+      }
+
+      return task;
+    });
+
+    saveTasks();
+    renderTasks();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+
+    saveTasks();
+    renderTasks();
+    showToast("Task deleted.");
+  }
+
+  function openEditModal(id) {
+    const task = tasks.find(item => item.id === id);
+
+    if (!task) return;
+
+    editingTaskId = id;
+    editInput.value = task.text;
+    editModal.classList.add("show");
+
+    setTimeout(() => {
+      editInput.focus();
+    }, 80);
+  }
+
+  function closeEditModal() {
+    editingTaskId = null;
+    editInput.value = "";
+    editModal.classList.remove("show");
+  }
+
+  function updateTask() {
+    const cleanText = editInput.value.trim();
+
+    if (!cleanText || editingTaskId === null) return;
+
+    tasks = tasks.map(task => {
+      if (task.id === editingTaskId) {
+        return {
+          ...task,
+          text: cleanText
+        };
+      }
+
+      return task;
+    });
+
+    saveTasks();
+    renderTasks();
+    closeEditModal();
+    showToast("Task updated.");
+  }
+
+  taskForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    addTask(taskInput.value);
+
+    taskInput.value = "";
+    taskInput.focus();
+  });
+
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      if (!button.dataset.filter) return;
+
+      currentFilter = button.dataset.filter;
+
+      filterButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+      });
+
+      renderTasks();
+    });
+  });
+
+  clearCompletedBtn.addEventListener("click", () => {
+    const completedCount = tasks.filter(task => task.done).length;
+
+    if (completedCount === 0) {
+      showToast("No completed tasks to clear yet.");
+      return;
+    }
+
+    tasks = tasks.filter(task => !task.done);
+
+    saveTasks();
+    renderTasks();
+    showToast("Completed tasks cleared. Clean board 🧼");
+  });
+
+  saveEdit.addEventListener("click", updateTask);
+  cancelEdit.addEventListener("click", closeEditModal);
+
+  editInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      updateTask();
+    }
+
+    if (event.key === "Escape") {
+      closeEditModal();
+    }
+  });
+
+  editModal.addEventListener("click", event => {
+    if (event.target === editModal) {
+      closeEditModal();
+    }
+  });
+
+  renderTasks();
+</script>
 </body>
 </html>
