@@ -1,7 +1,5 @@
 const Stripe = require("stripe");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -29,6 +27,8 @@ module.exports = async function handler(req, res) {
         error: "Missing STRIPE_PRICE_ID"
       });
     }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const origin =
       req.headers.origin ||
