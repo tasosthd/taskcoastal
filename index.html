@@ -1089,13 +1089,16 @@
   <main class="app hidden" id="appPage">
     <header class="topbar">
       <div class="brand">
-        <div class="logo">🌊</div>
-        <div>
-          <h1>Coastal Flow</h1>
-          <p id="dateText">Today</p>
-          <p id="userEmailText">Not logged in</p>
-        </div>
-      </div>
+  <div class="logo">🌊</div>
+
+  <div>
+    <h1>Coastal Flow</h1>
+    <p id="dateText">Today</p>
+    <p id="userEmailText">Not logged in</p>
+  </div>
+
+  <img class="user-avatar" id="userAvatar" alt="User profile picture" />
+</div>
 
       <div class="header-actions">
   <button class="icon-btn" id="backLaunchBtn" aria-label="Back to prelaunch">⌂</button>
@@ -1206,6 +1209,7 @@
 
   const dateText = document.getElementById("dateText");
   const userEmailText = document.getElementById("userEmailText");
+  const userAvatar = document.getElementById("userAvatar");
   const greeting = document.getElementById("greeting");
 
   const taskForm = document.getElementById("taskForm");
@@ -1304,10 +1308,25 @@
   themeBtnApp.addEventListener("click", toggleTheme);
 
   function updateUserUI() {
-    if (userEmailText) {
-      userEmailText.textContent = currentUser ? currentUser.email : "Not logged in";
+  if (userEmailText) {
+    userEmailText.textContent = currentUser ? currentUser.email : "Not logged in";
+  }
+
+  if (userAvatar) {
+    const avatarUrl =
+      currentUser?.user_metadata?.avatar_url ||
+      currentUser?.user_metadata?.picture ||
+      "";
+
+    if (avatarUrl) {
+      userAvatar.src = avatarUrl;
+      userAvatar.style.display = "block";
+    } else {
+      userAvatar.removeAttribute("src");
+      userAvatar.style.display = "none";
     }
   }
+}
 
   function setLoadingState(isLoading) {
     isLoadingTasks = isLoading;
