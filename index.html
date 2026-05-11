@@ -1588,10 +1588,41 @@ body {
   }
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      await supabaseClient.auth.signOut();
-    });
-  }
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = "…";
+
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        console.error("Logout error:", error);
+        showToast(error.message || "Logout failed.");
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = "⎋";
+        return;
+      }
+
+      currentUser = null;
+      tasks = [];
+
+      localStorage.removeItem("coastalLastView");
+
+      updateUserUI();
+      renderTasks();
+      openPrelaunch();
+
+      showToast("Logged out successfully.");
+      logoutBtn.disabled = false;
+      logoutBtn.textContent = "⎋";
+    } catch (error) {
+      console.error("Logout crash:", error);
+      showToast("Logout failed.");
+      logoutBtn.disabled = false;
+      logoutBtn.textContent = "⎋";
+    }
+  });
+}
 
   openAppBtn.addEventListener("click", openApp);
   backLaunchBtn.addEventListener("click", openPrelaunch);
