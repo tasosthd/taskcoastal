@@ -996,6 +996,150 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+    /* MOBILE FIXES */
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: none;
+  border: 1px solid var(--border);
+}
+
+#userEmailText {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.app,
+.page-shell {
+  width: 100%;
+  max-width: 520px;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.topbar {
+  width: 100%;
+}
+
+.brand {
+  min-width: 0;
+  flex: 1;
+}
+
+.brand > div {
+  min-width: 0;
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+@media (max-width: 430px) {
+  body {
+    padding: 14px;
+  }
+
+  .app {
+    padding-bottom: 120px;
+  }
+
+  .topbar {
+    gap: 8px;
+  }
+
+  .logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+    font-size: 18px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand h1 {
+    font-size: 1rem;
+  }
+
+  #dateText,
+  #userEmailText {
+    font-size: 0.68rem;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
+    font-size: 0.95rem;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .hero-card {
+    padding: 24px;
+    min-height: 180px;
+  }
+
+  .hero-card h2 {
+    font-size: 2.25rem;
+    letter-spacing: -0.07em;
+  }
+
+  .hero-card p {
+    font-size: 0.88rem;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stat-card strong {
+    font-size: 1.25rem;
+  }
+
+  .stat-card span {
+    font-size: 0.62rem;
+  }
+
+  .composer {
+    border-radius: 22px;
+  }
+
+  .composer input {
+    font-size: 0.9rem;
+  }
+
+  .add-btn {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+
+  .bottom-bar {
+    width: calc(100% - 24px);
+    bottom: 18px;
+  }
+}
   </style>
 </head>
 
