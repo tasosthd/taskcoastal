@@ -1912,8 +1912,40 @@ if (totalTaskCount >= FREE_TASK_LIMIT) {
 const upgradeBtn = document.getElementById("upgradeBtn");
 
 if (upgradeBtn) {
-  upgradeBtn.addEventListener("click", () => {
-    showToast("Stripe checkout coming soon. This is the money button 💸");
+  upgradeBtn.addEventListener("click", async () => {
+    if (!currentUser) {
+      showToast("Log in first before upgrading.");
+      return;
+    }
+
+    try {
+      upgradeBtn.disabled = true;
+      upgradeBtn.textContent = "Opening Stripe...";
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: currentUser.email,
+          userId: currentUser.id
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not start checkout.");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      showToast(error.message || "Checkout failed.");
+      upgradeBtn.disabled = false;
+      upgradeBtn.textContent = "Upgrade 🔒";
+    }
   });
 }
   
