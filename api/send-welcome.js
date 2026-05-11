@@ -42,7 +42,22 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         from: "Coastal Flow <info@taskcoastal.com>",
         to: email,
+        reply_to: "info@taskcoastal.com",
         subject: "You’re on the Coastal Flow beta list 🌊",
+
+        text: `
+You're officially on the Coastal Flow beta list.
+
+Thanks for joining. Coastal Flow is being built as a calmer way to plan your day, focus on the right work, and execute with less chaos.
+
+I'll send you a quick update when early access opens.
+
+Open Coastal Flow:
+https://taskcoastal.com
+
+You received this email because you joined the Coastal Flow waitlist.
+        `.trim(),
+
         html: `
           <!DOCTYPE html>
           <html>
@@ -59,7 +74,7 @@ export default async function handler(req, res) {
                   <div style="font-size:36px;margin-bottom:18px;">🌊</div>
 
                   <p style="display:inline-block;margin:0 0 18px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);color:#9eeeff;font-size:12px;font-weight:800;letter-spacing:.06em;">
-                    PRIVATE BETA CONFIRMED
+                    EARLY ACCESS CONFIRMED
                   </p>
 
                   <h1 style="font-size:36px;line-height:.95;margin:0 0 14px;color:#effcff;letter-spacing:-1.4px;">
@@ -67,7 +82,7 @@ export default async function handler(req, res) {
                   </h1>
 
                   <p style="color:rgba(239,252,255,.75);font-size:16px;line-height:1.6;margin:0;">
-                    Welcome to Coastal Flow — the calm execution system for people who want less chaos, better focus, and cleaner daily wins.
+                    Thanks for joining Coastal Flow — a calmer way to plan your day, focus on the right work, and execute with less chaos.
                   </p>
 
                   <div style="background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px;margin:24px 0;">
@@ -76,11 +91,11 @@ export default async function handler(req, res) {
                     </strong>
 
                     <p style="color:rgba(239,252,255,.7);line-height:1.6;margin:0;font-size:14px;">
-                      You’ll get early updates, beta access, and first-user pricing when Coastal Flow Pro launches.
+                      I’ll send you a quick update when early access opens. No noise — just the important stuff.
                     </p>
                   </div>
 
-                  <a href="https://taskcoastal.vercel.app" style="display:block;text-align:center;padding:15px 18px;border-radius:18px;background:#65d9f5;color:#061a22;text-decoration:none;font-weight:900;">
+                  <a href="https://taskcoastal.com" style="display:block;text-align:center;padding:15px 18px;border-radius:18px;background:#65d9f5;color:#061a22;text-decoration:none;font-weight:900;">
                     Open Coastal Flow
                   </a>
 
