@@ -1184,7 +1184,15 @@ if (googleLoginBtn) {
     }
   });
 }
-  
+  const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    showToast("Logged out.");
+    openPrelaunch();
+  });
+}
   const body = document.body;
 
   const prelaunchPage = document.getElementById("prelaunchPage");
