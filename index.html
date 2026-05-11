@@ -996,6 +996,10 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+
+    #upgradeCard {
+  margin-bottom: 14px;
+}
     /* MOBILE FIXES */
 .user-avatar {
   width: 34px;
@@ -1275,7 +1279,20 @@ body {
         <span>Done</span>
       </div>
     </section>
+    <section class="pricing-card" id="upgradeCard">
+  <span class="pricing-label">Free Plan</span>
+  <h3>Upgrade to Coastal Flow Pro</h3>
+  <p>Unlock unlimited tasks, AI planning, analytics, focus mode, and cloud sync power features.</p>
 
+  <div class="price-row">
+    <div>
+      <strong>€4.99</strong>
+      <span>/ month</span>
+    </div>
+
+    <button class="primary-btn" id="upgradeBtn" type="button">Upgrade 🔒</button>
+  </div>
+</section>
     <form class="composer" id="taskForm">
       <input id="taskInput" type="text" placeholder="Add a high-value task..." autocomplete="off" />
       <button class="add-btn" type="submit" aria-label="Add task">
@@ -1752,12 +1769,12 @@ body {
       return;
     }
 
-    const activeTaskCount = tasks.length;
+    const totalTaskCount = tasks.length;
 
-    if (activeTaskCount >= FREE_TASK_LIMIT) {
-      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Pro unlock coming soon 🔒`);
-      return;
-    }
+if (totalTaskCount >= FREE_TASK_LIMIT) {
+  showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Pro unlock coming soon 🔒`);
+  return;
+}
 
     const { data, error } = await supabaseClient
       .from("tasks")
@@ -1892,6 +1909,14 @@ body {
     showToast("Task updated.");
   }
 
+const upgradeBtn = document.getElementById("upgradeBtn");
+
+if (upgradeBtn) {
+  upgradeBtn.addEventListener("click", () => {
+    showToast("Stripe checkout coming soon. This is the money button 💸");
+  });
+}
+  
   taskForm.addEventListener("submit", event => {
     event.preventDefault();
 
@@ -1966,6 +1991,7 @@ body {
   });
 
   loadCurrentUser();
+  
 </script>
 </body>
 </html>
