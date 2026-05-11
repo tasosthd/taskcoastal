@@ -1393,6 +1393,9 @@ body {
   const saveEdit = document.getElementById("saveEdit");
   const cancelEdit = document.getElementById("cancelEdit");
 
+  const upgradeBtn = document.getElementById("upgradeBtn");
+  const upgradeCard = document.getElementById("upgradeCard");
+
   const toast = document.getElementById("toast");
 
   let currentUser = null;
@@ -1400,19 +1403,27 @@ body {
   let currentFilter = "all";
   let editingTaskId = null;
   let isLoadingTasks = false;
+  let isProUser = false;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
-  waitlistCount.textContent = currentWaitlistCount;
+
+  if (waitlistCount) {
+    waitlistCount.textContent = currentWaitlistCount;
+  }
 
   const today = new Date();
 
-  dateText.textContent = today.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric"
-  });
+  if (dateText) {
+    dateText.textContent = today.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric"
+    });
+  }
 
   function showToast(message) {
+    if (!toast) return;
+
     toast.textContent = message;
     toast.classList.add("show");
 
@@ -1422,6 +1433,8 @@ body {
   }
 
   function setGreeting() {
+    if (!greeting) return;
+
     const hour = new Date().getHours();
 
     if (hour < 12) {
@@ -1442,8 +1455,13 @@ body {
   function updateThemeButtons() {
     const isDark = body.classList.contains("dark");
 
-    themeBtnLaunch.textContent = isDark ? "☀" : "☾";
-    themeBtnApp.textContent = isDark ? "☀" : "☾";
+    if (themeBtnLaunch) {
+      themeBtnLaunch.textContent = isDark ? "☀" : "☾";
+    }
+
+    if (themeBtnApp) {
+      themeBtnApp.textContent = isDark ? "☀" : "☾";
+    }
   }
 
   function toggleTheme() {
@@ -1467,29 +1485,82 @@ body {
 
   loadTheme();
 
-  themeBtnLaunch.addEventListener("click", toggleTheme);
-  themeBtnApp.addEventListener("click", toggleTheme);
+  if (themeBtnLaunch) {
+    themeBtnLaunch.addEventListener("click", toggleTheme);
+  }
+
+  if (themeBtnApp) {
+    themeBtnApp.addEventListener("click", toggleTheme);
+  }
 
   function updateUserUI() {
-  if (userEmailText) {
-    userEmailText.textContent = currentUser ? currentUser.email : "Not logged in";
+    if (userEmailText) {
+      if (currentUser) {
+        userEmailText.textContent = isProUser
+          ? `${currentUser.email} · Pro`
+          : `${currentUser.email} · Free`;
+      } else {
+        userEmailText.textContent = "Not logged in";
+      }
+    }
+
+    if (userAvatar) {
+      const avatarUrl =
+        currentUser?.user_metadata?.avatar_url ||
+        currentUser?.user_metadata?.picture ||
+        "";
+
+      if (avatarUrl) {
+        userAvatar.src = avatarUrl;
+        userAvatar.style.display = "block";
+      } else {
+        userAvatar.removeAttribute("src");
+        userAvatar.style.display = "none";
+      }
+    }
+
+    updateUpgradeUI();
   }
 
-  if (userAvatar) {
-    const avatarUrl =
-      currentUser?.user_metadata?.avatar_url ||
-      currentUser?.user_metadata?.picture ||
-      "";
+  function updateUpgradeUI() {
+    if (!upgradeCard) return;
 
-    if (avatarUrl) {
-      userAvatar.src = avatarUrl;
-      userAvatar.style.display = "block";
+    if (!currentUser) {
+      upgradeCard.style.display = "none";
+      return;
+    }
+
+    upgradeCard.style.display = "block";
+
+    const label = upgradeCard.querySelector(".pricing-label");
+    const title = upgradeCard.querySelector("h3");
+    const copy = upgradeCard.querySelector("p");
+
+    if (isProUser) {
+      if (label) label.textContent = "Pro Plan Active";
+      if (title) title.textContent = "Coastal Flow Pro Activated";
+      if (copy) {
+        copy.textContent = "You have unlimited tasks, cloud sync, and Pro features unlocked.";
+      }
+
+      if (upgradeBtn) {
+        upgradeBtn.textContent = "Pro Active ✓";
+        upgradeBtn.disabled = true;
+      }
     } else {
-      userAvatar.removeAttribute("src");
-      userAvatar.style.display = "none";
+      if (label) label.textContent = "Free Plan";
+      if (title) title.textContent = "Upgrade to Coastal Flow Pro";
+      if (copy) {
+        copy.textContent =
+          "Unlock unlimited tasks, AI planning, analytics, focus mode, and cloud sync power features.";
+      }
+
+      if (upgradeBtn) {
+        upgradeBtn.textContent = "Upgrade 🔒";
+        upgradeBtn.disabled = false;
+      }
     }
   }
-}
 
   function setLoadingState(isLoading) {
     isLoadingTasks = isLoading;
@@ -1527,6 +1598,52 @@ body {
     prelaunchPage.classList.remove("hidden");
   }
 
+  async function ensureProfileExists() {
+    if (!currentUser) return;
+
+    const { error } = await supabaseClient
+      .from("profiles")
+      .upsert(
+        {
+          id: currentUser.id,
+          email: currentUser.email
+        },
+        {
+          onConflict: "id"
+        }
+      );
+
+    if (error) {
+      console.error("Profile upsert error:", error);
+    }
+  }
+
+  async function loadProfile() {
+    if (!currentUser) {
+      isProUser = false;
+      updateUserUI();
+      return;
+    }
+
+    await ensureProfileExists();
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("is_pro")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (error) {
+      console.error("Profile load error:", error);
+      isProUser = false;
+      updateUserUI();
+      return;
+    }
+
+    isProUser = data?.is_pro === true;
+    updateUserUI();
+  }
+
   async function loadCurrentUser() {
     const { data, error } = await supabaseClient.auth.getSession();
 
@@ -1537,13 +1654,16 @@ body {
     }
 
     currentUser = data.session?.user || null;
-    updateUserUI();
 
     if (currentUser) {
+      await loadProfile();
       openApp();
       await loadTasks();
     } else {
+      currentUser = null;
+      isProUser = false;
       tasks = [];
+      updateUserUI();
       renderTasks();
       openPrelaunch();
     }
@@ -1551,9 +1671,9 @@ body {
 
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
-    updateUserUI();
 
     if (currentUser) {
+      await loadProfile();
       openApp();
       await loadTasks();
 
@@ -1561,7 +1681,11 @@ body {
         showToast(`Logged in as ${currentUser.email}`);
       }
     } else {
+      currentUser = null;
+      isProUser = false;
       tasks = [];
+
+      updateUserUI();
       renderTasks();
       openPrelaunch();
 
@@ -1588,111 +1712,105 @@ body {
   }
 
   if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      logoutBtn.disabled = true;
-      logoutBtn.textContent = "…";
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        logoutBtn.disabled = true;
+        logoutBtn.textContent = "…";
 
-      const { error } = await supabaseClient.auth.signOut();
+        const { error } = await supabaseClient.auth.signOut();
 
-      if (error) {
-        console.error("Logout error:", error);
-        showToast(error.message || "Logout failed.");
+        if (error) {
+          console.error("Logout error:", error);
+          showToast(error.message || "Logout failed.");
+        }
+      } catch (error) {
+        console.error("Logout crash:", error);
+        showToast("Logout failed.");
+      } finally {
         logoutBtn.disabled = false;
         logoutBtn.textContent = "⎋";
-        return;
       }
+    });
+  }
 
-      currentUser = null;
-      tasks = [];
+  if (openAppBtn) {
+    openAppBtn.addEventListener("click", openApp);
+  }
 
-      localStorage.removeItem("coastalLastView");
+  if (backLaunchBtn) {
+    backLaunchBtn.addEventListener("click", openPrelaunch);
+  }
 
-      updateUserUI();
-      renderTasks();
-      openPrelaunch();
+  if (waitlistForm) {
+    waitlistForm.addEventListener("submit", async event => {
+      event.preventDefault();
 
-      showToast("Logged out successfully.");
-      logoutBtn.disabled = false;
-      logoutBtn.textContent = "⎋";
-    } catch (error) {
-      console.error("Logout crash:", error);
-      showToast("Logout failed.");
-      logoutBtn.disabled = false;
-      logoutBtn.textContent = "⎋";
-    }
-  });
-}
+      const email = waitlistEmail.value.trim().toLowerCase();
 
-  openAppBtn.addEventListener("click", openApp);
-  backLaunchBtn.addEventListener("click", openPrelaunch);
+      if (!email) return;
 
-  waitlistForm.addEventListener("submit", async event => {
-    event.preventDefault();
+      waitlistMsg.textContent = "Adding you to the beta list...";
+      waitlistMsg.style.color = "var(--muted)";
 
-    const email = waitlistEmail.value.trim().toLowerCase();
+      const { error } = await supabaseClient
+        .from("waitlist")
+        .insert([
+          {
+            email: email,
+            source: "coastal-flow-prelaunch"
+          }
+        ]);
 
-    if (!email) return;
-
-    waitlistMsg.textContent = "Adding you to the beta list...";
-    waitlistMsg.style.color = "var(--muted)";
-
-    const { error } = await supabaseClient
-      .from("waitlist")
-      .insert([
-        {
-          email: email,
-          source: "coastal-flow-prelaunch"
+      if (error) {
+        if (error.code === "23505") {
+          waitlistMsg.textContent =
+            "You are already on the beta list. Operator status secured 🌊";
+          waitlistMsg.style.color = "var(--success)";
+          waitlistEmail.value = "";
+          return;
         }
-      ]);
 
-    if (error) {
-      if (error.code === "23505") {
-        waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
-        waitlistMsg.style.color = "var(--success)";
-        waitlistEmail.value = "";
+        console.error("Supabase waitlist error:", error);
+        waitlistMsg.textContent =
+          error.message || "Something went wrong. Try again in a moment.";
+        waitlistMsg.style.color = "var(--danger)";
         return;
       }
 
-      console.error("Supabase waitlist error:", error);
-      waitlistMsg.textContent = error.message || "Something went wrong. Try again in a moment.";
-      waitlistMsg.style.color = "var(--danger)";
-      return;
-    }
+      currentWaitlistCount++;
+      localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
 
-    currentWaitlistCount++;
-    localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+      waitlistCount.textContent = currentWaitlistCount;
+      waitlistMsg.textContent = "You're on the list. Sending your welcome email 🌊";
+      waitlistMsg.style.color = "var(--success)";
 
-    waitlistCount.textContent = currentWaitlistCount;
-    waitlistMsg.textContent = "You're on the list. Sending your welcome email 🌊";
-    waitlistMsg.style.color = "var(--success)";
+      try {
+        const emailResponse = await fetch("/api/send-welcome", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email
+          })
+        });
 
-    try {
-      const emailResponse = await fetch("/api/send-welcome", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email: email
-        })
-      });
+        const emailData = await emailResponse.json();
 
-      const emailData = await emailResponse.json();
-
-      if (!emailResponse.ok) {
-        console.error("Welcome email API error:", emailData);
+        if (!emailResponse.ok) {
+          console.error("Welcome email API error:", emailData);
+          waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
+        } else {
+          waitlistMsg.textContent = "You're on the list. Check your email 🌊";
+        }
+      } catch (emailError) {
+        console.error("Welcome email failed:", emailError);
         waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
-      } else {
-        waitlistMsg.textContent = "You're on the list. Check your email 🌊";
       }
-    } catch (emailError) {
-      console.error("Welcome email failed:", emailError);
-      waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
-    }
 
-    waitlistEmail.value = "";
-  });
+      waitlistEmail.value = "";
+    });
+  }
 
   document.querySelectorAll(".pro-lock").forEach(button => {
     button.addEventListener("click", () => {
@@ -1802,10 +1920,10 @@ body {
 
     const totalTaskCount = tasks.length;
 
-if (totalTaskCount >= FREE_TASK_LIMIT) {
-  showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Pro unlock coming soon 🔒`);
-  return;
-}
+    if (!isProUser && totalTaskCount >= FREE_TASK_LIMIT) {
+      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro 🔒`);
+      return;
+    }
 
     const { data, error } = await supabaseClient
       .from("tasks")
@@ -1827,7 +1945,12 @@ if (totalTaskCount >= FREE_TASK_LIMIT) {
 
     tasks.unshift(data);
     renderTasks();
-    showToast("Task saved to cloud ☁️");
+
+    if (isProUser) {
+      showToast("Pro task saved. Unlimited mode 💎");
+    } else {
+      showToast(`Task saved. ${FREE_TASK_LIMIT - tasks.length} free slots left ☁️`);
+    }
   }
 
   async function toggleTask(id) {
@@ -1940,46 +2063,49 @@ if (totalTaskCount >= FREE_TASK_LIMIT) {
     showToast("Task updated.");
   }
 
-const upgradeBtn = document.getElementById("upgradeBtn");
-
-if (upgradeBtn) {
-  upgradeBtn.addEventListener("click", async () => {
-    if (!currentUser) {
-      showToast("Log in first before upgrading.");
-      return;
-    }
-
-    try {
-      upgradeBtn.disabled = true;
-      upgradeBtn.textContent = "Opening Stripe...";
-
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email: currentUser.email,
-          userId: currentUser.id
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Could not start checkout.");
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        showToast("Log in first before upgrading.");
+        return;
       }
 
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Checkout error:", error);
-      showToast(error.message || "Checkout failed.");
-      upgradeBtn.disabled = false;
-      upgradeBtn.textContent = "Upgrade 🔒";
-    }
-  });
-}
-  
+      if (isProUser) {
+        showToast("You are already Pro 💎");
+        return;
+      }
+
+      try {
+        upgradeBtn.disabled = true;
+        upgradeBtn.textContent = "Opening Stripe...";
+
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: currentUser.email,
+            userId: currentUser.id
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not start checkout.");
+        }
+
+        window.location.href = data.url;
+      } catch (error) {
+        console.error("Checkout error:", error);
+        showToast(error.message || "Checkout failed.");
+        upgradeBtn.disabled = false;
+        upgradeBtn.textContent = "Upgrade 🔒";
+      }
+    });
+  }
+
   taskForm.addEventListener("submit", event => {
     event.preventDefault();
 
@@ -2054,7 +2180,6 @@ if (upgradeBtn) {
   });
 
   loadCurrentUser();
-  
 </script>
 </body>
 </html>
