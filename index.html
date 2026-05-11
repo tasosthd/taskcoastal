@@ -1342,7 +1342,6 @@ body {
   <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
@@ -1369,6 +1368,7 @@ body {
   const waitlistEmail = document.getElementById("waitlistEmail");
   const waitlistMsg = document.getElementById("waitlistMsg");
   const waitlistCount = document.getElementById("waitlistCount");
+  const waitlistSubmitBtn = waitlistForm?.querySelector("button[type='submit']");
 
   const dateText = document.getElementById("dateText");
   const userEmailText = document.getElementById("userEmailText");
@@ -1434,6 +1434,21 @@ body {
     }, 2200);
   }
 
+  function timeoutPromise(ms) {
+    return new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out. Check Supabase table/RLS policy."));
+      }, ms);
+    });
+  }
+
+  function setWaitlistLoading(isLoading) {
+    if (!waitlistSubmitBtn) return;
+
+    waitlistSubmitBtn.disabled = isLoading;
+    waitlistSubmitBtn.textContent = isLoading ? "Adding..." : "Join beta";
+  }
+
   function setGreeting() {
     if (!greeting) return;
 
@@ -1487,13 +1502,8 @@ body {
 
   loadTheme();
 
-  if (themeBtnLaunch) {
-    themeBtnLaunch.addEventListener("click", toggleTheme);
-  }
-
-  if (themeBtnApp) {
-    themeBtnApp.addEventListener("click", toggleTheme);
-  }
+  if (themeBtnLaunch) themeBtnLaunch.addEventListener("click", toggleTheme);
+  if (themeBtnApp) themeBtnApp.addEventListener("click", toggleTheme);
 
   function updateUserUI() {
     if (userEmailText) {
@@ -1534,17 +1544,9 @@ body {
   function setLoadingState(isLoading) {
     isLoadingTasks = isLoading;
 
-    if (loadingState) {
-      loadingState.classList.toggle("show", isLoading);
-    }
-
-    if (tasksContainer) {
-      tasksContainer.style.display = isLoading ? "none" : "grid";
-    }
-
-    if (emptyState && isLoading) {
-      emptyState.classList.remove("show");
-    }
+    if (loadingState) loadingState.classList.toggle("show", isLoading);
+    if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
+    if (emptyState && isLoading) emptyState.classList.remove("show");
   }
 
   function openApp() {
@@ -1777,13 +1779,8 @@ body {
     });
   }
 
-  if (openAppBtn) {
-    openAppBtn.addEventListener("click", openApp);
-  }
-
-  if (backLaunchBtn) {
-    backLaunchBtn.addEventListener("click", openPrelaunch);
-  }
+  if (openAppBtn) openAppBtn.addEventListener("click", openApp);
+  if (backLaunchBtn) backLaunchBtn.addEventListener("click", openPrelaunch);
 
   if (waitlistForm) {
     waitlistForm.addEventListener("submit", async event => {
@@ -1791,13 +1788,18 @@ body {
 
       const email = waitlistEmail.value.trim().toLowerCase();
 
-      if (!email) return;
+      if (!email) {
+        waitlistMsg.textContent = "Enter your email first.";
+        waitlistMsg.style.color = "var(--danger)";
+        return;
+      }
 
       waitlistMsg.textContent = "Adding you to the beta list...";
       waitlistMsg.style.color = "var(--muted)";
+      setWaitlistLoading(true);
 
       try {
-        const { error } = await supabaseClient
+        const insertRequest = supabaseClient
           .from("waitlist")
           .insert([
             {
@@ -1805,6 +1807,11 @@ body {
               source: "coastal-flow-prelaunch"
             }
           ]);
+
+        const { error } = await Promise.race([
+          insertRequest,
+          timeoutPromise(12000)
+        ]);
 
         if (error) {
           console.error("Supabase waitlist error:", error);
@@ -1843,10 +1850,16 @@ body {
         }).catch(error => {
           console.error("Welcome email failed:", error);
         });
+
       } catch (error) {
         console.error("Waitlist crash:", error);
-        waitlistMsg.textContent = "Something went wrong. Try again.";
+
+        waitlistMsg.textContent =
+          error.message || "Something went wrong. Try again.";
+
         waitlistMsg.style.color = "var(--danger)";
+      } finally {
+        setWaitlistLoading(false);
       }
     });
   }
@@ -1858,14 +1871,8 @@ body {
   });
 
   function getFilteredTasks() {
-    if (currentFilter === "active") {
-      return tasks.filter(task => !task.done);
-    }
-
-    if (currentFilter === "done") {
-      return tasks.filter(task => task.done);
-    }
-
+    if (currentFilter === "active") return tasks.filter(task => !task.done);
+    if (currentFilter === "done") return tasks.filter(task => task.done);
     return tasks;
   }
 
@@ -2219,23 +2226,13 @@ body {
     });
   }
 
-  if (saveEdit) {
-    saveEdit.addEventListener("click", updateTask);
-  }
-
-  if (cancelEdit) {
-    cancelEdit.addEventListener("click", closeEditModal);
-  }
+  if (saveEdit) saveEdit.addEventListener("click", updateTask);
+  if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
 
   if (editInput) {
     editInput.addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        updateTask();
-      }
-
-      if (event.key === "Escape") {
-        closeEditModal();
-      }
+      if (event.key === "Enter") updateTask();
+      if (event.key === "Escape") closeEditModal();
     });
   }
 
