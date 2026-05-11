@@ -1522,12 +1522,12 @@ body {
     }
 
     if (upgradeCard) {
-      upgradeCard.classList.toggle("hidden", isProUser);
+      upgradeCard.classList.toggle("hidden", Boolean(isProUser));
     }
 
     if (upgradeBtn) {
       upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
-      upgradeBtn.disabled = isProUser;
+      upgradeBtn.disabled = Boolean(isProUser);
     }
   }
 
@@ -1553,18 +1553,20 @@ body {
       return;
     }
 
-    prelaunchPage.classList.add("hidden");
-    appPage.classList.remove("hidden");
-    bottomBar.classList.remove("hidden");
+    if (prelaunchPage) prelaunchPage.classList.add("hidden");
+    if (appPage) appPage.classList.remove("hidden");
+    if (bottomBar) bottomBar.classList.remove("hidden");
 
     updateUserUI();
     renderTasks();
   }
 
   function openPrelaunch() {
-    appPage.classList.add("hidden");
-    bottomBar.classList.add("hidden");
-    prelaunchPage.classList.remove("hidden");
+    if (appPage) appPage.classList.add("hidden");
+    if (bottomBar) bottomBar.classList.add("hidden");
+    if (prelaunchPage) prelaunchPage.classList.remove("hidden");
+
+    updateUserUI();
   }
 
   async function getOrCreateProfile() {
@@ -1574,9 +1576,18 @@ body {
       .from("profiles")
       .select("*")
       .eq("id", currentUser.id)
-      .single();
+      .maybeSingle();
 
-    if (existingProfile && !selectError) {
+    if (selectError) {
+      console.error("Profile select error:", selectError);
+      showToast("Could not load profile.");
+      currentProfile = null;
+      isProUser = false;
+      updateUserUI();
+      return null;
+    }
+
+    if (existingProfile) {
       currentProfile = existingProfile;
       isProUser = Boolean(existingProfile.is_pro);
       updateUserUI();
@@ -1618,7 +1629,7 @@ body {
       .from("profiles")
       .select("*")
       .eq("id", currentUser.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Refresh profile error:", error);
@@ -1630,6 +1641,41 @@ body {
     updateUserUI();
 
     return data;
+  }
+
+  async function refreshProfileWithRetry(maxAttempts = 5) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const profile = await refreshProfile();
+
+      if (profile?.is_pro) {
+        showToast("Coastal Flow Pro activated 💎");
+        return profile;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1400));
+    }
+
+    showToast("Payment received. Pro may activate in a moment.");
+    return currentProfile;
+  }
+
+  async function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const checkoutStatus = params.get("checkout");
+
+    if (!checkoutStatus) return;
+
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+
+    if (checkoutStatus === "success") {
+      showToast("Payment complete. Activating Pro...");
+      await refreshProfileWithRetry(5);
+    }
+
+    if (checkoutStatus === "cancelled") {
+      showToast("Checkout cancelled.");
+    }
   }
 
   async function loadCurrentUser() {
@@ -1656,31 +1702,6 @@ body {
       updateUserUI();
       openPrelaunch();
     }
-  }
-
-  async function handleCheckoutReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const checkoutStatus = params.get("checkout");
-
-    if (!checkoutStatus) return;
-
-    if (checkoutStatus === "success") {
-      showToast("Payment complete. Activating Pro...");
-      await refreshProfile();
-
-      if (isProUser) {
-        showToast("Coastal Flow Pro activated 💸");
-      } else {
-        showToast("Payment received. Pro may activate in a moment.");
-      }
-    }
-
-    if (checkoutStatus === "cancelled") {
-      showToast("Checkout cancelled.");
-    }
-
-    const cleanUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, document.title, cleanUrl);
   }
 
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -1775,38 +1796,43 @@ body {
       waitlistMsg.textContent = "Adding you to the beta list...";
       waitlistMsg.style.color = "var(--muted)";
 
-      const { error } = await supabaseClient
-        .from("waitlist")
-        .insert([
-          {
-            email: email,
-            source: "coastal-flow-prelaunch"
-          }
-        ]);
+      try {
+        const { error } = await supabaseClient
+          .from("waitlist")
+          .insert([
+            {
+              email: email,
+              source: "coastal-flow-prelaunch"
+            }
+          ]);
 
-      if (error) {
-        if (error.code === "23505") {
-          waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
-          waitlistMsg.style.color = "var(--success)";
-          waitlistEmail.value = "";
+        if (error) {
+          console.error("Supabase waitlist error:", error);
+
+          if (error.code === "23505") {
+            waitlistMsg.textContent = "You are already on the beta list 🌊";
+            waitlistMsg.style.color = "var(--success)";
+            waitlistEmail.value = "";
+            return;
+          }
+
+          waitlistMsg.textContent = error.message || "Could not join beta list.";
+          waitlistMsg.style.color = "var(--danger)";
           return;
         }
 
-        console.error("Supabase waitlist error:", error);
-        waitlistMsg.textContent = error.message || "Something went wrong. Try again in a moment.";
-        waitlistMsg.style.color = "var(--danger)";
-        return;
-      }
+        currentWaitlistCount++;
+        localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
 
-      currentWaitlistCount++;
-      localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+        if (waitlistCount) {
+          waitlistCount.textContent = currentWaitlistCount;
+        }
 
-      waitlistCount.textContent = currentWaitlistCount;
-      waitlistMsg.textContent = "You're on the list. Sending your welcome email 🌊";
-      waitlistMsg.style.color = "var(--success)";
+        waitlistMsg.textContent = "You're on the beta list 🌊";
+        waitlistMsg.style.color = "var(--success)";
+        waitlistEmail.value = "";
 
-      try {
-        const emailResponse = await fetch("/api/send-welcome", {
+        fetch("/api/send-welcome", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -1814,22 +1840,14 @@ body {
           body: JSON.stringify({
             email: email
           })
+        }).catch(error => {
+          console.error("Welcome email failed:", error);
         });
-
-        const emailData = await emailResponse.json();
-
-        if (!emailResponse.ok) {
-          console.error("Welcome email API error:", emailData);
-          waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
-        } else {
-          waitlistMsg.textContent = "You're on the list. Check your email 🌊";
-        }
-      } catch (emailError) {
-        console.error("Welcome email failed:", emailError);
-        waitlistMsg.textContent = "You're on the list. Email will arrive soon 🌊";
+      } catch (error) {
+        console.error("Waitlist crash:", error);
+        waitlistMsg.textContent = "Something went wrong. Try again.";
+        waitlistMsg.style.color = "var(--danger)";
       }
-
-      waitlistEmail.value = "";
     });
   }
 
@@ -1855,17 +1873,19 @@ body {
     const done = tasks.filter(task => task.done).length;
     const active = tasks.length - done;
 
-    totalCount.textContent = tasks.length;
-    activeCount.textContent = active;
-    doneCount.textContent = done;
+    if (totalCount) totalCount.textContent = tasks.length;
+    if (activeCount) activeCount.textContent = active;
+    if (doneCount) doneCount.textContent = done;
   }
 
   function renderTasks() {
+    if (!tasksContainer) return;
+
     tasksContainer.innerHTML = "";
 
     const filteredTasks = getFilteredTasks();
 
-    if (!isLoadingTasks) {
+    if (!isLoadingTasks && emptyState) {
       emptyState.classList.toggle("show", filteredTasks.length === 0);
     }
 
@@ -1938,6 +1958,8 @@ body {
       showToast("Log in first to save tasks ☁️");
       return;
     }
+
+    await refreshProfile();
 
     if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
       showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
@@ -2110,10 +2132,23 @@ body {
           })
         });
 
-        const data = await response.json();
+        const rawText = await response.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          console.error("Non-JSON checkout API response:", rawText);
+          throw new Error("Server returned non-JSON. Check Vercel logs.");
+        }
 
         if (!response.ok) {
           throw new Error(data.error || "Could not start checkout.");
+        }
+
+        if (!data.url) {
+          throw new Error("Stripe checkout URL missing.");
         }
 
         window.location.href = data.url;
@@ -2126,14 +2161,16 @@ body {
     });
   }
 
-  taskForm.addEventListener("submit", event => {
-    event.preventDefault();
+  if (taskForm) {
+    taskForm.addEventListener("submit", event => {
+      event.preventDefault();
 
-    addTask(taskInput.value);
+      addTask(taskInput.value);
 
-    taskInput.value = "";
-    taskInput.focus();
-  });
+      taskInput.value = "";
+      taskInput.focus();
+    });
+  }
 
   filterButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -2149,55 +2186,66 @@ body {
     });
   });
 
-  clearCompletedBtn.addEventListener("click", async () => {
-    if (!currentUser) {
-      showToast("Log in first.");
-      return;
-    }
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        showToast("Log in first.");
+        return;
+      }
 
-    const completedCount = tasks.filter(task => task.done).length;
+      const completedCount = tasks.filter(task => task.done).length;
 
-    if (completedCount === 0) {
-      showToast("No completed tasks to clear yet.");
-      return;
-    }
+      if (completedCount === 0) {
+        showToast("No completed tasks to clear yet.");
+        return;
+      }
 
-    const { error } = await supabaseClient
-      .from("tasks")
-      .delete()
-      .eq("user_id", currentUser.id)
-      .eq("done", true);
+      const { error } = await supabaseClient
+        .from("tasks")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("done", true);
 
-    if (error) {
-      console.error("Clear completed error:", error);
-      showToast("Could not clear completed tasks.");
-      return;
-    }
+      if (error) {
+        console.error("Clear completed error:", error);
+        showToast("Could not clear completed tasks.");
+        return;
+      }
 
-    tasks = tasks.filter(task => !task.done);
+      tasks = tasks.filter(task => !task.done);
 
-    renderTasks();
-    showToast("Completed tasks cleared. Clean board 🧼");
-  });
+      renderTasks();
+      showToast("Completed tasks cleared. Clean board 🧼");
+    });
+  }
 
-  saveEdit.addEventListener("click", updateTask);
-  cancelEdit.addEventListener("click", closeEditModal);
+  if (saveEdit) {
+    saveEdit.addEventListener("click", updateTask);
+  }
 
-  editInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-      updateTask();
-    }
+  if (cancelEdit) {
+    cancelEdit.addEventListener("click", closeEditModal);
+  }
 
-    if (event.key === "Escape") {
-      closeEditModal();
-    }
-  });
+  if (editInput) {
+    editInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        updateTask();
+      }
 
-  editModal.addEventListener("click", event => {
-    if (event.target === editModal) {
-      closeEditModal();
-    }
-  });
+      if (event.key === "Escape") {
+        closeEditModal();
+      }
+    });
+  }
+
+  if (editModal) {
+    editModal.addEventListener("click", event => {
+      if (event.target === editModal) {
+        closeEditModal();
+      }
+    });
+  }
 
   loadCurrentUser();
 </script>
