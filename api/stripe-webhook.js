@@ -1,19 +1,6 @@
 const Stripe = require("stripe");
 const { createClient } = require("@supabase/supabase-js");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
-module.exports.config = {
-  api: {
-    bodyParser: false
-  }
-};
-
 async function getRawBody(req) {
   const chunks = [];
 
@@ -24,7 +11,7 @@ async function getRawBody(req) {
   return Buffer.concat(chunks);
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -55,6 +42,13 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+  const supabaseAdmin = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+
   const signature = req.headers["stripe-signature"];
 
   let event;
@@ -68,7 +62,7 @@ module.exports = async function handler(req, res) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
-    console.error("Stripe webhook verification failed:", error.message);
+    console.error("Webhook signature verification failed:", error.message);
 
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
@@ -78,6 +72,7 @@ module.exports = async function handler(req, res) {
       const session = event.data.object;
 
       const userId = session.metadata?.user_id;
+      const email = session.metadata?.email || session.customer_details?.email || null;
       const customerId = session.customer;
       const subscriptionId = session.subscription;
 
@@ -91,12 +86,18 @@ module.exports = async function handler(req, res) {
 
       const { error } = await supabaseAdmin
         .from("profiles")
-        .update({
-          is_pro: true,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId
-        })
-        .eq("id", userId);
+        .upsert(
+          {
+            id: userId,
+            email: email,
+            is_pro: true,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId
+          },
+          {
+            onConflict: "id"
+          }
+        );
 
       if (error) {
         console.error("Supabase Pro upgrade error:", error);
@@ -147,14 +148,14 @@ module.exports = async function handler(req, res) {
         .eq("stripe_subscription_id", subscription.id);
 
       if (error) {
-        console.error("Supabase subscription cancellation error:", error);
+        console.error("Supabase subscription deleted error:", error);
 
         return res.status(500).json({
-          error: "Failed to cancel Pro status"
+          error: "Failed to remove Pro status"
         });
       }
 
-      console.log("Subscription cancelled:", subscription.id);
+      console.log("Subscription deleted. Pro disabled:", subscription.id);
     }
 
     if (event.type === "invoice.payment_failed") {
@@ -173,11 +174,11 @@ module.exports = async function handler(req, res) {
           console.error("Supabase payment failed update error:", error);
 
           return res.status(500).json({
-            error: "Failed to handle payment failure"
+            error: "Failed to handle failed payment"
           });
         }
 
-        console.log("Payment failed. Pro disabled for subscription:", subscriptionId);
+        console.log("Payment failed. Pro disabled:", subscriptionId);
       }
     }
 
@@ -185,10 +186,18 @@ module.exports = async function handler(req, res) {
       received: true
     });
   } catch (error) {
-    console.error("Stripe webhook handler error:", error);
+    console.error("Webhook handler crash:", error);
 
     return res.status(500).json({
       error: "Webhook handler failed"
     });
+  }
+}
+
+module.exports = handler;
+
+module.exports.config = {
+  api: {
+    bodyParser: false
   }
 };
