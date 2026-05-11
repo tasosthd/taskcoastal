@@ -489,6 +489,15 @@
       font-weight: 600;
     }
 
+    #userEmailText {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+      
+    
     .header-actions {
       display: flex;
       align-items: center;
@@ -1084,6 +1093,7 @@
         <div>
           <h1>Coastal Flow</h1>
           <p id="dateText">Today</p>
+          <p id="userEmailText">Not logged in</p>
         </div>
       </div>
 
@@ -1133,7 +1143,12 @@
       <button class="filter-btn" id="clearCompleted" type="button">Clear</button>
     </section>
 
-    <section class="tasks" id="tasks"></section>
+    <section class="empty" id="loadingState">
+  <span class="emoji">🌊</span>
+  Loading your tasks...
+</section>
+
+<section class="tasks" id="tasks"></section>
 
     <section class="empty" id="emptyState">
       <span class="emoji">🐚</span>
@@ -1168,6 +1183,8 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  const FREE_TASK_LIMIT = 10;
+
   const body = document.body;
 
   const prelaunchPage = document.getElementById("prelaunchPage");
@@ -1188,12 +1205,14 @@
   const waitlistCount = document.getElementById("waitlistCount");
 
   const dateText = document.getElementById("dateText");
+  const userEmailText = document.getElementById("userEmailText");
   const greeting = document.getElementById("greeting");
 
   const taskForm = document.getElementById("taskForm");
   const taskInput = document.getElementById("taskInput");
   const tasksContainer = document.getElementById("tasks");
   const emptyState = document.getElementById("emptyState");
+  const loadingState = document.getElementById("loadingState");
 
   const totalCount = document.getElementById("totalCount");
   const activeCount = document.getElementById("activeCount");
@@ -1213,6 +1232,7 @@
   let tasks = [];
   let currentFilter = "all";
   let editingTaskId = null;
+  let isLoadingTasks = false;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
   waitlistCount.textContent = currentWaitlistCount;
@@ -1283,6 +1303,28 @@
   themeBtnLaunch.addEventListener("click", toggleTheme);
   themeBtnApp.addEventListener("click", toggleTheme);
 
+  function updateUserUI() {
+    if (userEmailText) {
+      userEmailText.textContent = currentUser ? currentUser.email : "Not logged in";
+    }
+  }
+
+  function setLoadingState(isLoading) {
+    isLoadingTasks = isLoading;
+
+    if (loadingState) {
+      loadingState.classList.toggle("show", isLoading);
+    }
+
+    if (tasksContainer) {
+      tasksContainer.style.display = isLoading ? "none" : "grid";
+    }
+
+    if (emptyState && isLoading) {
+      emptyState.classList.remove("show");
+    }
+  }
+
   function openApp() {
     if (!currentUser) {
       showToast("Log in with Google first to save your tasks ☁️");
@@ -1293,6 +1335,7 @@
     appPage.classList.remove("hidden");
     bottomBar.classList.remove("hidden");
 
+    updateUserUI();
     renderTasks();
   }
 
@@ -1307,10 +1350,12 @@
 
     if (error) {
       console.error("Auth session error:", error);
+      showToast("Could not check login status.");
       return;
     }
 
     currentUser = data.session?.user || null;
+    updateUserUI();
 
     if (currentUser) {
       openApp();
@@ -1324,6 +1369,7 @@
 
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
+    updateUserUI();
 
     if (currentUser) {
       openApp();
@@ -1467,7 +1513,9 @@
 
     const filteredTasks = getFilteredTasks();
 
-    emptyState.classList.toggle("show", filteredTasks.length === 0);
+    if (!isLoadingTasks) {
+      emptyState.classList.toggle("show", filteredTasks.length === 0);
+    }
 
     filteredTasks.forEach(task => {
       const taskElement = document.createElement("article");
@@ -1509,11 +1557,15 @@
   async function loadTasks() {
     if (!currentUser) return;
 
+    setLoadingState(true);
+
     const { data, error } = await supabaseClient
       .from("tasks")
       .select("*")
       .eq("user_id", currentUser.id)
       .order("created_at", { ascending: false });
+
+    setLoadingState(false);
 
     if (error) {
       console.error("Load tasks error:", error);
@@ -1532,6 +1584,13 @@
 
     if (!currentUser) {
       showToast("Log in first to save tasks ☁️");
+      return;
+    }
+
+    const activeTaskCount = tasks.length;
+
+    if (activeTaskCount >= FREE_TASK_LIMIT) {
+      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Pro unlock coming soon 🔒`);
       return;
     }
 
