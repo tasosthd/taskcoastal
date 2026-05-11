@@ -1799,19 +1799,15 @@ body {
       setWaitlistLoading(true);
 
       try {
-        const insertRequest = supabaseClient
-          .from("waitlist")
-          .insert([
-            {
-              email: email,
-              source: "coastal-flow-prelaunch"
-            }
-          ]);
-
-        const { error } = await Promise.race([
-          insertRequest,
-          timeoutPromise(12000)
-        ]);
+        cconst { data, error } = await supabaseClient
+  .from("waitlist")
+  .insert([
+    {
+      email: email,
+      source: "coastal-flow-prelaunch"
+    }
+  ])
+  .select();
 
         if (error) {
           console.error("Supabase waitlist error:", error);
