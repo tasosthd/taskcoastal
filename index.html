@@ -1273,9 +1273,9 @@ let tasks = [];
 
   setGreeting();
 
-  function saveTasks() {
-    localStorage.setItem("coastalTasks", JSON.stringify(tasks));
-  }
+ function saveTasks() {
+  // Tasks are now saved in Supabase, not localStorage.
+}
 
   function saveTheme(isDark) {
     localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
