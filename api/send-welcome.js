@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Coastal Flow <onboarding@resend.dev>",
+        from: "Coastal Flow <info@taskcoastal.com>",
         to: email,
         subject: "You’re on the Coastal Flow beta list 🌊",
         html: `
