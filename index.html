@@ -1168,32 +1168,6 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const googleLoginBtn = document.getElementById("googleLoginBtn");
-
-if (googleLoginBtn) {
-  googleLoginBtn.addEventListener("click", async () => {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://taskcoastal.com"
-      }
-    });
-
-    if (error) {
-      console.error("Google login error:", error);
-      alert(error.message);
-    }
-  });
-}
-  const logoutBtn = document.getElementById("logoutBtn");
-
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
-    showToast("Logged out.");
-    openPrelaunch();
-  });
-}
   const body = document.body;
 
   const prelaunchPage = document.getElementById("prelaunchPage");
@@ -1205,6 +1179,8 @@ if (logoutBtn) {
 
   const openAppBtn = document.getElementById("openAppBtn");
   const backLaunchBtn = document.getElementById("backLaunchBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const googleLoginBtn = document.getElementById("googleLoginBtn");
 
   const waitlistForm = document.getElementById("waitlistForm");
   const waitlistEmail = document.getElementById("waitlistEmail");
@@ -1234,12 +1210,11 @@ if (logoutBtn) {
   const toast = document.getElementById("toast");
 
   let currentUser = null;
-let tasks = [];
+  let tasks = [];
   let currentFilter = "all";
   let editingTaskId = null;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
-
   waitlistCount.textContent = currentWaitlistCount;
 
   const today = new Date();
@@ -1273,16 +1248,13 @@ let tasks = [];
 
   setGreeting();
 
- function saveTasks() {
-  // Tasks are now saved in Supabase, not localStorage.
-}
-
   function saveTheme(isDark) {
     localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
   }
 
   function updateThemeButtons() {
     const isDark = body.classList.contains("dark");
+
     themeBtnLaunch.textContent = isDark ? "☀" : "☾";
     themeBtnApp.textContent = isDark ? "☀" : "☾";
   }
@@ -1312,21 +1284,14 @@ let tasks = [];
   themeBtnApp.addEventListener("click", toggleTheme);
 
   function openApp() {
+    if (!currentUser) {
+      showToast("Log in with Google first to save your tasks ☁️");
+      return;
+    }
+
     prelaunchPage.classList.add("hidden");
     appPage.classList.remove("hidden");
     bottomBar.classList.remove("hidden");
-
-    localStorage.setItem("coastalLastView", "app");
-
-    const hasVisited = localStorage.getItem("coastalHasVisited");
-
-    if (!hasVisited) {
-      setTimeout(() => {
-        showToast("Welcome 🌊 Add 3 high-value tasks and execute clean.");
-      }, 450);
-
-      localStorage.setItem("coastalHasVisited", "true");
-    }
 
     renderTasks();
   }
@@ -1335,18 +1300,73 @@ let tasks = [];
     appPage.classList.add("hidden");
     bottomBar.classList.add("hidden");
     prelaunchPage.classList.remove("hidden");
+  }
 
-    localStorage.setItem("coastalLastView", "prelaunch");
+  async function loadCurrentUser() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      console.error("Auth session error:", error);
+      return;
+    }
+
+    currentUser = data.session?.user || null;
+
+    if (currentUser) {
+      openApp();
+      await loadTasks();
+    } else {
+      tasks = [];
+      renderTasks();
+      openPrelaunch();
+    }
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    currentUser = session?.user || null;
+
+    if (currentUser) {
+      openApp();
+      await loadTasks();
+
+      if (event === "SIGNED_IN") {
+        showToast(`Logged in as ${currentUser.email}`);
+      }
+    } else {
+      tasks = [];
+      renderTasks();
+      openPrelaunch();
+
+      if (event === "SIGNED_OUT") {
+        showToast("Logged out.");
+      }
+    }
+  });
+
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener("click", async () => {
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "https://taskcoastal.com"
+        }
+      });
+
+      if (error) {
+        console.error("Google login error:", error);
+        showToast(error.message);
+      }
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+    });
   }
 
   openAppBtn.addEventListener("click", openApp);
   backLaunchBtn.addEventListener("click", openPrelaunch);
-
-  const lastView = localStorage.getItem("coastalLastView");
-
-  if (lastView === "app") {
-    openApp();
-  }
 
   waitlistForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -1486,43 +1506,109 @@ let tasks = [];
     updateStats();
   }
 
-  function addTask(text) {
+  async function loadTasks() {
+    if (!currentUser) return;
+
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Load tasks error:", error);
+      showToast("Could not load tasks.");
+      return;
+    }
+
+    tasks = data || [];
+    renderTasks();
+  }
+
+  async function addTask(text) {
     const cleanText = text.trim();
 
     if (!cleanText) return;
 
-    tasks.unshift({
-      id: Date.now(),
-      text: cleanText,
-      done: false,
-      createdAt: new Date().toISOString()
-    });
+    if (!currentUser) {
+      showToast("Log in first to save tasks ☁️");
+      return;
+    }
 
-    saveTasks();
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .insert([
+        {
+          user_id: currentUser.id,
+          text: cleanText,
+          done: false
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Add task error:", error);
+      showToast("Could not add task.");
+      return;
+    }
+
+    tasks.unshift(data);
     renderTasks();
-    showToast("Task added. Now execute 😎");
+    showToast("Task saved to cloud ☁️");
   }
 
-  function toggleTask(id) {
-    tasks = tasks.map(task => {
-      if (task.id === id) {
+  async function toggleTask(id) {
+    const task = tasks.find(item => item.id === id);
+
+    if (!task || !currentUser) return;
+
+    const newDoneValue = !task.done;
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .update({
+        done: newDoneValue
+      })
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Toggle task error:", error);
+      showToast("Could not update task.");
+      return;
+    }
+
+    tasks = tasks.map(item => {
+      if (item.id === id) {
         return {
-          ...task,
-          done: !task.done
+          ...item,
+          done: newDoneValue
         };
       }
 
-      return task;
+      return item;
     });
 
-    saveTasks();
     renderTasks();
   }
 
-  function deleteTask(id) {
-    tasks = tasks.filter(task => task.id !== id);
+  async function deleteTask(id) {
+    if (!currentUser) return;
 
-    saveTasks();
+    const { error } = await supabaseClient
+      .from("tasks")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Delete task error:", error);
+      showToast("Could not delete task.");
+      return;
+    }
+
+    tasks = tasks.filter(task => task.id !== id);
     renderTasks();
     showToast("Task deleted.");
   }
@@ -1547,10 +1633,24 @@ let tasks = [];
     editModal.classList.remove("show");
   }
 
-  function updateTask() {
+  async function updateTask() {
     const cleanText = editInput.value.trim();
 
-    if (!cleanText || editingTaskId === null) return;
+    if (!cleanText || editingTaskId === null || !currentUser) return;
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .update({
+        text: cleanText
+      })
+      .eq("id", editingTaskId)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Update task error:", error);
+      showToast("Could not update task.");
+      return;
+    }
 
     tasks = tasks.map(task => {
       if (task.id === editingTaskId) {
@@ -1563,7 +1663,6 @@ let tasks = [];
       return task;
     });
 
-    saveTasks();
     renderTasks();
     closeEditModal();
     showToast("Task updated.");
@@ -1592,7 +1691,12 @@ let tasks = [];
     });
   });
 
-  clearCompletedBtn.addEventListener("click", () => {
+  clearCompletedBtn.addEventListener("click", async () => {
+    if (!currentUser) {
+      showToast("Log in first.");
+      return;
+    }
+
     const completedCount = tasks.filter(task => task.done).length;
 
     if (completedCount === 0) {
@@ -1600,9 +1704,20 @@ let tasks = [];
       return;
     }
 
+    const { error } = await supabaseClient
+      .from("tasks")
+      .delete()
+      .eq("user_id", currentUser.id)
+      .eq("done", true);
+
+    if (error) {
+      console.error("Clear completed error:", error);
+      showToast("Could not clear completed tasks.");
+      return;
+    }
+
     tasks = tasks.filter(task => !task.done);
 
-    saveTasks();
     renderTasks();
     showToast("Completed tasks cleared. Clean board 🧼");
   });
@@ -1626,7 +1741,7 @@ let tasks = [];
     }
   });
 
-  renderTasks();
+  loadCurrentUser();
 </script>
 </body>
 </html>
