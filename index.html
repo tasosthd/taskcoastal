@@ -1399,11 +1399,13 @@ body {
   const toast = document.getElementById("toast");
 
   let currentUser = null;
+  let currentProfile = null;
+  let isProUser = false;
+
   let tasks = [];
   let currentFilter = "all";
   let editingTaskId = null;
   let isLoadingTasks = false;
-  let isProUser = false;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
 
@@ -1519,46 +1521,13 @@ body {
       }
     }
 
-    updateUpgradeUI();
-  }
-
-  function updateUpgradeUI() {
-    if (!upgradeCard) return;
-
-    if (!currentUser) {
-      upgradeCard.style.display = "none";
-      return;
+    if (upgradeCard) {
+      upgradeCard.classList.toggle("hidden", isProUser);
     }
 
-    upgradeCard.style.display = "block";
-
-    const label = upgradeCard.querySelector(".pricing-label");
-    const title = upgradeCard.querySelector("h3");
-    const copy = upgradeCard.querySelector("p");
-
-    if (isProUser) {
-      if (label) label.textContent = "Pro Plan Active";
-      if (title) title.textContent = "Coastal Flow Pro Activated";
-      if (copy) {
-        copy.textContent = "You have unlimited tasks, cloud sync, and Pro features unlocked.";
-      }
-
-      if (upgradeBtn) {
-        upgradeBtn.textContent = "Pro Active ✓";
-        upgradeBtn.disabled = true;
-      }
-    } else {
-      if (label) label.textContent = "Free Plan";
-      if (title) title.textContent = "Upgrade to Coastal Flow Pro";
-      if (copy) {
-        copy.textContent =
-          "Unlock unlimited tasks, AI planning, analytics, focus mode, and cloud sync power features.";
-      }
-
-      if (upgradeBtn) {
-        upgradeBtn.textContent = "Upgrade 🔒";
-        upgradeBtn.disabled = false;
-      }
+    if (upgradeBtn) {
+      upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
+      upgradeBtn.disabled = isProUser;
     }
   }
 
@@ -1598,50 +1567,69 @@ body {
     prelaunchPage.classList.remove("hidden");
   }
 
-  async function ensureProfileExists() {
-    if (!currentUser) return;
+  async function getOrCreateProfile() {
+    if (!currentUser) return null;
 
-    const { error } = await supabaseClient
+    const { data: existingProfile, error: selectError } = await supabaseClient
       .from("profiles")
-      .upsert(
+      .select("*")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (existingProfile && !selectError) {
+      currentProfile = existingProfile;
+      isProUser = Boolean(existingProfile.is_pro);
+      updateUserUI();
+      return existingProfile;
+    }
+
+    const { data: newProfile, error: insertError } = await supabaseClient
+      .from("profiles")
+      .insert([
         {
           id: currentUser.id,
-          email: currentUser.email
-        },
-        {
-          onConflict: "id"
+          email: currentUser.email,
+          is_pro: false
         }
-      );
+      ])
+      .select()
+      .single();
 
-    if (error) {
-      console.error("Profile upsert error:", error);
-    }
-  }
-
-  async function loadProfile() {
-    if (!currentUser) {
+    if (insertError) {
+      console.error("Create profile error:", insertError);
+      showToast("Could not create user profile.");
+      currentProfile = null;
       isProUser = false;
       updateUserUI();
-      return;
+      return null;
     }
 
-    await ensureProfileExists();
+    currentProfile = newProfile;
+    isProUser = Boolean(newProfile.is_pro);
+    updateUserUI();
+
+    return newProfile;
+  }
+
+  async function refreshProfile() {
+    if (!currentUser) return null;
 
     const { data, error } = await supabaseClient
       .from("profiles")
-      .select("is_pro")
+      .select("*")
       .eq("id", currentUser.id)
       .single();
 
     if (error) {
-      console.error("Profile load error:", error);
-      isProUser = false;
-      updateUserUI();
-      return;
+      console.error("Refresh profile error:", error);
+      return null;
     }
 
-    isProUser = data?.is_pro === true;
+    currentProfile = data;
+    isProUser = Boolean(data?.is_pro);
     updateUserUI();
+
+    return data;
   }
 
   async function loadCurrentUser() {
@@ -1656,24 +1644,50 @@ body {
     currentUser = data.session?.user || null;
 
     if (currentUser) {
-      await loadProfile();
+      await getOrCreateProfile();
       openApp();
       await loadTasks();
+      await handleCheckoutReturn();
     } else {
-      currentUser = null;
+      currentProfile = null;
       isProUser = false;
       tasks = [];
-      updateUserUI();
       renderTasks();
+      updateUserUI();
       openPrelaunch();
     }
+  }
+
+  async function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const checkoutStatus = params.get("checkout");
+
+    if (!checkoutStatus) return;
+
+    if (checkoutStatus === "success") {
+      showToast("Payment complete. Activating Pro...");
+      await refreshProfile();
+
+      if (isProUser) {
+        showToast("Coastal Flow Pro activated 💸");
+      } else {
+        showToast("Payment received. Pro may activate in a moment.");
+      }
+    }
+
+    if (checkoutStatus === "cancelled") {
+      showToast("Checkout cancelled.");
+    }
+
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
   }
 
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
 
     if (currentUser) {
-      await loadProfile();
+      await getOrCreateProfile();
       openApp();
       await loadTasks();
 
@@ -1681,12 +1695,11 @@ body {
         showToast(`Logged in as ${currentUser.email}`);
       }
     } else {
-      currentUser = null;
+      currentProfile = null;
       isProUser = false;
       tasks = [];
-
-      updateUserUI();
       renderTasks();
+      updateUserUI();
       openPrelaunch();
 
       if (event === "SIGNED_OUT") {
@@ -1722,7 +1735,17 @@ body {
         if (error) {
           console.error("Logout error:", error);
           showToast(error.message || "Logout failed.");
+          return;
         }
+
+        currentUser = null;
+        currentProfile = null;
+        isProUser = false;
+        tasks = [];
+
+        renderTasks();
+        updateUserUI();
+        openPrelaunch();
       } catch (error) {
         console.error("Logout crash:", error);
         showToast("Logout failed.");
@@ -1763,16 +1786,14 @@ body {
 
       if (error) {
         if (error.code === "23505") {
-          waitlistMsg.textContent =
-            "You are already on the beta list. Operator status secured 🌊";
+          waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
           waitlistMsg.style.color = "var(--success)";
           waitlistEmail.value = "";
           return;
         }
 
         console.error("Supabase waitlist error:", error);
-        waitlistMsg.textContent =
-          error.message || "Something went wrong. Try again in a moment.";
+        waitlistMsg.textContent = error.message || "Something went wrong. Try again in a moment.";
         waitlistMsg.style.color = "var(--danger)";
         return;
       }
@@ -1918,10 +1939,8 @@ body {
       return;
     }
 
-    const totalTaskCount = tasks.length;
-
-    if (!isProUser && totalTaskCount >= FREE_TASK_LIMIT) {
-      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro 🔒`);
+    if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
+      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
       return;
     }
 
@@ -1949,7 +1968,8 @@ body {
     if (isProUser) {
       showToast("Pro task saved. Unlimited mode 💎");
     } else {
-      showToast(`Task saved. ${FREE_TASK_LIMIT - tasks.length} free slots left ☁️`);
+      const remaining = FREE_TASK_LIMIT - tasks.length;
+      showToast(`Task saved. ${remaining} free tasks left.`);
     }
   }
 
@@ -2071,7 +2091,7 @@ body {
       }
 
       if (isProUser) {
-        showToast("You are already Pro 💎");
+        showToast("You already have Coastal Flow Pro 💎");
         return;
       }
 
