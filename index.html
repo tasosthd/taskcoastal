@@ -1065,12 +1065,12 @@
     </div>
 
     <div class="launch-actions">
-      <button class="primary-btn" id="openAppBtn" type="button">Open Demo App</button>
+  <button class="primary-btn" id="openAppBtn" type="button">Open Demo App</button>
 
-      <a class="secondary-btn" href="mailto:your@email.com?subject=Coastal Flow Feedback">
-        Send Feedback
-      </a>
-    </div>
+  <button class="secondary-btn" id="googleLoginBtn" type="button">
+    Continue with Google
+  </button>
+</div>
 
     <a class="feedback-link" href="mailto:your@email.com?subject=Coastal Flow Beta Request">
       Want early access? Message the founder.
@@ -1167,6 +1167,24 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  const googleLoginBtn = document.getElementById("googleLoginBtn");
+
+if (googleLoginBtn) {
+  googleLoginBtn.addEventListener("click", async () => {
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://taskcoastal.com"
+      }
+    });
+
+    if (error) {
+      console.error("Google login error:", error);
+      alert(error.message);
+    }
+  });
+}
+  
   const body = document.body;
 
   const prelaunchPage = document.getElementById("prelaunchPage");
