@@ -124,10 +124,6 @@
       display: none !important;
     }
 
-    /* =========================
-       PRELAUNCH LANDING
-    ========================= */
-
     .prelaunch {
       min-height: calc(100vh - 44px);
       display: flex;
@@ -445,10 +441,6 @@
       font-size: 0.82rem;
       font-weight: 900;
     }
-
-    /* =========================
-       APP
-    ========================= */
 
     .app {
       width: min(100%, 520px);
@@ -1167,7 +1159,14 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     const body = document.body;
 
     const prelaunchPage = document.getElementById("prelaunchPage");
@@ -1212,7 +1211,6 @@
     let editingTaskId = null;
 
     let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
-    let waitlistEmails = JSON.parse(localStorage.getItem("coastalWaitlistEmails")) || [];
 
     waitlistCount.textContent = currentWaitlistCount;
 
@@ -1320,27 +1318,45 @@
       openApp();
     }
 
-    waitlistForm.addEventListener("submit", event => {
+    waitlistForm.addEventListener("submit", async event => {
       event.preventDefault();
 
       const email = waitlistEmail.value.trim().toLowerCase();
 
       if (!email) return;
 
-      if (waitlistEmails.includes(email)) {
-        waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
-        waitlistEmail.value = "";
+      waitlistMsg.textContent = "Adding you to the beta list...";
+      waitlistMsg.style.color = "var(--muted)";
+
+      const { error } = await supabaseClient
+        .from("waitlist")
+        .insert([
+          {
+            email: email,
+            source: "coastal-flow-prelaunch"
+          }
+        ]);
+
+      if (error) {
+        if (error.code === "23505") {
+          waitlistMsg.textContent = "You are already on the beta list. Operator status secured 🌊";
+          waitlistMsg.style.color = "var(--success)";
+          waitlistEmail.value = "";
+          return;
+        }
+
+        console.error(error);
+        waitlistMsg.textContent = "Something went wrong. Try again in a moment.";
+        waitlistMsg.style.color = "var(--danger)";
         return;
       }
 
-      waitlistEmails.push(email);
       currentWaitlistCount++;
-
-      localStorage.setItem("coastalWaitlistEmails", JSON.stringify(waitlistEmails));
       localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
 
       waitlistCount.textContent = currentWaitlistCount;
       waitlistMsg.textContent = "You're on the list. Big moves coming 🚀";
+      waitlistMsg.style.color = "var(--success)";
       waitlistEmail.value = "";
     });
 
