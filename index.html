@@ -1290,7 +1290,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
+<script>
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
@@ -1380,14 +1380,6 @@
     setTimeout(() => {
       toast.classList.remove("show");
     }, 2200);
-  }
-
-  function timeoutPromise(ms) {
-    return new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error("Request timed out. Check Supabase table/RLS policy."));
-      }, ms);
-    });
   }
 
   function setWaitlistLoading(isLoading) {
@@ -1749,74 +1741,91 @@
   }
 
   if (waitlistForm) {
-  waitlistForm.addEventListener("submit", async event => {
-    event.preventDefault();
+    waitlistForm.addEventListener("submit", async event => {
+      event.preventDefault();
 
-    const email = waitlistEmail.value.trim().toLowerCase();
+      const email = waitlistEmail.value.trim().toLowerCase();
 
-    if (!email) {
-      waitlistMsg.textContent = "Enter your email first.";
-      waitlistMsg.style.color = "var(--danger)";
-      return;
-    }
-
-    waitlistMsg.textContent = "Adding you to the beta list...";
-    waitlistMsg.style.color = "var(--muted)";
-    setWaitlistLoading(true);
-
-    try {
-      const insertRequest = supabaseClient
-        .from("waitlist")
-        .insert([
-          {
-            email: email,
-            source: "coastal-flow-prelaunch"
-          }
-        ]);
-
-      const { error } = await Promise.race([
-        insertRequest,
-        timeoutPromise(12000)
-      ]);
-
-      if (error) {
-        console.error("Supabase waitlist error:", error);
-
-        if (error.code === "23505") {
-          waitlistMsg.textContent = "You are already on the beta list 🌊";
-          waitlistMsg.style.color = "var(--success)";
-          waitlistEmail.value = "";
-          return;
-        }
-
-        waitlistMsg.textContent = error.message || "Could not join beta list.";
+      if (!email) {
+        waitlistMsg.textContent = "Enter your email first.";
         waitlistMsg.style.color = "var(--danger)";
         return;
       }
 
-      currentWaitlistCount++;
-      localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+      waitlistMsg.textContent = "Adding you to the beta list...";
+      waitlistMsg.style.color = "var(--muted)";
+      setWaitlistLoading(true);
 
-      if (waitlistCount) {
-        waitlistCount.textContent = currentWaitlistCount;
+      try {
+        const controller = new AbortController();
+
+        const timeout = setTimeout(() => {
+          controller.abort();
+        }, 12000);
+
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({
+            email: email,
+            source: "coastal-flow-prelaunch"
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+
+          console.error("Waitlist fetch error:", response.status, errorText);
+
+          if (
+            response.status === 409 ||
+            errorText.includes("duplicate") ||
+            errorText.includes("waitlist_email_key")
+          ) {
+            waitlistMsg.textContent = "You are already on the beta list 🌊";
+            waitlistMsg.style.color = "var(--success)";
+            waitlistEmail.value = "";
+            return;
+          }
+
+          waitlistMsg.textContent = `Error ${response.status}: Could not join beta list.`;
+          waitlistMsg.style.color = "var(--danger)";
+          return;
+        }
+
+        currentWaitlistCount++;
+        localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+
+        if (waitlistCount) {
+          waitlistCount.textContent = currentWaitlistCount;
+        }
+
+        waitlistMsg.textContent = "You're on the beta list 🌊";
+        waitlistMsg.style.color = "var(--success)";
+        waitlistEmail.value = "";
+
+      } catch (error) {
+        console.error("Waitlist crash:", error);
+
+        waitlistMsg.textContent =
+          error.name === "AbortError"
+            ? "Request timed out. Try again."
+            : "Something went wrong. Try again.";
+
+        waitlistMsg.style.color = "var(--danger)";
+      } finally {
+        setWaitlistLoading(false);
       }
-
-      waitlistMsg.textContent = "You're on the beta list 🌊";
-      waitlistMsg.style.color = "var(--success)";
-      waitlistEmail.value = "";
-
-    } catch (error) {
-      console.error("Waitlist crash:", error);
-
-      waitlistMsg.textContent =
-        error.message || "Something went wrong. Try again.";
-
-      waitlistMsg.style.color = "var(--danger)";
-    } finally {
-      setWaitlistLoading(false);
-    }
-  });
-}
+    });
+  }
 
   document.querySelectorAll(".pro-lock").forEach(button => {
     button.addEventListener("click", () => {
