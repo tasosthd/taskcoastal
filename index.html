@@ -1233,7 +1233,8 @@ if (logoutBtn) {
 
   const toast = document.getElementById("toast");
 
-  let tasks = JSON.parse(localStorage.getItem("coastalTasks")) || [];
+  let currentUser = null;
+let tasks = [];
   let currentFilter = "all";
   let editingTaskId = null;
 
