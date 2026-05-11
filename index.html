@@ -1749,88 +1749,74 @@
   }
 
   if (waitlistForm) {
-    waitlistForm.addEventListener("submit", async event => {
-      event.preventDefault();
+  waitlistForm.addEventListener("submit", async event => {
+    event.preventDefault();
 
-      const email = waitlistEmail.value.trim().toLowerCase();
+    const email = waitlistEmail.value.trim().toLowerCase();
 
-      if (!email) {
-        waitlistMsg.textContent = "Enter your email first.";
+    if (!email) {
+      waitlistMsg.textContent = "Enter your email first.";
+      waitlistMsg.style.color = "var(--danger)";
+      return;
+    }
+
+    waitlistMsg.textContent = "Adding you to the beta list...";
+    waitlistMsg.style.color = "var(--muted)";
+    setWaitlistLoading(true);
+
+    try {
+      const insertRequest = supabaseClient
+        .from("waitlist")
+        .insert([
+          {
+            email: email,
+            source: "coastal-flow-prelaunch"
+          }
+        ]);
+
+      const { error } = await Promise.race([
+        insertRequest,
+        timeoutPromise(12000)
+      ]);
+
+      if (error) {
+        console.error("Supabase waitlist error:", error);
+
+        if (error.code === "23505") {
+          waitlistMsg.textContent = "You are already on the beta list 🌊";
+          waitlistMsg.style.color = "var(--success)";
+          waitlistEmail.value = "";
+          return;
+        }
+
+        waitlistMsg.textContent = error.message || "Could not join beta list.";
         waitlistMsg.style.color = "var(--danger)";
         return;
       }
 
-      waitlistMsg.textContent = "Adding you to the beta list...";
-      waitlistMsg.style.color = "var(--muted)";
-      setWaitlistLoading(true);
+      currentWaitlistCount++;
+      localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
 
-      try {
-        const insertRequest = supabaseClient
-          .from("beta_signups")
-          .insert([
-            {
-              email: email
-            }
-          ])
-          .select();
-
-        const { data, error } = await Promise.race([
-          insertRequest,
-          timeoutPromise(12000)
-        ]);
-
-        if (error) {
-          console.error("Supabase beta signup error:", error);
-
-          if (error.code === "23505") {
-            waitlistMsg.textContent = "You are already on the beta list 🌊";
-            waitlistMsg.style.color = "var(--success)";
-            waitlistEmail.value = "";
-            return;
-          }
-
-          waitlistMsg.textContent = error.message || "Could not join beta list.";
-          waitlistMsg.style.color = "var(--danger)";
-          return;
-        }
-
-        console.log("Beta signup saved:", data);
-
-        currentWaitlistCount++;
-        localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
-
-        if (waitlistCount) {
-          waitlistCount.textContent = currentWaitlistCount;
-        }
-
-        waitlistMsg.textContent = "You're on the beta list 🌊";
-        waitlistMsg.style.color = "var(--success)";
-        waitlistEmail.value = "";
-
-        fetch("/api/send-welcome", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: email
-          })
-        }).catch(error => {
-          console.error("Welcome email failed:", error);
-        });
-
-      } catch (error) {
-        console.error("Beta signup crash:", error);
-
-        waitlistMsg.textContent =
-          error.message || "Something went wrong. Try again.";
-
-        waitlistMsg.style.color = "var(--danger)";
-      } finally {
-        setWaitlistLoading(false);
+      if (waitlistCount) {
+        waitlistCount.textContent = currentWaitlistCount;
       }
-    });
-  }
+
+      waitlistMsg.textContent = "You're on the beta list 🌊";
+      waitlistMsg.style.color = "var(--success)";
+      waitlistEmail.value = "";
+
+    } catch (error) {
+      console.error("Waitlist crash:", error);
+
+      waitlistMsg.textContent =
+        error.message || "Something went wrong. Try again.";
+
+      waitlistMsg.style.color = "var(--danger)";
+    } finally {
+      setWaitlistLoading(false);
+    }
+  });
+}
 
   document.querySelectorAll(".pro-lock").forEach(button => {
     button.addEventListener("click", () => {
