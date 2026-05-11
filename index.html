@@ -1808,7 +1808,11 @@
           waitlistCount.textContent = currentWaitlistCount;
         }
 
-        waitlistMsg.textContent = "You're on the beta list 🌊";
+        waitlistMsg.textContent =
+  "You're on the beta list 🌊 Check Spam/Promotions if the welcome email is missing.";
+
+waitlistMsg.style.color = "var(--success)";
+waitlistEmail.value = "";
 waitlistMsg.style.color = "var(--success)";
 waitlistEmail.value = "";
 
