@@ -1,10 +1,8 @@
 export default async function handler(req, res) {
-  // Allow browser preflight requests
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Only allow POST requests
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed. Use POST."
@@ -12,7 +10,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Make sure Resend API key exists in Vercel
     if (!process.env.RESEND_API_KEY) {
       return res.status(500).json({
         error: "Missing RESEND_API_KEY in Vercel environment variables."
@@ -37,21 +34,15 @@ export default async function handler(req, res) {
 <html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
-
 <body style="margin:0; padding:0; background:#061a22; font-family:Arial, Helvetica, sans-serif; color:#effcff;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#061a22; padding:34px 14px;">
     <tr>
       <td align="center">
-
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:580px; background:linear-gradient(145deg,#123f4f,#092b37); border-radius:30px; overflow:hidden; border:1px solid rgba(255,255,255,0.14); box-shadow:0 28px 80px rgba(0,0,0,0.35);">
-          
           <tr>
             <td style="padding:38px 32px 22px 32px; text-align:center;">
-              <div style="width:68px; height:68px; line-height:68px; margin:0 auto 18px auto; border-radius:24px; background:rgba(255,255,255,0.12); font-size:32px;">
-                🌊
-              </div>
+              <div style="width:68px; height:68px; line-height:68px; margin:0 auto 18px auto; border-radius:24px; background:rgba(255,255,255,0.12); font-size:32px;">🌊</div>
 
               <div style="display:inline-block; padding:8px 14px; border-radius:999px; background:rgba(101,217,245,0.16); color:#65d9f5; font-size:12px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;">
                 Beta access confirmed
@@ -125,9 +116,7 @@ export default async function handler(req, res) {
               </p>
             </td>
           </tr>
-
         </table>
-
       </td>
     </tr>
   </table>
@@ -142,24 +131,29 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        // Use this for testing first.
-        // After verifying taskcoastal.com in Resend, change to:
-        // from: "Coastal Flow <info@taskcoastal.com>",
-        from: "Coastal Flow <onboarding@resend.dev>",
-
+        from: "Coastal Flow <info@taskcoastal.com>",
         to: [email],
         subject: "You’re on the Coastal Flow beta list 🌊",
         html
       })
     });
 
-    const resendData = await resendResponse.json();
+    const resendText = await resendResponse.text();
+
+    let resendData;
+
+    try {
+      resendData = JSON.parse(resendText);
+    } catch {
+      resendData = resendText;
+    }
 
     if (!resendResponse.ok) {
-      console.error("Resend error:", resendData);
+      console.error("Resend error:", resendResponse.status, resendData);
 
       return res.status(500).json({
         error: "Email failed to send.",
+        status: resendResponse.status,
         details: resendData
       });
     }
@@ -174,7 +168,8 @@ export default async function handler(req, res) {
     console.error("send-message.js error:", error);
 
     return res.status(500).json({
-      error: "Server error while sending email."
+      error: "Server error while sending email.",
+      details: error.message
     });
   }
 }
