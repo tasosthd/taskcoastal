@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <title>Coastal Flow Tasks</title>
 
@@ -1140,6 +1140,45 @@
         width: calc(100% - 24px);
       }
     }
+    /* Prevent iPhone input zoom */
+input,
+textarea,
+select,
+button {
+  font-size: 16px;
+}
+
+/* Keep forms smooth on mobile */
+input,
+textarea,
+select {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Prevent accidental layout zoom/overflow */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Make mobile inputs feel native */
+@media (max-width: 520px) {
+  input,
+  textarea,
+  select,
+  button {
+    font-size: 16px !important;
+  }
+
+  .waitlist-form input,
+  .composer input,
+  .modal input {
+    font-size: 16px !important;
+    min-height: 48px;
+  }
+}
   </style>
 </head>
 
