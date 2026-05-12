@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Coastal Flow Tasks | Prelaunch</title>
-<link rel="icon" type="image/png" href="index.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="index.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     * {
@@ -30,9 +32,6 @@
       --danger: #ff5f70;
       --success: #22c98b;
       --shadow: 0 24px 80px rgba(14, 75, 102, 0.18);
-      --radius-xl: 32px;
-      --radius-lg: 24px;
-      --radius-md: 18px;
     }
 
     body.dark {
@@ -102,6 +101,30 @@
       }
     }
 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pop {
+      from {
+        transform: translateY(10px) scale(0.98);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
     button,
     input,
     a {
@@ -117,79 +140,130 @@
       text-decoration: none;
     }
 
-    .page-shell {
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+      animation: fadeIn 0.35s ease both;
+    }
+
+    .shell {
       width: min(100%, 520px);
       margin: 0 auto;
     }
 
-    .hidden {
-      display: none !important;
+    .center-screen {
+      min-height: calc(100vh - 44px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .prelaunch {
+    .boot-card {
+      width: min(100%, 420px);
+      padding: 28px;
+      border-radius: 34px;
+      background: var(--glass-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(30px);
+      text-align: center;
+    }
+
+    .boot-card img {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    .boot-card h1 {
+      font-size: 1.35rem;
+      letter-spacing: -0.05em;
+      margin-bottom: 7px;
+    }
+
+    .boot-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand img,
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      object-fit: cover;
+      background: var(--glass-strong);
+      border: 1px solid var(--border);
+      box-shadow: 0 14px 36px rgba(10, 113, 143, 0.16);
+      backdrop-filter: blur(22px);
+    }
+
+    .brand h2,
+    .brand h1 {
+      font-size: 1.05rem;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-top: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 190px;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      color: var(--text);
+      font-size: 1.05rem;
+      box-shadow: 0 12px 34px rgba(10, 113, 143, 0.12);
+      transition: transform 0.2s ease, background 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.93);
+    }
+
+    .launch {
       min-height: calc(100vh - 44px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 18px;
       padding-bottom: 40px;
-      animation: fadeIn 0.5s ease both;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .launch-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 4px;
-    }
-
-    .launch-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .launch-logo,
-    .logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      background: var(--glass-strong);
-      border: 1px solid var(--border);
-      box-shadow: 0 14px 36px rgba(10, 113, 143, 0.16);
-      backdrop-filter: blur(22px);
-      font-size: 22px;
-    }
-
-    .launch-brand h2 {
-      font-size: 1.05rem;
-      letter-spacing: -0.04em;
-      line-height: 1.05;
-    }
-
-    .launch-brand p {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 800;
-      margin-top: 3px;
-    }
-
-    .launch-card {
+    .glass-card {
       position: relative;
       overflow: hidden;
       border-radius: 36px;
@@ -200,7 +274,7 @@
       backdrop-filter: blur(30px);
     }
 
-    .launch-card::before {
+    .glass-card::before {
       content: "";
       position: absolute;
       width: 220px;
@@ -212,7 +286,7 @@
       filter: blur(4px);
     }
 
-    .launch-badge {
+    .badge {
       position: relative;
       z-index: 1;
       display: inline-flex;
@@ -228,7 +302,7 @@
       margin-bottom: 18px;
     }
 
-    .launch-card h1 {
+    .glass-card h1 {
       position: relative;
       z-index: 1;
       font-size: clamp(2.35rem, 13vw, 4rem);
@@ -238,7 +312,7 @@
       margin-bottom: 16px;
     }
 
-    .launch-card .launch-copy {
+    .glass-card p {
       position: relative;
       z-index: 1;
       color: var(--muted);
@@ -249,7 +323,8 @@
       margin-bottom: 22px;
     }
 
-    .waitlist-form {
+    .waitlist-form,
+    .composer {
       position: relative;
       z-index: 1;
       display: flex;
@@ -261,7 +336,15 @@
       backdrop-filter: blur(20px);
     }
 
-    .waitlist-form input {
+    .composer {
+      margin-bottom: 14px;
+      background: var(--glass);
+      box-shadow: 0 18px 50px rgba(9, 95, 122, 0.12);
+    }
+
+    .waitlist-form input,
+    .composer input,
+    .modal input {
       flex: 1;
       min-width: 0;
       border: 0;
@@ -273,7 +356,8 @@
       font-weight: 700;
     }
 
-    .waitlist-form input::placeholder {
+    .waitlist-form input::placeholder,
+    .composer input::placeholder {
       color: var(--muted);
       font-weight: 700;
     }
@@ -300,6 +384,30 @@
       box-shadow: 0 8px 18px rgba(8, 125, 157, 0.2);
     }
 
+    .secondary-btn,
+    .pro-lock,
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--text);
+      backdrop-filter: blur(22px);
+      font-weight: 1000;
+      transition: 0.2s ease;
+    }
+
+    .secondary-btn,
+    .pro-lock {
+      border-radius: 20px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .secondary-btn:active,
+    .pro-lock:active,
+    .filter-btn:active {
+      transform: scale(0.95);
+    }
+
     .waitlist-message {
       position: relative;
       z-index: 1;
@@ -311,14 +419,15 @@
       font-weight: 900;
     }
 
-    .launch-meta {
+    .three-grid,
+    .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
-    .meta-card,
-    .stat-card {
+    .stat-card,
+    .meta-card {
       padding: 15px 12px;
       border-radius: 24px;
       background: var(--glass);
@@ -328,15 +437,15 @@
       text-align: center;
     }
 
-    .meta-card strong,
-    .stat-card strong {
+    .stat-card strong,
+    .meta-card strong {
       display: block;
       font-size: 1.35rem;
       letter-spacing: -0.05em;
     }
 
-    .meta-card span,
-    .stat-card span {
+    .stat-card span,
+    .meta-card span {
       display: block;
       margin-top: 3px;
       color: var(--muted);
@@ -401,48 +510,10 @@
       font-weight: 800;
     }
 
-    .pro-grid {
+    .two-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-    }
-
-    .pro-lock {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 14px;
-      background: var(--glass);
-      color: var(--text);
-      font-weight: 900;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 12px 30px rgba(9, 95, 122, 0.1);
-      transition: 0.2s ease;
-    }
-
-    .pro-lock:active {
-      transform: scale(0.94);
-    }
-
-    .launch-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .secondary-btn {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 15px;
-      background: var(--glass);
-      color: var(--text);
-      font-weight: 1000;
-      backdrop-filter: blur(22px);
-      text-align: center;
-      transition: 0.2s ease;
-    }
-
-    .secondary-btn:active {
-      transform: scale(0.95);
     }
 
     .feedback-link {
@@ -453,96 +524,21 @@
       font-weight: 900;
     }
 
-    .app {
-      width: min(100%, 520px);
-      margin: 0 auto;
+    .app-shell {
       padding-bottom: 96px;
-      animation: fadeIn 0.45s ease both;
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 22px;
-      width: 100%;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .brand > div {
-      min-width: 0;
-    }
-
-    .brand h1 {
-      font-size: 1.15rem;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
-    }
-
-    .brand p {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 3px;
-      font-weight: 600;
-    }
-
-    #userEmailText {
-      max-width: 170px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.72rem;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .user-avatar {
-      width: 34px;
-      height: 34px;
-      min-width: 34px;
-      border-radius: 50%;
-      object-fit: cover;
-      display: none;
-      border: 1px solid var(--border);
-    }
-
-    .header-actions {
+    .app-header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
     }
 
-    .icon-btn {
-      width: 46px;
-      height: 46px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--glass);
-      backdrop-filter: blur(22px);
-      color: var(--text);
-      font-size: 1.05rem;
-      cursor: pointer;
-      box-shadow: 0 12px 34px rgba(10, 113, 143, 0.12);
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .icon-btn:active {
-      transform: scale(0.93);
-    }
-
     .hero-card {
       position: relative;
       overflow: hidden;
-      border-radius: var(--radius-xl);
+      border-radius: 32px;
       padding: 28px;
       min-height: 190px;
       background: linear-gradient(145deg, var(--glass-strong), var(--glass));
@@ -560,20 +556,6 @@
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.32);
       filter: blur(2px);
-    }
-
-    .hero-card .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.28);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 800;
-      margin-bottom: 18px;
     }
 
     .hero-card h2 {
@@ -596,38 +578,7 @@
     }
 
     .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
       margin-bottom: 18px;
-    }
-
-    .composer {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 24px;
-      background: var(--glass);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(24px);
-      box-shadow: 0 18px 50px rgba(9, 95, 122, 0.12);
-      margin-bottom: 14px;
-    }
-
-    .composer input {
-      flex: 1;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      padding: 0 8px;
-      font-size: 1rem;
-      min-width: 0;
-      font-weight: 700;
-    }
-
-    .composer input::placeholder {
-      color: var(--muted);
     }
 
     .add-btn {
@@ -639,9 +590,14 @@
       color: white;
       display: grid;
       place-items: center;
-      cursor: pointer;
       box-shadow: 0 14px 30px rgba(8, 125, 157, 0.28);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .add-btn:active {
+      transform: scale(0.92);
+      box-shadow: 0 8px 18px rgba(8, 125, 157, 0.2);
     }
 
     .send-arrow {
@@ -654,11 +610,6 @@
       stroke-linejoin: round;
     }
 
-    .add-btn:active {
-      transform: scale(0.92);
-      box-shadow: 0 8px 18px rgba(8, 125, 157, 0.2);
-    }
-
     .filters {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -667,16 +618,11 @@
     }
 
     .filter-btn {
-      border: 1px solid var(--border);
       border-radius: 18px;
-      background: var(--glass);
       color: var(--muted);
       padding: 12px 8px;
       font-size: 0.78rem;
       font-weight: 900;
-      cursor: pointer;
-      backdrop-filter: blur(18px);
-      transition: 0.2s ease;
     }
 
     .filter-btn.active {
@@ -703,16 +649,14 @@
       animation: pop 0.28s ease both;
     }
 
-    @keyframes pop {
-      from {
-        transform: translateY(10px) scale(0.98);
-        opacity: 0;
-      }
+    .task.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+    }
 
-      to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
+    .task.drag-over {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
     }
 
     .check {
@@ -724,10 +668,10 @@
       background: rgba(255, 255, 255, 0.2);
       display: grid;
       place-items: center;
-      cursor: pointer;
       color: transparent;
       font-weight: 1000;
       transition: 0.2s ease;
+      touch-action: manipulation;
     }
 
     .task.done .check {
@@ -760,8 +704,8 @@
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.18);
       color: var(--text);
-      cursor: pointer;
       transition: 0.2s ease;
+      touch-action: manipulation;
     }
 
     .mini-btn:active {
@@ -776,7 +720,7 @@
       display: none;
       text-align: center;
       padding: 34px 22px;
-      border-radius: var(--radius-xl);
+      border-radius: 32px;
       background: var(--glass);
       border: 1px solid var(--border);
       backdrop-filter: blur(22px);
@@ -800,7 +744,7 @@
       bottom: 20px;
       transform: translateX(-50%);
       width: min(calc(100% - 32px), 500px);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
@@ -811,6 +755,10 @@
       backdrop-filter: blur(28px);
       box-shadow: var(--shadow);
       z-index: 10;
+    }
+
+    .bottom-bar.active {
+      display: flex;
     }
 
     body.dark .bottom-bar {
@@ -825,7 +773,6 @@
       color: var(--muted);
       padding: 12px 10px;
       font-weight: 900;
-      cursor: pointer;
       transition: 0.2s ease;
     }
 
@@ -859,19 +806,7 @@
       border: 1px solid var(--border);
       backdrop-filter: blur(30px);
       box-shadow: var(--shadow);
-      animation: slideUp 0.28s ease both;
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(26px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      animation: fadeIn 0.28s ease both;
     }
 
     .modal h3 {
@@ -885,12 +820,9 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.18);
-      color: var(--text);
-      outline: 0;
       padding: 15px;
       font-size: 1rem;
       margin-bottom: 12px;
-      font-weight: 700;
     }
 
     .modal-actions {
@@ -904,7 +836,6 @@
       border-radius: 18px;
       padding: 14px;
       font-weight: 900;
-      cursor: pointer;
     }
 
     .save-edit {
@@ -944,19 +875,8 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    #upgradeCard {
-      margin-bottom: 14px;
-    }
-
-    .app,
-    .page-shell {
-      width: 100%;
-      max-width: 520px;
-    }
-
-    body {
-      width: 100%;
-      overflow-x: hidden;
+    .hidden {
+      display: none !important;
     }
 
     @media (max-width: 430px) {
@@ -964,13 +884,14 @@
         padding: 14px;
       }
 
-      .app {
-        padding-bottom: 120px;
-      }
-
-      .launch-card,
+      .glass-card,
       .hero-card {
         padding: 24px;
+      }
+
+      .glass-card h1 {
+        font-size: 2.65rem;
+        letter-spacing: -0.075em;
       }
 
       .waitlist-form {
@@ -981,47 +902,33 @@
         min-height: 44px;
       }
 
-      .launch-meta {
-        gap: 8px;
-      }
-
-      .meta-card {
-        padding: 13px 8px;
-      }
-
-      .pro-grid,
-      .launch-actions {
+      .two-grid {
         grid-template-columns: 1fr;
       }
 
-      .topbar {
+      .top-row {
         gap: 8px;
-      }
-
-      .logo {
-        width: 42px;
-        height: 42px;
-        border-radius: 15px;
-        font-size: 18px;
       }
 
       .brand {
         gap: 8px;
       }
 
-      .brand h1 {
+      .brand img,
+      .logo-img {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+      }
+
+      .brand h1,
+      .brand h2 {
         font-size: 1rem;
       }
 
-      #dateText,
-      #userEmailText {
+      .brand p {
         font-size: 0.68rem;
-      }
-
-      .user-avatar {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
+        max-width: 150px;
       }
 
       .icon-btn {
@@ -1031,7 +938,7 @@
         font-size: 0.95rem;
       }
 
-      .header-actions {
+      .app-header-actions {
         gap: 6px;
       }
 
@@ -1048,25 +955,24 @@
         font-size: 0.88rem;
       }
 
+      .three-grid,
       .stats {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
       }
 
-      .stat-card {
+      .stat-card,
+      .meta-card {
         padding: 14px 8px;
       }
 
-      .stat-card strong {
+      .stat-card strong,
+      .meta-card strong {
         font-size: 1.25rem;
       }
 
-      .stat-card span {
+      .stat-card span,
+      .meta-card span {
         font-size: 0.62rem;
-      }
-
-      .composer {
-        border-radius: 22px;
       }
 
       .composer input {
@@ -1092,41 +998,46 @@
 </head>
 
 <body>
-  <section class="prelaunch page-shell" id="prelaunchPage">
-    <div class="launch-top">
-  <div class="launch-brand">
+  <section id="bootView" class="view active center-screen">
+    <div class="boot-card">
+      <img src="index.png" alt="Coastal Flow Logo" />
+      <h1>Loading Coastal Flow</h1>
+      <p>Checking your login session...</p>
+    </div>
+  </section>
 
-    <img src="index.png" class="launch-logo" alt="Coastal Flow Logo">
+  <section id="landingView" class="view shell launch">
+    <div class="top-row">
+      <div class="brand">
+        <img src="index.png" alt="Coastal Flow Logo" />
+        <div>
+          <h2>Coastal Flow</h2>
+          <p>Private beta opening soon</p>
+        </div>
+      </div>
 
-    <div>
-      <h2>Coastal Flow</h2>
-      <p>Private beta opening soon</p>
+      <button class="icon-btn" id="themeBtnLanding" type="button" aria-label="Toggle dark mode">☾</button>
     </div>
 
-  </div>
-
-  <button class="icon-btn" id="themeBtnLaunch" aria-label="Toggle dark mode">☾</button>
-</div>
-
-    <div class="launch-card">
-      <div class="launch-badge">✨ Prelaunch productivity app</div>
+    <div class="glass-card">
+      <div class="badge">✨ Prelaunch productivity app</div>
 
       <h1>Build your calm execution system.</h1>
 
-      <p class="launch-copy">
+      <p>
         Coastal Flow is a luxury task manager for people who want less chaos,
         better focus, and cleaner daily execution.
       </p>
 
       <form class="waitlist-form" id="waitlistForm">
         <input id="waitlistEmail" type="email" placeholder="Enter your email" required />
-        <button class="primary-btn" type="submit">Join Beta</button>
+        <button class="primary-btn" id="waitlistBtn" type="submit">Join Beta</button>
       </form>
 
       <small class="waitlist-message" id="waitlistMsg"></small>
     </div>
 
-    <div class="launch-meta">
+    <div class="three-grid">
       <div class="meta-card">
         <strong id="waitlistCount">127</strong>
         <span>Joined</span>
@@ -1161,19 +1072,16 @@
       </div>
     </div>
 
-    <div class="pro-grid">
+    <div class="two-grid">
       <button class="pro-lock" type="button">AI Daily Plan 🔒</button>
       <button class="pro-lock" type="button">Cloud Sync 🔒</button>
       <button class="pro-lock" type="button">Analytics 🔒</button>
       <button class="pro-lock" type="button">Focus Mode 🔒</button>
     </div>
 
-    <div class="launch-actions">
-      <button class="primary-btn" id="openAppBtn" type="button">Open Demo App</button>
-
-      <button class="secondary-btn" id="googleLoginBtn" type="button">
-        Continue with Google
-      </button>
+    <div class="two-grid">
+      <button class="primary-btn" id="openAppBtn" type="button">Open App</button>
+      <button class="secondary-btn" id="googleLoginBtn" type="button">Continue with Google</button>
     </div>
 
     <a class="feedback-link" href="mailto:tasosthd@icloud.com?subject=Coastal Flow Beta Request">
@@ -1181,10 +1089,10 @@
     </a>
   </section>
 
-  <main class="app hidden" id="appPage">
-    <header class="topbar">
+  <main id="appView" class="view shell app-shell">
+    <header class="top-row">
       <div class="brand">
-        <div class="logo"><img src="index.png" class="launch-logo" alt="Coastal Flow Logo"></div>
+        <img src="index.png" alt="Coastal Flow Logo" />
 
         <div>
           <h1>Coastal Flow</h1>
@@ -1192,18 +1100,18 @@
           <p id="userEmailText">Not logged in</p>
         </div>
 
-        <img class="user-avatar" id="userAvatar" alt="User profile picture" />
+        <img class="user-avatar hidden" id="userAvatar" alt="User profile picture" />
       </div>
 
-      <div class="header-actions">
-        <button class="icon-btn" id="backLaunchBtn" aria-label="Back to prelaunch">⌂</button>
-        <button class="icon-btn" id="themeBtnApp" aria-label="Toggle dark mode">☾</button>
-        <button class="icon-btn" id="logoutBtn" aria-label="Log out">⎋</button>
+      <div class="app-header-actions">
+        <button class="icon-btn" id="backLandingBtn" type="button" aria-label="Back to prelaunch">⌂</button>
+        <button class="icon-btn" id="themeBtnApp" type="button" aria-label="Toggle dark mode">☾</button>
+        <button class="icon-btn" id="logoutBtn" type="button" aria-label="Log out">⎋</button>
       </div>
     </header>
 
     <section class="hero-card">
-      <div class="tag">✨ Minimal task manager</div>
+      <div class="badge">✨ Minimal task manager</div>
       <h2 id="greeting">Build your calm empire.</h2>
       <p>Plan the day, clear the noise, and move like a focused operator.</p>
     </section>
@@ -1251,10 +1159,10 @@
     </form>
 
     <section class="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="active">Active</button>
-      <button class="filter-btn" data-filter="done">Done</button>
-      <button class="filter-btn" id="clearCompleted" type="button">Clear</button>
+      <button class="filter-btn active" data-filter="all" type="button">All</button>
+      <button class="filter-btn" data-filter="active" type="button">Active</button>
+      <button class="filter-btn" data-filter="done" type="button">Done</button>
+      <button class="filter-btn" id="clearCompletedBtn" type="button">Clear</button>
     </section>
 
     <section class="empty" id="loadingState">
@@ -1262,7 +1170,7 @@
       Loading your tasks...
     </section>
 
-    <section class="tasks" id="tasks"></section>
+    <section class="tasks" id="tasksContainer"></section>
 
     <section class="empty" id="emptyState">
       <span class="emoji">🐚</span>
@@ -1270,10 +1178,10 @@
     </section>
   </main>
 
-  <nav class="bottom-bar hidden" id="bottomBar">
-    <button class="active" data-filter="all">All</button>
-    <button data-filter="active">Focus</button>
-    <button data-filter="done">Wins</button>
+  <nav class="bottom-bar" id="bottomBar">
+    <button class="active" data-filter="all" type="button">All</button>
+    <button data-filter="active" type="button">Focus</button>
+    <button data-filter="done" type="button">Wins</button>
   </nav>
 
   <div class="modal-overlay" id="editModal">
@@ -1283,8 +1191,8 @@
       <input id="editInput" type="text" />
 
       <div class="modal-actions">
-        <button class="cancel-edit" id="cancelEdit" type="button">Cancel</button>
-        <button class="save-edit" id="saveEdit" type="button">Save</button>
+        <button class="cancel-edit" id="cancelEditBtn" type="button">Cancel</button>
+        <button class="save-edit" id="saveEditBtn" type="button">Save</button>
       </div>
     </div>
   </div>
@@ -1293,472 +1201,782 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-  const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
+  <script>
+    const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
+    const SITE_URL = "https://taskcoastal.com";
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      storageKey: "taskcoastal-auth-token",
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      flowType: "pkce"
-    }
-  });
-
-  if (window.location.hash === "#") {
-    history.replaceState(null, "", window.location.pathname);
-  }
-
-  const FREE_TASK_LIMIT = 10;
-  const body = document.body;
-
-  const prelaunchPage = document.getElementById("prelaunchPage");
-  const appPage = document.getElementById("appPage");
-  const bottomBar = document.getElementById("bottomBar");
-
-  const themeBtnLaunch = document.getElementById("themeBtnLaunch");
-  const themeBtnApp = document.getElementById("themeBtnApp");
-
-  const openAppBtn = document.getElementById("openAppBtn");
-  const backLaunchBtn = document.getElementById("backLaunchBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const googleLoginBtn = document.getElementById("googleLoginBtn");
-
-  const waitlistForm = document.getElementById("waitlistForm");
-  const waitlistEmail = document.getElementById("waitlistEmail");
-  const waitlistMsg = document.getElementById("waitlistMsg");
-  const waitlistCount = document.getElementById("waitlistCount");
-  const waitlistSubmitBtn = waitlistForm?.querySelector("button[type='submit']");
-
-  const dateText = document.getElementById("dateText");
-  const userEmailText = document.getElementById("userEmailText");
-  const userAvatar = document.getElementById("userAvatar");
-  const greeting = document.getElementById("greeting");
-
-  const taskForm = document.getElementById("taskForm");
-  const taskInput = document.getElementById("taskInput");
-  const tasksContainer = document.getElementById("tasks");
-  const emptyState = document.getElementById("emptyState");
-  const loadingState = document.getElementById("loadingState");
-
-  const totalCount = document.getElementById("totalCount");
-  const activeCount = document.getElementById("activeCount");
-  const doneCount = document.getElementById("doneCount");
-
-  const filterButtons = document.querySelectorAll("[data-filter]");
-  const clearCompletedBtn = document.getElementById("clearCompleted");
-
-  const editModal = document.getElementById("editModal");
-  const editInput = document.getElementById("editInput");
-  const saveEdit = document.getElementById("saveEdit");
-  const cancelEdit = document.getElementById("cancelEdit");
-
-  const upgradeBtn = document.getElementById("upgradeBtn");
-  const upgradeCard = document.getElementById("upgradeCard");
-
-  const toast = document.getElementById("toast");
-
-  let currentUser = null;
-  let currentProfile = null;
-  let isProUser = false;
-
-  let tasks = [];
-  let currentFilter = "all";
-  let editingTaskId = null;
-  let isLoadingTasks = false;
-  let draggedTaskId = null;
-  let hasLoadedInitialSession = false;
-
-  let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
-
-  function saveCurrentScreen(screen) {
-    localStorage.setItem("coastalCurrentScreen", screen);
-  }
-
-  function getSavedScreen() {
-    return localStorage.getItem("coastalCurrentScreen") || "app";
-  }
-
-  const dragStyle = document.createElement("style");
-  dragStyle.textContent = `
-    .task {
-      cursor: grab;
-      touch-action: auto;
-    }
-
-    .task.dragging {
-      opacity: 0.55;
-      transform: scale(0.98);
-      cursor: grabbing;
-    }
-
-    .task.drag-over {
-      outline: 2px solid var(--accent);
-      outline-offset: 4px;
-    }
-
-    .check,
-    .mini-btn,
-    .task-actions {
-      touch-action: manipulation;
-      pointer-events: auto;
-    }
-  `;
-  document.head.appendChild(dragStyle);
-
-  if (waitlistCount) {
-    waitlistCount.textContent = currentWaitlistCount;
-  }
-
-  const today = new Date();
-
-  if (dateText) {
-    dateText.textContent = today.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric"
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storageKey: "taskcoastal-auth-token",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        flowType: "pkce"
+      }
     });
-  }
 
-  function showToast(message) {
-    if (!toast) return;
+    const FREE_TASK_LIMIT = 10;
 
-    toast.textContent = message;
-    toast.classList.add("show");
+    const state = {
+      user: null,
+      profile: null,
+      isPro: false,
+      tasks: [],
+      filter: "all",
+      editingTaskId: null,
+      isLoadingTasks: false,
+      waitlistCount: Number(localStorage.getItem("coastalWaitlistCount")) || 127
+    };
 
-    setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2200);
-  }
+    const el = {
+      bootView: document.getElementById("bootView"),
+      landingView: document.getElementById("landingView"),
+      appView: document.getElementById("appView"),
+      bottomBar: document.getElementById("bottomBar"),
 
-  function setWaitlistLoading(isLoading) {
-    if (!waitlistSubmitBtn) return;
+      themeBtnLanding: document.getElementById("themeBtnLanding"),
+      themeBtnApp: document.getElementById("themeBtnApp"),
 
-    waitlistSubmitBtn.disabled = isLoading;
-    waitlistSubmitBtn.textContent = isLoading ? "Adding..." : "Join Beta";
-  }
+      googleLoginBtn: document.getElementById("googleLoginBtn"),
+      openAppBtn: document.getElementById("openAppBtn"),
+      backLandingBtn: document.getElementById("backLandingBtn"),
+      logoutBtn: document.getElementById("logoutBtn"),
 
-  function setGreeting() {
-    if (!greeting) return;
+      waitlistForm: document.getElementById("waitlistForm"),
+      waitlistEmail: document.getElementById("waitlistEmail"),
+      waitlistMsg: document.getElementById("waitlistMsg"),
+      waitlistBtn: document.getElementById("waitlistBtn"),
+      waitlistCount: document.getElementById("waitlistCount"),
 
-    const hour = new Date().getHours();
+      dateText: document.getElementById("dateText"),
+      userEmailText: document.getElementById("userEmailText"),
+      userAvatar: document.getElementById("userAvatar"),
+      greeting: document.getElementById("greeting"),
 
-    if (hour < 12) {
-      greeting.textContent = "Morning flow. Big wins only.";
-    } else if (hour < 18) {
-      greeting.textContent = "Afternoon focus. Execute clean.";
-    } else {
-      greeting.textContent = "Evening reset. Finish strong.";
-    }
-  }
+      upgradeCard: document.getElementById("upgradeCard"),
+      upgradeBtn: document.getElementById("upgradeBtn"),
 
-  setGreeting();
+      taskForm: document.getElementById("taskForm"),
+      taskInput: document.getElementById("taskInput"),
+      tasksContainer: document.getElementById("tasksContainer"),
+      loadingState: document.getElementById("loadingState"),
+      emptyState: document.getElementById("emptyState"),
 
-  function saveTheme(isDark) {
-    localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
-  }
+      totalCount: document.getElementById("totalCount"),
+      activeCount: document.getElementById("activeCount"),
+      doneCount: document.getElementById("doneCount"),
 
-  function updateThemeButtons() {
-    const isDark = body.classList.contains("dark");
+      clearCompletedBtn: document.getElementById("clearCompletedBtn"),
+      filterButtons: document.querySelectorAll("[data-filter]"),
 
-    if (themeBtnLaunch) themeBtnLaunch.textContent = isDark ? "☀" : "☾";
-    if (themeBtnApp) themeBtnApp.textContent = isDark ? "☀" : "☾";
-  }
+      editModal: document.getElementById("editModal"),
+      editInput: document.getElementById("editInput"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      saveEditBtn: document.getElementById("saveEditBtn"),
 
-  function toggleTheme() {
-    body.classList.toggle("dark");
-    saveTheme(body.classList.contains("dark"));
-    updateThemeButtons();
-  }
+      toast: document.getElementById("toast")
+    };
 
-  function loadTheme() {
-    const theme = localStorage.getItem("coastalTheme");
-
-    if (theme === "dark") {
-      body.classList.add("dark");
-    }
-
-    updateThemeButtons();
-  }
-
-  loadTheme();
-
-  if (themeBtnLaunch) themeBtnLaunch.addEventListener("click", toggleTheme);
-  if (themeBtnApp) themeBtnApp.addEventListener("click", toggleTheme);
-
-  function updateUserUI() {
-    if (userEmailText) {
-      userEmailText.textContent = currentUser
-        ? isProUser
-          ? `${currentUser.email} · Pro`
-          : `${currentUser.email} · Free`
-        : "Not logged in";
+    function cleanBadHash() {
+      if (window.location.hash === "#") {
+        history.replaceState(null, "", window.location.pathname);
+      }
     }
 
-    if (userAvatar) {
+    function showView(viewName) {
+      el.bootView.classList.remove("active");
+      el.landingView.classList.remove("active");
+      el.appView.classList.remove("active");
+      el.bottomBar.classList.remove("active");
+
+      if (viewName === "boot") {
+        el.bootView.classList.add("active");
+      }
+
+      if (viewName === "landing") {
+        el.landingView.classList.add("active");
+      }
+
+      if (viewName === "app") {
+        el.appView.classList.add("active");
+        el.bottomBar.classList.add("active");
+      }
+    }
+
+    function showToast(message) {
+      if (!el.toast) return;
+
+      el.toast.textContent = message;
+      el.toast.classList.add("show");
+
+      setTimeout(() => {
+        el.toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function saveScreen(screen) {
+      localStorage.setItem("coastalCurrentScreen", screen);
+    }
+
+    function saveTheme(isDark) {
+      localStorage.setItem("coastalTheme", isDark ? "dark" : "light");
+    }
+
+    function updateThemeButtons() {
+      const isDark = document.body.classList.contains("dark");
+
+      el.themeBtnLanding.textContent = isDark ? "☀" : "☾";
+      el.themeBtnApp.textContent = isDark ? "☀" : "☾";
+    }
+
+    function loadTheme() {
+      const theme = localStorage.getItem("coastalTheme");
+
+      if (theme === "dark") {
+        document.body.classList.add("dark");
+      }
+
+      updateThemeButtons();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      saveTheme(document.body.classList.contains("dark"));
+      updateThemeButtons();
+    }
+
+    function setDateAndGreeting() {
+      const today = new Date();
+
+      el.dateText.textContent = today.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric"
+      });
+
+      const hour = today.getHours();
+
+      if (hour < 12) {
+        el.greeting.textContent = "Morning flow. Big wins only.";
+      } else if (hour < 18) {
+        el.greeting.textContent = "Afternoon focus. Execute clean.";
+      } else {
+        el.greeting.textContent = "Evening reset. Finish strong.";
+      }
+    }
+
+    function updateUserUI() {
+      if (state.user) {
+        el.userEmailText.textContent = state.isPro
+          ? `${state.user.email} · Pro`
+          : `${state.user.email} · Free`;
+      } else {
+        el.userEmailText.textContent = "Not logged in";
+      }
+
       const avatarUrl =
-        currentUser?.user_metadata?.avatar_url ||
-        currentUser?.user_metadata?.picture ||
+        state.user?.user_metadata?.avatar_url ||
+        state.user?.user_metadata?.picture ||
         "";
 
       if (avatarUrl) {
-        userAvatar.src = avatarUrl;
-        userAvatar.style.display = "block";
+        el.userAvatar.src = avatarUrl;
+        el.userAvatar.classList.remove("hidden");
       } else {
-        userAvatar.removeAttribute("src");
-        userAvatar.style.display = "none";
+        el.userAvatar.removeAttribute("src");
+        el.userAvatar.classList.add("hidden");
+      }
+
+      el.upgradeCard.classList.toggle("hidden", Boolean(state.isPro));
+      el.upgradeBtn.disabled = Boolean(state.isPro);
+      el.upgradeBtn.textContent = state.isPro ? "Pro Active ✓" : "Upgrade 🔒";
+    }
+
+    function updateStats() {
+      const done = state.tasks.filter(task => task.done).length;
+      const active = state.tasks.length - done;
+
+      el.totalCount.textContent = state.tasks.length;
+      el.activeCount.textContent = active;
+      el.doneCount.textContent = done;
+    }
+
+    function getFilteredTasks() {
+      if (state.filter === "active") {
+        return state.tasks.filter(task => !task.done);
+      }
+
+      if (state.filter === "done") {
+        return state.tasks.filter(task => task.done);
+      }
+
+      return state.tasks;
+    }
+
+    function setLoadingTasks(isLoading) {
+      state.isLoadingTasks = isLoading;
+      el.loadingState.classList.toggle("show", isLoading);
+      el.tasksContainer.style.display = isLoading ? "none" : "grid";
+
+      if (isLoading) {
+        el.emptyState.classList.remove("show");
       }
     }
 
-    if (upgradeCard) {
-      upgradeCard.classList.toggle("hidden", Boolean(isProUser));
+    function renderTasks() {
+      el.tasksContainer.innerHTML = "";
+
+      const filteredTasks = getFilteredTasks();
+
+      if (!state.isLoadingTasks) {
+        el.emptyState.classList.toggle("show", filteredTasks.length === 0);
+      }
+
+      filteredTasks.forEach(task => {
+        const taskElement = document.createElement("article");
+
+        taskElement.className = `task ${task.done ? "done" : ""}`;
+        taskElement.dataset.id = task.id;
+        taskElement.draggable = true;
+
+        taskElement.innerHTML = `
+          <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
+
+          <div class="task-text"></div>
+
+          <div class="task-actions">
+            <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
+            <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
+          </div>
+        `;
+
+        taskElement.querySelector(".task-text").textContent = task.text;
+
+        taskElement.querySelector(".check").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleTask(task.id);
+        });
+
+        taskElement.querySelector(".edit").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openEditModal(task.id);
+        });
+
+        taskElement.querySelector(".delete").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteTask(task.id);
+        });
+
+        taskElement.addEventListener("dragstart", event => {
+          if (
+            event.target.closest(".check") ||
+            event.target.closest(".edit") ||
+            event.target.closest(".delete") ||
+            event.target.closest(".mini-btn")
+          ) {
+            event.preventDefault();
+            return;
+          }
+
+          taskElement.classList.add("dragging");
+
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", String(task.id));
+          }
+        });
+
+        taskElement.addEventListener("dragend", async () => {
+          taskElement.classList.remove("dragging");
+
+          document.querySelectorAll(".task.drag-over").forEach(item => {
+            item.classList.remove("drag-over");
+          });
+
+          await saveTaskOrder();
+        });
+
+        taskElement.addEventListener("dragover", event => {
+          event.preventDefault();
+          taskElement.classList.add("drag-over");
+        });
+
+        taskElement.addEventListener("dragleave", () => {
+          taskElement.classList.remove("drag-over");
+        });
+
+        taskElement.addEventListener("drop", event => {
+          event.preventDefault();
+          taskElement.classList.remove("drag-over");
+        });
+
+        el.tasksContainer.appendChild(taskElement);
+      });
+
+      updateStats();
     }
 
-    if (upgradeBtn) {
-      upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
-      upgradeBtn.disabled = Boolean(isProUser);
-    }
-  }
+    function getDragAfterElement(container, y) {
+      const draggableElements = [
+        ...container.querySelectorAll(".task:not(.dragging)")
+      ];
 
-  function setLoadingState(isLoading) {
-    isLoadingTasks = isLoading;
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
 
-    if (loadingState) loadingState.classList.toggle("show", isLoading);
-    if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
-    if (emptyState && isLoading) emptyState.classList.remove("show");
-  }
+          if (offset < 0 && offset > closest.offset) {
+            return {
+              offset,
+              element: child
+            };
+          }
 
-  function openApp(shouldSave = true) {
-    if (!currentUser) {
-      showToast("Log in with Google first to save your tasks ☁️");
-      return;
-    }
-
-    if (shouldSave) {
-      saveCurrentScreen("app");
-    }
-
-    if (prelaunchPage) prelaunchPage.classList.add("hidden");
-    if (appPage) appPage.classList.remove("hidden");
-    if (bottomBar) bottomBar.classList.remove("hidden");
-
-    updateUserUI();
-    renderTasks();
-  }
-
-  function openPrelaunch(shouldSave = false) {
-    if (shouldSave) {
-      saveCurrentScreen("landing");
-    }
-
-    if (appPage) appPage.classList.add("hidden");
-    if (bottomBar) bottomBar.classList.add("hidden");
-    if (prelaunchPage) prelaunchPage.classList.remove("hidden");
-
-    updateUserUI();
-  }
-
-  async function getOrCreateProfile() {
-    if (!currentUser) return null;
-
-    const { data: existingProfile, error: selectError } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (selectError) {
-      console.error("Profile select error:", selectError);
-      showToast("Could not load profile.");
-      currentProfile = null;
-      isProUser = false;
-      updateUserUI();
-      return null;
-    }
-
-    if (existingProfile) {
-      currentProfile = existingProfile;
-      isProUser = Boolean(existingProfile.is_pro);
-      updateUserUI();
-      return existingProfile;
-    }
-
-    const { data: newProfile, error: insertError } = await supabaseClient
-      .from("profiles")
-      .insert([
+          return closest;
+        },
         {
-          id: currentUser.id,
-          email: currentUser.email,
-          is_pro: false
+          offset: Number.NEGATIVE_INFINITY,
+          element: null
         }
-      ])
-      .select()
-      .single();
+      ).element;
+    }
 
-    if (insertError) {
-      console.error("Create profile error:", insertError);
-      showToast("Could not create user profile.");
-      currentProfile = null;
-      isProUser = false;
+    async function saveTaskOrder() {
+      if (!state.user) return;
+
+      const orderedIds = [...el.tasksContainer.querySelectorAll(".task")]
+        .map(item => item.dataset.id);
+
+      const reorderedTasks = orderedIds
+        .map((id, index) => {
+          const task = state.tasks.find(item => String(item.id) === String(id));
+
+          if (!task) return null;
+
+          return {
+            ...task,
+            position: index
+          };
+        })
+        .filter(Boolean);
+
+      const hiddenTasks = state.tasks.filter(task => {
+        return !orderedIds.includes(String(task.id));
+      });
+
+      state.tasks = [...reorderedTasks, ...hiddenTasks];
+
+      const results = await Promise.all(
+        reorderedTasks.map(task => {
+          return supabaseClient
+            .from("tasks")
+            .update({
+              position: task.position
+            })
+            .eq("id", task.id)
+            .eq("user_id", state.user.id);
+        })
+      );
+
+      const failed = results.find(result => result.error);
+
+      if (failed) {
+        console.error("Save order error:", failed.error);
+        showToast(failed.error.message || "Could not save task order.");
+      }
+    }
+
+    async function getOrCreateProfile() {
+      if (!state.user) return null;
+
+      const { data: existingProfile, error: selectError } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", state.user.id)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error("Profile select error:", selectError);
+        state.profile = null;
+        state.isPro = false;
+        updateUserUI();
+        return null;
+      }
+
+      if (existingProfile) {
+        state.profile = existingProfile;
+        state.isPro = Boolean(existingProfile.is_pro);
+        updateUserUI();
+        return existingProfile;
+      }
+
+      const { data: newProfile, error: insertError } = await supabaseClient
+        .from("profiles")
+        .insert([
+          {
+            id: state.user.id,
+            email: state.user.email,
+            is_pro: false
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Create profile error:", insertError);
+        state.profile = null;
+        state.isPro = false;
+        updateUserUI();
+        return null;
+      }
+
+      state.profile = newProfile;
+      state.isPro = Boolean(newProfile.is_pro);
       updateUserUI();
-      return null;
+
+      return newProfile;
     }
 
-    currentProfile = newProfile;
-    isProUser = Boolean(newProfile.is_pro);
-    updateUserUI();
+    async function refreshProfile() {
+      if (!state.user) return null;
 
-    return newProfile;
-  }
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", state.user.id)
+        .maybeSingle();
 
-  async function refreshProfile() {
-    if (!currentUser) return null;
-
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Refresh profile error:", error);
-      return null;
-    }
-
-    currentProfile = data;
-    isProUser = Boolean(data?.is_pro);
-    updateUserUI();
-
-    return data;
-  }
-
-  async function refreshProfileWithRetry(maxAttempts = 5) {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const profile = await refreshProfile();
-
-      if (profile?.is_pro) {
-        showToast("Coastal Flow Pro activated 💎");
-        return profile;
+      if (error) {
+        console.error("Refresh profile error:", error);
+        return null;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      state.profile = data;
+      state.isPro = Boolean(data?.is_pro);
+      updateUserUI();
+
+      return data;
     }
 
-    showToast("Payment received. Pro may activate in a moment.");
-    return currentProfile;
-  }
+    async function refreshProfileWithRetry(maxAttempts = 5) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const profile = await refreshProfile();
 
-  async function handleCheckoutReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const checkoutStatus = params.get("checkout");
+        if (profile?.is_pro) {
+          showToast("Coastal Flow Pro activated 💎");
+          return profile;
+        }
 
-    if (!checkoutStatus) return;
-
-    const cleanUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, document.title, cleanUrl);
-
-    if (checkoutStatus === "success") {
-      saveCurrentScreen("app");
-      showToast("Payment complete. Activating Pro...");
-      await refreshProfileWithRetry(5);
-    }
-
-    if (checkoutStatus === "cancelled") {
-      saveCurrentScreen("app");
-      showToast("Checkout cancelled.");
-    }
-  }
-
-  async function bootLoggedInUser(user) {
-    currentUser = user;
-
-    await getOrCreateProfile();
-    await loadTasks();
-    await handleCheckoutReturn();
-
-    saveCurrentScreen("app");
-    openApp(false);
-  }
-
-  async function bootLoggedOutUser() {
-    currentUser = null;
-    currentProfile = null;
-    isProUser = false;
-    tasks = [];
-
-    renderTasks();
-    updateUserUI();
-    openPrelaunch(false);
-  }
-
-  async function loadCurrentUser() {
-    const { data, error } = await supabaseClient.auth.getSession();
-
-    hasLoadedInitialSession = true;
-
-    if (error) {
-      console.error("Auth session error:", error);
-      showToast("Could not check login status.");
-      await bootLoggedOutUser();
-      return;
-    }
-
-    const user = data.session?.user || null;
-
-    if (user) {
-      await bootLoggedInUser(user);
-    } else {
-      await bootLoggedOutUser();
-    }
-  }
-
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    const user = session?.user || null;
-
-    if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
-      return;
-    }
-
-    if (user) {
-      await bootLoggedInUser(user);
-
-      if (event === "SIGNED_IN") {
-        showToast(`Logged in as ${user.email}`);
+        await new Promise(resolve => setTimeout(resolve, 1400));
       }
-    } else {
+
+      showToast("Payment received. Pro may activate in a moment.");
+      return state.profile;
+    }
+
+    async function loadTasks() {
+      if (!state.user) return;
+
+      setLoadingTasks(true);
+
+      const { data, error } = await supabaseClient
+        .from("tasks")
+        .select("*")
+        .eq("user_id", state.user.id)
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: false });
+
+      setLoadingTasks(false);
+
+      if (error) {
+        console.error("Load tasks error:", error);
+        showToast(error.message || "Could not load tasks.");
+        return;
+      }
+
+      state.tasks = data || [];
+      renderTasks();
+    }
+
+    async function addTask(text) {
+      const cleanText = text.trim();
+
+      if (!cleanText) return;
+
+      if (!state.user) {
+        showToast("Log in first to save tasks ☁️");
+        return;
+      }
+
+      await refreshProfile();
+
+      if (!state.isPro && state.tasks.length >= FREE_TASK_LIMIT) {
+        showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
+        return;
+      }
+
+      const nextPosition =
+        state.tasks.length > 0
+          ? Math.max(...state.tasks.map(task => Number(task.position) || 0)) + 1
+          : 0;
+
+      const { data, error } = await supabaseClient
+        .from("tasks")
+        .insert([
+          {
+            user_id: state.user.id,
+            text: cleanText,
+            done: false,
+            position: nextPosition
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Add task error full:", error);
+        showToast(error.message || "Could not add task.");
+        return;
+      }
+
+      state.tasks.push(data);
+      renderTasks();
+
+      if (state.isPro) {
+        showToast("Pro task saved. Unlimited mode 💎");
+      } else {
+        const remaining = FREE_TASK_LIMIT - state.tasks.length;
+        showToast(`Task saved. ${remaining} free tasks left.`);
+      }
+    }
+
+    async function toggleTask(id) {
+      const task = state.tasks.find(item => String(item.id) === String(id));
+
+      if (!task || !state.user) return;
+
+      const newDoneValue = !task.done;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          done: newDoneValue
+        })
+        .eq("id", id)
+        .eq("user_id", state.user.id);
+
+      if (error) {
+        console.error("Toggle task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      state.tasks = state.tasks.map(item => {
+        if (String(item.id) === String(id)) {
+          return {
+            ...item,
+            done: newDoneValue
+          };
+        }
+
+        return item;
+      });
+
+      renderTasks();
+    }
+
+    async function deleteTask(id) {
+      if (!state.user) return;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", state.user.id);
+
+      if (error) {
+        console.error("Delete task error:", error);
+        showToast("Could not delete task.");
+        return;
+      }
+
+      state.tasks = state.tasks.filter(task => String(task.id) !== String(id));
+      renderTasks();
+      await saveTaskOrder();
+      showToast("Task deleted.");
+    }
+
+    function openEditModal(id) {
+      const task = state.tasks.find(item => String(item.id) === String(id));
+
+      if (!task) return;
+
+      state.editingTaskId = id;
+      el.editInput.value = task.text;
+      el.editModal.classList.add("show");
+
+      setTimeout(() => {
+        el.editInput.focus();
+      }, 80);
+    }
+
+    function closeEditModal() {
+      state.editingTaskId = null;
+      el.editInput.value = "";
+      el.editModal.classList.remove("show");
+    }
+
+    async function updateTask() {
+      const cleanText = el.editInput.value.trim();
+
+      if (!cleanText || state.editingTaskId === null || !state.user) return;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          text: cleanText
+        })
+        .eq("id", state.editingTaskId)
+        .eq("user_id", state.user.id);
+
+      if (error) {
+        console.error("Update task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      state.tasks = state.tasks.map(task => {
+        if (String(task.id) === String(state.editingTaskId)) {
+          return {
+            ...task,
+            text: cleanText
+          };
+        }
+
+        return task;
+      });
+
+      renderTasks();
+      closeEditModal();
+      showToast("Task updated.");
+    }
+
+    async function handleCheckoutReturn() {
+      const params = new URLSearchParams(window.location.search);
+      const checkoutStatus = params.get("checkout");
+
+      if (!checkoutStatus) return;
+
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      if (checkoutStatus === "success") {
+        saveScreen("app");
+        showToast("Payment complete. Activating Pro...");
+        await refreshProfileWithRetry(5);
+      }
+
+      if (checkoutStatus === "cancelled") {
+        saveScreen("app");
+        showToast("Checkout cancelled.");
+      }
+    }
+
+    async function bootLoggedInUser(user) {
+      state.user = user;
+
+      await getOrCreateProfile();
+      await loadTasks();
+      await handleCheckoutReturn();
+
+      saveScreen("app");
+      updateUserUI();
+      renderTasks();
+      showView("app");
+    }
+
+    async function bootLoggedOutUser() {
+      state.user = null;
+      state.profile = null;
+      state.isPro = false;
+      state.tasks = [];
+
+      updateUserUI();
+      renderTasks();
+      showView("landing");
+    }
+
+    async function bootApp() {
+      cleanBadHash();
+      showView("boot");
+
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error("Auth session error:", error);
+        showToast("Could not check login status.");
+        await bootLoggedOutUser();
+        return;
+      }
+
+      const user = data.session?.user || null;
+
+      if (user) {
+        await bootLoggedInUser(user);
+      } else {
+        await bootLoggedOutUser();
+      }
+    }
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user || null;
+
+      if (event === "INITIAL_SESSION") return;
+
+      if (user) {
+        await bootLoggedInUser(user);
+
+        if (event === "SIGNED_IN") {
+          showToast(`Logged in as ${user.email}`);
+        }
+
+        return;
+      }
+
       if (event === "SIGNED_OUT") {
-        saveCurrentScreen("landing");
+        saveScreen("landing");
         showToast("Logged out.");
+        await bootLoggedOutUser();
       }
+    });
 
-      await bootLoggedOutUser();
-    }
-  });
+    el.themeBtnLanding.addEventListener("click", toggleTheme);
+    el.themeBtnApp.addEventListener("click", toggleTheme);
 
-  if (googleLoginBtn) {
-    googleLoginBtn.addEventListener("click", async () => {
+    el.googleLoginBtn.addEventListener("click", async () => {
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "https://taskcoastal.com"
+          redirectTo: SITE_URL
         }
       });
 
       if (error) {
         console.error("Google login error:", error);
-        showToast(error.message);
+        showToast(error.message || "Google login failed.");
       }
     });
-  }
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
+    el.logoutBtn.addEventListener("click", async () => {
       try {
-        logoutBtn.disabled = true;
-        logoutBtn.textContent = "…";
+        el.logoutBtn.disabled = true;
+        el.logoutBtn.textContent = "…";
 
         const { error } = await supabaseClient.auth.signOut();
 
@@ -1768,53 +1986,46 @@
           return;
         }
 
-        currentUser = null;
-        currentProfile = null;
-        isProUser = false;
-        tasks = [];
-
-        saveCurrentScreen("landing");
-
-        renderTasks();
-        updateUserUI();
-        openPrelaunch(false);
+        saveScreen("landing");
+        await bootLoggedOutUser();
       } catch (error) {
         console.error("Logout crash:", error);
         showToast("Logout failed.");
       } finally {
-        logoutBtn.disabled = false;
-        logoutBtn.textContent = "⎋";
+        el.logoutBtn.disabled = false;
+        el.logoutBtn.textContent = "⎋";
       }
     });
-  }
 
-  if (openAppBtn) {
-    openAppBtn.addEventListener("click", () => {
-      openApp(true);
-    });
-  }
-
-  if (backLaunchBtn) {
-    backLaunchBtn.addEventListener("click", () => {
-      openPrelaunch(false);
-    });
-  }
-
-  if (waitlistForm) {
-    waitlistForm.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      const email = waitlistEmail.value.trim().toLowerCase();
-
-      if (!email) {
-        waitlistMsg.textContent = "Enter your email first.";
-        waitlistMsg.style.color = "var(--danger)";
+    el.openAppBtn.addEventListener("click", () => {
+      if (!state.user) {
+        showToast("Log in with Google first to save your tasks ☁️");
         return;
       }
 
-      waitlistMsg.textContent = "Adding you to the beta list...";
-      waitlistMsg.style.color = "var(--muted)";
-      setWaitlistLoading(true);
+      saveScreen("app");
+      showView("app");
+    });
+
+    el.backLandingBtn.addEventListener("click", () => {
+      showView("landing");
+    });
+
+    el.waitlistForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const email = el.waitlistEmail.value.trim().toLowerCase();
+
+      if (!email) {
+        el.waitlistMsg.textContent = "Enter your email first.";
+        el.waitlistMsg.style.color = "var(--danger)";
+        return;
+      }
+
+      el.waitlistMsg.textContent = "Adding you to the beta list...";
+      el.waitlistMsg.style.color = "var(--muted)";
+      el.waitlistBtn.disabled = true;
+      el.waitlistBtn.textContent = "Adding...";
 
       try {
         const controller = new AbortController();
@@ -1832,7 +2043,7 @@
             Prefer: "return=minimal"
           },
           body: JSON.stringify({
-            email: email,
+            email,
             source: "coastal-flow-prelaunch"
           }),
           signal: controller.signal
@@ -1850,28 +2061,25 @@
             errorText.includes("duplicate") ||
             errorText.includes("waitlist_email_key")
           ) {
-            waitlistMsg.textContent = "You are already on the beta list 🌊";
-            waitlistMsg.style.color = "var(--success)";
-            waitlistEmail.value = "";
+            el.waitlistMsg.textContent = "You are already on the beta list 🌊";
+            el.waitlistMsg.style.color = "var(--success)";
+            el.waitlistEmail.value = "";
             return;
           }
 
-          waitlistMsg.textContent = `Error ${response.status}: Could not join beta list.`;
-          waitlistMsg.style.color = "var(--danger)";
+          el.waitlistMsg.textContent = `Error ${response.status}: Could not join beta list.`;
+          el.waitlistMsg.style.color = "var(--danger)";
           return;
         }
 
-        currentWaitlistCount++;
-        localStorage.setItem("coastalWaitlistCount", currentWaitlistCount);
+        state.waitlistCount++;
+        localStorage.setItem("coastalWaitlistCount", state.waitlistCount);
+        el.waitlistCount.textContent = state.waitlistCount;
 
-        if (waitlistCount) {
-          waitlistCount.textContent = currentWaitlistCount;
-        }
-
-        waitlistMsg.textContent =
+        el.waitlistMsg.textContent =
           "You're on the beta list 🌊 Check Spam/Promotions if the welcome email is missing.";
-        waitlistMsg.style.color = "var(--success)";
-        waitlistEmail.value = "";
+        el.waitlistMsg.style.color = "var(--success)";
+        el.waitlistEmail.value = "";
 
         fetch("/api/send-welcome", {
           method: "POST",
@@ -1879,7 +2087,7 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            email: email
+            email
           })
         }).catch(error => {
           console.error("Welcome email failed:", error);
@@ -1887,443 +2095,38 @@
       } catch (error) {
         console.error("Waitlist crash:", error);
 
-        waitlistMsg.textContent =
+        el.waitlistMsg.textContent =
           error.name === "AbortError"
             ? "Request timed out. Try again."
             : "Something went wrong. Try again.";
 
-        waitlistMsg.style.color = "var(--danger)";
+        el.waitlistMsg.style.color = "var(--danger)";
       } finally {
-        setWaitlistLoading(false);
-      }
-    });
-  }
-
-  document.querySelectorAll(".pro-lock").forEach(button => {
-    button.addEventListener("click", () => {
-      showToast("This is coming in Coastal Flow Pro 🔒");
-    });
-  });
-
-  function getFilteredTasks() {
-    if (currentFilter === "active") {
-      return tasks.filter(task => !task.done);
-    }
-
-    if (currentFilter === "done") {
-      return tasks.filter(task => task.done);
-    }
-
-    return tasks;
-  }
-
-  function updateStats() {
-    const done = tasks.filter(task => task.done).length;
-    const active = tasks.length - done;
-
-    if (totalCount) totalCount.textContent = tasks.length;
-    if (activeCount) activeCount.textContent = active;
-    if (doneCount) doneCount.textContent = done;
-  }
-
-  function getDragAfterElement(container, y) {
-    const draggableElements = [
-      ...container.querySelectorAll(".task:not(.dragging)")
-    ];
-
-    return draggableElements.reduce(
-      (closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-
-        if (offset < 0 && offset > closest.offset) {
-          return {
-            offset: offset,
-            element: child
-          };
-        }
-
-        return closest;
-      },
-      {
-        offset: Number.NEGATIVE_INFINITY,
-        element: null
-      }
-    ).element;
-  }
-
-  async function saveTaskOrder() {
-    if (!currentUser || !tasksContainer) return;
-
-    const orderedIds = [...tasksContainer.querySelectorAll(".task")]
-      .map(element => element.dataset.id);
-
-    const reorderedTasks = orderedIds
-      .map((id, index) => {
-        const task = tasks.find(item => String(item.id) === String(id));
-
-        if (!task) return null;
-
-        return {
-          ...task,
-          position: index
-        };
-      })
-      .filter(Boolean);
-
-    const hiddenTasks = tasks.filter(task => {
-      return !orderedIds.includes(String(task.id));
-    });
-
-    tasks = [...reorderedTasks, ...hiddenTasks];
-
-    const updates = reorderedTasks.map(task => {
-      return supabaseClient
-        .from("tasks")
-        .update({
-          position: task.position
-        })
-        .eq("id", task.id)
-        .eq("user_id", currentUser.id);
-    });
-
-    const results = await Promise.all(updates);
-    const failed = results.find(result => result.error);
-
-    if (failed) {
-      console.error("Save order error:", failed.error);
-      showToast(failed.error.message || "Could not save task order.");
-      return;
-    }
-
-    showToast("Task order saved 🌊");
-  }
-
-  function setupTaskDragEvents(taskElement, task) {
-    taskElement.draggable = true;
-
-    taskElement.addEventListener("dragstart", event => {
-      if (
-        event.target.closest(".check") ||
-        event.target.closest(".edit") ||
-        event.target.closest(".delete") ||
-        event.target.closest(".mini-btn")
-      ) {
-        event.preventDefault();
-        return;
-      }
-
-      draggedTaskId = task.id;
-      taskElement.classList.add("dragging");
-
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", String(task.id));
+        el.waitlistBtn.disabled = false;
+        el.waitlistBtn.textContent = "Join Beta";
       }
     });
 
-    taskElement.addEventListener("dragend", async () => {
-      draggedTaskId = null;
-      taskElement.classList.remove("dragging");
-
-      document.querySelectorAll(".task.drag-over").forEach(element => {
-        element.classList.remove("drag-over");
+    document.querySelectorAll(".pro-lock").forEach(button => {
+      button.addEventListener("click", () => {
+        showToast("This is coming in Coastal Flow Pro 🔒");
       });
-
-      await saveTaskOrder();
     });
 
-    taskElement.addEventListener("dragover", event => {
-      event.preventDefault();
-      taskElement.classList.add("drag-over");
-    });
-
-    taskElement.addEventListener("dragleave", () => {
-      taskElement.classList.remove("drag-over");
-    });
-
-    taskElement.addEventListener("drop", event => {
-      event.preventDefault();
-      taskElement.classList.remove("drag-over");
-    });
-  }
-
-  if (tasksContainer) {
-    tasksContainer.addEventListener("dragover", event => {
-      event.preventDefault();
-
-      const dragging = document.querySelector(".task.dragging");
-
-      if (!dragging) return;
-
-      const afterElement = getDragAfterElement(tasksContainer, event.clientY);
-
-      if (afterElement == null) {
-        tasksContainer.appendChild(dragging);
-      } else {
-        tasksContainer.insertBefore(dragging, afterElement);
-      }
-    });
-  }
-
-  function renderTasks() {
-    if (!tasksContainer) return;
-
-    tasksContainer.innerHTML = "";
-
-    const filteredTasks = getFilteredTasks();
-
-    if (!isLoadingTasks && emptyState) {
-      emptyState.classList.toggle("show", filteredTasks.length === 0);
-    }
-
-    filteredTasks.forEach(task => {
-      const taskElement = document.createElement("article");
-
-      taskElement.className = `task ${task.done ? "done" : ""}`;
-      taskElement.dataset.id = task.id;
-
-      taskElement.innerHTML = `
-        <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
-
-        <div class="task-text"></div>
-
-        <div class="task-actions">
-          <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
-          <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
-        </div>
-      `;
-
-      taskElement.querySelector(".task-text").textContent = task.text;
-
-      setupTaskDragEvents(taskElement, task);
-
-      taskElement.querySelector(".check").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleTask(task.id);
-      });
-
-      taskElement.querySelector(".edit").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        openEditModal(task.id);
-      });
-
-      taskElement.querySelector(".delete").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        deleteTask(task.id);
-      });
-
-      tasksContainer.appendChild(taskElement);
-    });
-
-    updateStats();
-  }
-
-  async function loadTasks() {
-    if (!currentUser) return;
-
-    setLoadingState(true);
-
-    const { data, error } = await supabaseClient
-      .from("tasks")
-      .select("*")
-      .eq("user_id", currentUser.id)
-      .order("position", { ascending: true })
-      .order("created_at", { ascending: false });
-
-    setLoadingState(false);
-
-    if (error) {
-      console.error("Load tasks error:", error);
-      showToast(error.message || "Could not load tasks.");
-      return;
-    }
-
-    tasks = data || [];
-    renderTasks();
-  }
-
-  async function addTask(text) {
-    const cleanText = text.trim();
-
-    if (!cleanText) return;
-
-    if (!currentUser) {
-      showToast("Log in first to save tasks ☁️");
-      return;
-    }
-
-    await refreshProfile();
-
-    if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
-      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
-      return;
-    }
-
-    const nextPosition =
-      tasks.length > 0
-        ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
-        : 0;
-
-    const { data, error } = await supabaseClient
-      .from("tasks")
-      .insert([
-        {
-          user_id: currentUser.id,
-          text: cleanText,
-          done: false,
-          position: nextPosition
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Add task error full:", error);
-      showToast(error.message || "Could not add task.");
-      return;
-    }
-
-    tasks.push(data);
-    renderTasks();
-
-    if (isProUser) {
-      showToast("Pro task saved. Unlimited mode 💎");
-    } else {
-      const remaining = FREE_TASK_LIMIT - tasks.length;
-      showToast(`Task saved. ${remaining} free tasks left.`);
-    }
-  }
-
-  async function toggleTask(id) {
-    const task = tasks.find(item => String(item.id) === String(id));
-
-    if (!task || !currentUser) return;
-
-    const newDoneValue = !task.done;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .update({
-        done: newDoneValue
-      })
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Toggle task error:", error);
-      showToast("Could not update task.");
-      return;
-    }
-
-    tasks = tasks.map(item => {
-      if (String(item.id) === String(id)) {
-        return {
-          ...item,
-          done: newDoneValue
-        };
-      }
-
-      return item;
-    });
-
-    renderTasks();
-  }
-
-  async function deleteTask(id) {
-    if (!currentUser) return;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Delete task error:", error);
-      showToast("Could not delete task.");
-      return;
-    }
-
-    tasks = tasks.filter(task => String(task.id) !== String(id));
-    renderTasks();
-    await saveTaskOrder();
-    showToast("Task deleted.");
-  }
-
-  function openEditModal(id) {
-    const task = tasks.find(item => String(item.id) === String(id));
-
-    if (!task) return;
-
-    editingTaskId = id;
-    editInput.value = task.text;
-    editModal.classList.add("show");
-
-    setTimeout(() => {
-      editInput.focus();
-    }, 80);
-  }
-
-  function closeEditModal() {
-    editingTaskId = null;
-    editInput.value = "";
-    editModal.classList.remove("show");
-  }
-
-  async function updateTask() {
-    const cleanText = editInput.value.trim();
-
-    if (!cleanText || editingTaskId === null || !currentUser) return;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .update({
-        text: cleanText
-      })
-      .eq("id", editingTaskId)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Update task error:", error);
-      showToast("Could not update task.");
-      return;
-    }
-
-    tasks = tasks.map(task => {
-      if (String(task.id) === String(editingTaskId)) {
-        return {
-          ...task,
-          text: cleanText
-        };
-      }
-
-      return task;
-    });
-
-    renderTasks();
-    closeEditModal();
-    showToast("Task updated.");
-  }
-
-  if (upgradeBtn) {
-    upgradeBtn.addEventListener("click", async () => {
-      if (!currentUser) {
+    el.upgradeBtn.addEventListener("click", async () => {
+      if (!state.user) {
         showToast("Log in first before upgrading.");
         return;
       }
 
-      if (isProUser) {
+      if (state.isPro) {
         showToast("You already have Coastal Flow Pro 💎");
         return;
       }
 
       try {
-        upgradeBtn.disabled = true;
-        upgradeBtn.textContent = "Opening Stripe...";
+        el.upgradeBtn.disabled = true;
+        el.upgradeBtn.textContent = "Opening Stripe...";
 
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
@@ -2331,8 +2134,8 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            email: currentUser.email,
-            userId: currentUser.id
+            email: state.user.email,
+            userId: state.user.id
           })
         });
 
@@ -2355,50 +2158,46 @@
           throw new Error("Stripe checkout URL missing.");
         }
 
-        saveCurrentScreen("app");
+        saveScreen("app");
         window.location.href = data.url;
       } catch (error) {
         console.error("Checkout error:", error);
         showToast(error.message || "Checkout failed.");
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = "Upgrade 🔒";
+        el.upgradeBtn.disabled = false;
+        el.upgradeBtn.textContent = "Upgrade 🔒";
       }
     });
-  }
 
-  if (taskForm) {
-    taskForm.addEventListener("submit", event => {
+    el.taskForm.addEventListener("submit", event => {
       event.preventDefault();
 
-      addTask(taskInput.value);
+      addTask(el.taskInput.value);
 
-      taskInput.value = "";
-      taskInput.focus();
+      el.taskInput.value = "";
+      el.taskInput.focus();
     });
-  }
 
-  filterButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      if (!button.dataset.filter) return;
+    el.filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        if (!button.dataset.filter) return;
 
-      currentFilter = button.dataset.filter;
+        state.filter = button.dataset.filter;
 
-      filterButtons.forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+        el.filterButtons.forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.filter === state.filter);
+        });
+
+        renderTasks();
       });
-
-      renderTasks();
     });
-  });
 
-  if (clearCompletedBtn) {
-    clearCompletedBtn.addEventListener("click", async () => {
-      if (!currentUser) {
+    el.clearCompletedBtn.addEventListener("click", async () => {
+      if (!state.user) {
         showToast("Log in first.");
         return;
       }
 
-      const completedCount = tasks.filter(task => task.done).length;
+      const completedCount = state.tasks.filter(task => task.done).length;
 
       if (completedCount === 0) {
         showToast("No completed tasks to clear yet.");
@@ -2408,7 +2207,7 @@
       const { error } = await supabaseClient
         .from("tasks")
         .delete()
-        .eq("user_id", currentUser.id)
+        .eq("user_id", state.user.id)
         .eq("done", true);
 
       if (error) {
@@ -2417,46 +2216,51 @@
         return;
       }
 
-      tasks = tasks.filter(task => !task.done);
+      state.tasks = state.tasks.filter(task => !task.done);
 
       renderTasks();
       await saveTaskOrder();
       showToast("Completed tasks cleared. Clean board 🧼");
     });
-  }
 
-  if (saveEdit) saveEdit.addEventListener("click", updateTask);
-  if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
+    el.tasksContainer.addEventListener("dragover", event => {
+      event.preventDefault();
 
-  if (editInput) {
-    editInput.addEventListener("keydown", event => {
+      const dragging = document.querySelector(".task.dragging");
+
+      if (!dragging) return;
+
+      const afterElement = getDragAfterElement(el.tasksContainer, event.clientY);
+
+      if (afterElement == null) {
+        el.tasksContainer.appendChild(dragging);
+      } else {
+        el.tasksContainer.insertBefore(dragging, afterElement);
+      }
+    });
+
+    el.saveEditBtn.addEventListener("click", updateTask);
+    el.cancelEditBtn.addEventListener("click", closeEditModal);
+
+    el.editInput.addEventListener("keydown", event => {
       if (event.key === "Enter") updateTask();
       if (event.key === "Escape") closeEditModal();
     });
-  }
 
-  if (editModal) {
-    editModal.addEventListener("click", event => {
-      if (event.target === editModal) {
+    el.editModal.addEventListener("click", event => {
+      if (event.target === el.editModal) {
         closeEditModal();
       }
     });
-  }
 
-  loadCurrentUser().catch(error => {
-  console.error("Boot error:", error);
+    loadTheme();
+    setDateAndGreeting();
 
-  currentUser = null;
-  currentProfile = null;
-  isProUser = false;
-  tasks = [];
-
-  renderTasks();
-  updateUserUI();
-  openPrelaunch(false);
-
-  showToast("App boot failed. Check console.");
-});
-</script>
+    bootApp().catch(error => {
+      console.error("Boot error:", error);
+      showToast("App boot failed. Check console.");
+      bootLoggedOutUser();
+    });
+  </script>
 </body>
 </html>
