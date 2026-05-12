@@ -816,11 +816,11 @@
           googleLoginBtn.textContent = "Opening Google...";
 
           const { error } = await supabaseClient.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: "https://taskcoastal.com/c/"
-            }
-          });
+                provider: "google",
+                options: {
+                  redirectTo: "https://taskcoastal.com/c/"
+                }
+              });
 
           if (error) {
             console.error("Google login error:", error);
