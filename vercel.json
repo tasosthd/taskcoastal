@@ -1,0 +1,47 @@
+{
+  "buildCommand": "echo 'Static assets ready'",
+  "outputDirectory": ".",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "/index.html",
+      "methods": ["GET", "HEAD"]
+    },
+    {
+      "src": "^/c/?$",
+      "dest": "/c/index.html",
+      "methods": ["GET", "HEAD"]
+    },
+    {
+      "src": "^/c/.*",
+      "dest": "/c/index.html",
+      "methods": ["GET", "HEAD"]
+    },
+    {
+      "src": "^/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "^/(?!api).*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|json)$",
+      "dest": "/$0"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
