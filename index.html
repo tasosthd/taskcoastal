@@ -818,7 +818,7 @@
           const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: APP_URL
+                redirectTo: "https://taskcoastal.com/c/"
             }
           });
 
