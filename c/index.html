@@ -1160,10 +1160,6 @@
       }
     });
 
-    if (window.location.hash === "#") {
-      history.replaceState(null, "", window.location.pathname);
-    }
-
     const FREE_TASK_LIMIT = 10;
     const body = document.body;
 
@@ -1244,6 +1240,11 @@
         top: 0,
         behavior: "auto"
       });
+    }
+
+    function cleanUrlToDashboard() {
+      const cleanUrl = window.location.origin + "/c/";
+      window.history.replaceState({}, document.title, cleanUrl);
     }
 
     function showToast(message) {
@@ -1456,8 +1457,7 @@
 
       if (!checkoutStatus) return;
 
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
+      cleanUrlToDashboard();
 
       if (checkoutStatus === "success") {
         showToast("Payment complete. Activating Pro...");
@@ -1511,6 +1511,46 @@
       window.location.replace(LANDING_URL);
     }
 
+    async function exchangeOAuthCodeIfPresent() {
+      const url = new URL(window.location.href);
+      const hasCode = url.searchParams.has("code");
+      const hasError = url.searchParams.has("error");
+
+      if (hasError) {
+        console.error("OAuth URL error:", url.search);
+        window.location.replace(LANDING_URL);
+        return false;
+      }
+
+      if (!hasCode) {
+        return true;
+      }
+
+      try {
+        const { data, error } = await withTimeout(
+          supabaseClient.auth.exchangeCodeForSession(window.location.href),
+          9000,
+          "OAuth exchange"
+        );
+
+        if (error) {
+          console.error("OAuth exchange error:", error);
+          window.location.replace(LANDING_URL);
+          return false;
+        }
+
+        console.log("OAuth session exchanged:", data);
+        cleanUrlToDashboard();
+
+        await new Promise(resolve => setTimeout(resolve, 250));
+        return true;
+      } catch (error) {
+        console.error("OAuth exchange crash:", error);
+        window.location.replace(LANDING_URL);
+        return false;
+      }
+    }
+
     async function loadCurrentUser() {
       if (isBooting) return;
 
@@ -1518,9 +1558,15 @@
       showOnly("loading");
 
       try {
+        const exchangeOk = await exchangeOAuthCodeIfPresent();
+
+        if (!exchangeOk) {
+          return;
+        }
+
         const { data, error } = await withTimeout(
           supabaseClient.auth.getSession(),
-          7000,
+          9000,
           "Auth session"
         );
 
@@ -1570,17 +1616,14 @@
         return;
       }
 
-      if (user) {
+      if (event === "SIGNED_IN" && user) {
         await bootLoggedInUser(user);
+        showToast(`Logged in as ${user.email}`);
+        return;
+      }
 
-        if (event === "SIGNED_IN") {
-          showToast(`Logged in as ${user.email}`);
-        }
-      } else {
-        if (event === "SIGNED_OUT") {
-          showToast("Logged out.");
-        }
-
+      if (event === "SIGNED_OUT") {
+        showToast("Logged out.");
         await bootLoggedOutUser();
       }
     });
