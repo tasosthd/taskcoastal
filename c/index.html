@@ -1390,11 +1390,11 @@
       console.log("OAuth code detected, exchanging for session...");
 
       try {
-        const { data, error } = await withTimeout(
-          supabaseClient.auth.exchangeCodeForSession(window.location.href),
-          15000,  // Increased to 15 seconds
-          "OAuth exchange"
-        );
+        cconst { data, error } = await withTimeout(
+  supabaseClient.auth.exchangeCodeForSession(code),
+  15000,
+  "OAuth exchange"
+);
 
         if (error) {
           console.error("OAuth exchange error:", error);
