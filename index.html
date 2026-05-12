@@ -1297,7 +1297,14 @@
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage
+    }
+  });
 
   const FREE_TASK_LIMIT = 10;
   const body = document.body;
@@ -1367,7 +1374,7 @@
   }
 
   function getSavedScreen() {
-    return localStorage.getItem("coastalCurrentScreen") || "landing";
+    return localStorage.getItem("coastalCurrentScreen") || "app";
   }
 
   const dragStyle = document.createElement("style");
@@ -1679,10 +1686,10 @@
 
       const savedScreen = getSavedScreen();
 
-      if (savedScreen === "app") {
-        openApp(false);
-      } else {
+      if (savedScreen === "landing") {
         openPrelaunch(false);
+      } else {
+        openApp(false);
       }
     } else {
       currentProfile = null;
@@ -1713,10 +1720,10 @@
       } else {
         const savedScreen = getSavedScreen();
 
-        if (savedScreen === "app") {
-          openApp(false);
-        } else {
+        if (savedScreen === "landing") {
           openPrelaunch(false);
+        } else {
+          openApp(false);
         }
       }
     } else {
