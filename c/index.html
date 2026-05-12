@@ -502,14 +502,27 @@
     }
 
     .composer {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 24px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(24px);
-    }
+  position: fixed;
+  left: 50%;
+  bottom: 86px;
+  transform: translateX(-50%);
+  z-index: 45;
+
+  width: min(calc(100% - 28px), 720px);
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+
+  border-radius: 24px;
+  background: rgba(6, 31, 40, 0.78);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(28px);
+  box-shadow: var(--shadow);
+}
+
+body.light .composer {
+  background: rgba(255, 255, 255, 0.82);
+}
 
     .composer input {
       flex: 1;
