@@ -1,1 +1,2161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
+  <title>Coastal Flow Dashboard</title>
+
+  <link rel="icon" type="image/png" href="/index.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <meta name="theme-color" content="#061f28" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Coastal Flow" />
+  <link rel="apple-touch-icon" href="/index.png" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg: #061f28;
+      --bg-2: #0b303c;
+      --bg-3: #124b5b;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-strong: rgba(255, 255, 255, 0.13);
+      --card-heavy: rgba(255, 255, 255, 0.18);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #eefcff;
+      --muted: rgba(238, 252, 255, 0.64);
+      --soft: rgba(238, 252, 255, 0.42);
+      --accent: #52dff7;
+      --accent-2: #1599b8;
+      --danger: #ff6b7c;
+      --success: #33d89b;
+      --shadow: 0 30px 100px rgba(0, 0, 0, 0.34);
+      --radius-xl: 34px;
+      --radius-lg: 26px;
+      --radius-md: 18px;
+    }
+
+    body.light {
+      --bg: #eafaff;
+      --bg-2: #c7f0fb;
+      --bg-3: #f7fdff;
+      --card: rgba(255, 255, 255, 0.58);
+      --card-strong: rgba(255, 255, 255, 0.78);
+      --card-heavy: rgba(255, 255, 255, 0.9);
+      --border: rgba(8, 90, 115, 0.14);
+      --text: #082936;
+      --muted: rgba(8, 41, 54, 0.62);
+      --soft: rgba(8, 41, 54, 0.38);
+      --shadow: 0 30px 100px rgba(21, 153, 184, 0.2);
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 6%, rgba(255, 255, 255, 0.46), transparent 24%),
+        radial-gradient(circle at 92% 16%, rgba(82, 223, 247, 0.24), transparent 28%),
+        radial-gradient(circle at 50% 105%, rgba(82, 223, 247, 0.16), transparent 34%),
+        linear-gradient(135deg, var(--bg), var(--bg-2), var(--bg-3));
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    button,
+    input,
+    a {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      font-size: 16px;
+    }
+
+    input,
+    textarea,
+    select {
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .screen {
+      width: 100%;
+      min-height: 100vh;
+      padding: 26px;
+    }
+
+    .loader-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+    }
+
+    .loader-card {
+      width: min(100%, 430px);
+      padding: 34px;
+      border-radius: 32px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(28px);
+      text-align: center;
+    }
+
+    .loader-card img {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      object-fit: cover;
+    }
+
+    .loader-card h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+    .loader-card p {
+      color: var(--muted);
+      font-weight: 800;
+      margin-top: 8px;
+      font-size: 0.92rem;
+    }
+
+    .topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: var(--card-strong);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+    }
+
+    .brand h2 {
+      font-size: 1.08rem;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+      margin-top: 4px;
+      max-width: 280px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--text);
+      backdrop-filter: blur(22px);
+      font-size: 1rem;
+      font-weight: 900;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.93);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04232e;
+      font-weight: 1000;
+      box-shadow: 0 18px 42px rgba(82, 223, 247, 0.22);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+    }
+
+    .btn.secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .badge,
+    .pricing-label {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: 8px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 1000;
+      letter-spacing: 0.02em;
+    }
+
+    .pricing-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      font-size: 0.68rem;
+    }
+
+    .app-shell {
+      width: min(100%, 1320px);
+      margin: 0 auto;
+      min-height: calc(100vh - 52px);
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 26px;
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .profile-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 32px;
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(28px);
+      box-shadow: var(--shadow);
+    }
+
+    .profile-card::after,
+    .app-hero::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 999px;
+      right: -130px;
+      top: -130px;
+      background: rgba(255, 255, 255, 0.16);
+      pointer-events: none;
+    }
+
+    .profile-card > *,
+    .app-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      min-width: 0;
+    }
+
+    .profile-row > div {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .profile-row h2 {
+      font-size: 1.05rem;
+      letter-spacing: -0.04em;
+    }
+
+    .profile-row p {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      object-fit: cover;
+      display: none;
+      border: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+
+    #userEmailText {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+      max-width: 230px;
+    }
+
+    .plan-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 16px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 1000;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .app-title {
+      font-size: 3rem;
+      line-height: 0.9;
+      letter-spacing: -0.09em;
+      margin-bottom: 12px;
+    }
+
+    .profile-card p {
+      color: var(--muted);
+      font-weight: 750;
+      line-height: 1.5;
+    }
+
+    .panel {
+      border-radius: 30px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(28px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+      padding: 24px;
+    }
+
+    .panel h3 {
+      font-size: 1.45rem;
+      letter-spacing: -0.06em;
+      margin-bottom: 9px;
+    }
+
+    .panel p {
+      color: var(--muted);
+      font-weight: 750;
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+
+    .price-row {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .price-row strong {
+      font-size: 1.65rem;
+      letter-spacing: -0.07em;
+    }
+
+    .price-row span {
+      color: var(--muted);
+      font-weight: 850;
+      font-size: 0.82rem;
+    }
+
+    .app-main {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+      padding-bottom: 96px;
+    }
+
+    .app-main > .topbar {
+      margin-bottom: 0;
+    }
+
+    .app-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 36px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04)),
+        var(--card);
+      border: 1px solid var(--border);
+      padding: 38px;
+      backdrop-filter: blur(28px);
+      box-shadow: var(--shadow);
+    }
+
+    .app-hero h1 {
+      font-size: clamp(2.7rem, 5.4vw, 5.6rem);
+      line-height: 0.88;
+      letter-spacing: -0.095em;
+      margin: 18px 0 12px;
+      max-width: 880px;
+    }
+
+    .app-hero p {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .app-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      border-radius: 22px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      padding: 18px 10px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.35rem;
+      letter-spacing: -0.05em;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .composer {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+    }
+
+    .composer input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0 12px;
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .composer input::placeholder {
+      color: var(--muted);
+    }
+
+    .add-btn {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04232e;
+      display: grid;
+      place-items: center;
+    }
+
+    .send-arrow {
+      width: 25px;
+      height: 25px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--muted);
+      padding: 13px;
+      font-size: 0.82rem;
+      font-weight: 1000;
+    }
+
+    .filter-btn.active {
+      background: var(--card-strong);
+      color: var(--text);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.15);
+    }
+
+    .tasks {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 22px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      animation: pop 0.22s ease both;
+      cursor: grab;
+      min-width: 0;
+    }
+
+    @keyframes pop {
+      from {
+        transform: translateY(8px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .task.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+      cursor: grabbing;
+    }
+
+    .task.drag-over {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .check {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: transparent;
+      font-weight: 1000;
+    }
+
+    .task.done .check {
+      color: #04232e;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .task-text {
+      flex: 1;
+      min-width: 0;
+      font-weight: 850;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .task.done .task-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+
+    .mini-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .mini-btn.delete {
+      color: var(--danger);
+    }
+
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 34px 22px;
+      border-radius: 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .empty.show {
+      display: block;
+    }
+
+    .empty .emoji {
+      display: block;
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: min(calc(100% - 28px), 560px);
+      display: flex;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 26px;
+      background: rgba(6, 31, 40, 0.78);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(28px);
+      box-shadow: var(--shadow);
+      z-index: 30;
+    }
+
+    body.light .bottom-bar {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .bottom-bar button {
+      flex: 1;
+      border: 0;
+      border-radius: 18px;
+      padding: 12px 8px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 1000;
+    }
+
+    .bottom-bar button.active {
+      background: var(--card-strong);
+      color: var(--text);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: end;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(12px);
+      z-index: 60;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 520px);
+      padding: 22px;
+      border-radius: 30px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    body.light .modal {
+      background: var(--bg-3);
+    }
+
+    .modal h3 {
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+
+    .modal input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--text);
+      outline: 0;
+      padding: 15px;
+      font-weight: 850;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 92px;
+      transform: translateX(-50%) translateY(20px);
+      width: min(calc(100% - 36px), 460px);
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-weight: 900;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s ease;
+      z-index: 90;
+    }
+
+    body.light .toast {
+      background: var(--bg-3);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 901px) {
+      .app-main > .topbar {
+        position: sticky;
+        top: 26px;
+        z-index: 10;
+        padding: 0;
+      }
+
+      .bottom-bar {
+        display: none !important;
+      }
+
+      .profile-card,
+      .panel,
+      .app-hero,
+      .composer,
+      .stat,
+      .task,
+      .empty {
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .profile-card:hover,
+      .panel:hover,
+      .app-hero:hover {
+        transform: translateY(-2px);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .screen {
+        padding: 16px;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        gap: 12px;
+      }
+
+      .profile-card {
+        display: none;
+      }
+
+      .app-main {
+        padding-bottom: 96px;
+      }
+
+      .app-hero {
+        padding: 28px;
+        border-radius: 32px;
+      }
+
+      .app-hero h1 {
+        font-size: clamp(2.5rem, 12vw, 4.4rem);
+      }
+
+      #upgradeCard {
+        order: 2;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .screen {
+        padding: 14px;
+      }
+
+      .loader-card {
+        padding: 28px 22px;
+      }
+
+      .topbar {
+        margin-bottom: 14px;
+      }
+
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+      }
+
+      .brand h2 {
+        font-size: 0.98rem;
+      }
+
+      .brand p {
+        font-size: 0.66rem;
+        max-width: 180px;
+      }
+
+      .top-actions {
+        gap: 7px;
+      }
+
+      .icon-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+        font-size: 0.92rem;
+      }
+
+      .app-hero h1 {
+        letter-spacing: -0.08em;
+      }
+
+      .app-hero p,
+      .panel p {
+        font-size: 0.88rem;
+      }
+
+      .panel {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      .app-stats {
+        gap: 8px;
+      }
+
+      .stat {
+        padding: 14px 8px;
+        border-radius: 18px;
+      }
+
+      .stat strong {
+        font-size: 1.1rem;
+      }
+
+      .stat span {
+        font-size: 0.58rem;
+      }
+
+      .app-hero {
+        padding: 24px;
+        border-radius: 30px;
+      }
+
+      .composer {
+        padding: 8px;
+        border-radius: 22px;
+      }
+
+      .composer input,
+      .modal input {
+        font-size: 16px !important;
+        min-height: 48px;
+      }
+
+      .add-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+      }
+
+      .filters {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .task {
+        padding: 13px;
+        border-radius: 20px;
+      }
+
+      .task-actions {
+        gap: 5px;
+      }
+
+      .mini-btn {
+        width: 32px;
+        height: 32px;
+      }
+
+      .bottom-bar {
+        bottom: 14px;
+        width: calc(100% - 24px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="loader-screen" id="loadingScreen">
+    <div class="loader-card">
+      <img src="/index.png" alt="Coastal Flow Logo" />
+      <h2>Loading Coastal Flow</h2>
+      <p>Checking your login session...</p>
+    </div>
+  </section>
+
+  <section class="screen hidden" id="appScreen">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <section class="profile-card">
+          <div class="profile-row">
+            <img src="/index.png" class="brand-logo" alt="Coastal Flow Logo" />
+
+            <div>
+              <h2>Coastal Flow</h2>
+              <p id="dateText">Today</p>
+              <p id="userEmailText">Not logged in</p>
+            </div>
+
+            <img class="user-avatar" id="userAvatar" alt="User profile picture" />
+          </div>
+
+          <span class="plan-pill" id="planPill">Free Plan</span>
+
+          <h1 class="app-title">Calm execution.</h1>
+
+          <p>
+            Plan the day, remove the noise, and execute the tasks that actually move the business forward.
+          </p>
+        </section>
+
+        <section class="panel" id="upgradeCard">
+          <span class="pricing-label">Free Plan</span>
+
+          <h3>Upgrade to Pro</h3>
+
+          <p>
+            Unlock unlimited tasks, AI planning, analytics, focus mode, and cloud sync.
+          </p>
+
+          <div class="price-row">
+            <div>
+              <strong>€4.99</strong>
+              <span>/ month</span>
+            </div>
+
+            <button class="btn" id="upgradeBtn" type="button">Upgrade 🔒</button>
+          </div>
+        </section>
+      </aside>
+
+      <main class="app-main">
+        <header class="topbar">
+          <div class="brand">
+            <img src="/index.png" class="brand-logo" alt="Coastal Flow Logo" />
+
+            <div>
+              <h2>Coastal Flow</h2>
+              <p id="mobileUserText">Execution dashboard</p>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <button class="icon-btn" id="homeBtn" type="button" aria-label="Landing">⌂</button>
+            <button class="icon-btn" id="themeBtnApp" type="button" aria-label="Toggle theme">☾</button>
+            <button class="icon-btn" id="logoutBtn" type="button" aria-label="Log out">⎋</button>
+          </div>
+        </header>
+
+        <section class="app-hero">
+          <span class="badge">✨ Minimal task manager</span>
+          <h1 id="greeting">Build your calm empire.</h1>
+          <p>One clean board. One focused day. No chaos.</p>
+        </section>
+
+        <section class="app-stats">
+          <div class="stat">
+            <strong id="totalCount">0</strong>
+            <span>Total</span>
+          </div>
+
+          <div class="stat">
+            <strong id="activeCount">0</strong>
+            <span>Active</span>
+          </div>
+
+          <div class="stat">
+            <strong id="doneCount">0</strong>
+            <span>Done</span>
+          </div>
+        </section>
+
+        <form class="composer" id="taskForm">
+          <input id="taskInput" type="text" placeholder="Add a high-value task..." autocomplete="off" />
+
+          <button class="add-btn" type="submit" aria-label="Add task">
+            <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 19V5M12 5L6 11M12 5L18 11" />
+            </svg>
+          </button>
+        </form>
+
+        <section class="filters">
+          <button class="filter-btn active" data-filter="all" type="button">All</button>
+          <button class="filter-btn" data-filter="active" type="button">Active</button>
+          <button class="filter-btn" data-filter="done" type="button">Done</button>
+          <button class="filter-btn" id="clearCompleted" type="button">Clear</button>
+        </section>
+
+        <section class="empty" id="loadingState">
+          <span class="emoji">🌊</span>
+          Loading your tasks...
+        </section>
+
+        <section class="tasks" id="tasks"></section>
+
+        <section class="empty" id="emptyState">
+          <span class="emoji">🐚</span>
+          No tasks here. Add one and start stacking wins.
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <nav class="bottom-bar hidden" id="bottomBar">
+    <button class="active" data-filter="all" type="button">All</button>
+    <button data-filter="active" type="button">Focus</button>
+    <button data-filter="done" type="button">Wins</button>
+  </nav>
+
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>Edit task</h3>
+
+      <input id="editInput" type="text" />
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="cancelEdit" type="button">Cancel</button>
+        <button class="btn" id="saveEdit" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
+
+    const APP_URL = "https://taskcoastal.com/c/";
+    const LANDING_URL = "https://taskcoastal.com/";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storageKey: "taskcoastal-auth-token",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        flowType: "pkce"
+      }
+    });
+
+    if (window.location.hash === "#") {
+      history.replaceState(null, "", window.location.pathname);
+    }
+
+    const FREE_TASK_LIMIT = 10;
+    const body = document.body;
+
+    const loadingScreen = document.getElementById("loadingScreen");
+    const appScreen = document.getElementById("appScreen");
+    const bottomBar = document.getElementById("bottomBar");
+
+    const themeBtnApp = document.getElementById("themeBtnApp");
+    const homeBtn = document.getElementById("homeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const dateText = document.getElementById("dateText");
+    const userEmailText = document.getElementById("userEmailText");
+    const mobileUserText = document.getElementById("mobileUserText");
+    const userAvatar = document.getElementById("userAvatar");
+    const greeting = document.getElementById("greeting");
+    const planPill = document.getElementById("planPill");
+
+    const taskForm = document.getElementById("taskForm");
+    const taskInput = document.getElementById("taskInput");
+    const tasksContainer = document.getElementById("tasks");
+    const emptyState = document.getElementById("emptyState");
+    const loadingState = document.getElementById("loadingState");
+
+    const totalCount = document.getElementById("totalCount");
+    const activeCount = document.getElementById("activeCount");
+    const doneCount = document.getElementById("doneCount");
+
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const clearCompletedBtn = document.getElementById("clearCompleted");
+
+    const editModal = document.getElementById("editModal");
+    const editInput = document.getElementById("editInput");
+    const saveEdit = document.getElementById("saveEdit");
+    const cancelEdit = document.getElementById("cancelEdit");
+
+    const upgradeBtn = document.getElementById("upgradeBtn");
+    const upgradeCard = document.getElementById("upgradeCard");
+
+    const toast = document.getElementById("toast");
+
+    let currentUser = null;
+    let currentProfile = null;
+    let isProUser = false;
+    let tasks = [];
+    let currentFilter = "all";
+    let editingTaskId = null;
+    let isLoadingTasks = false;
+    let hasLoadedInitialSession = false;
+    let isBooting = false;
+
+    function withTimeout(promise, ms = 7000, label = "Request") {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`${label} timed out`));
+          }, ms);
+        })
+      ]);
+    }
+
+    function showOnly(screen) {
+      if (loadingScreen) loadingScreen.classList.add("hidden");
+      if (appScreen) appScreen.classList.add("hidden");
+      if (bottomBar) bottomBar.classList.add("hidden");
+
+      if (screen === "loading" && loadingScreen) {
+        loadingScreen.classList.remove("hidden");
+      }
+
+      if (screen === "app") {
+        if (appScreen) appScreen.classList.remove("hidden");
+        if (bottomBar) bottomBar.classList.remove("hidden");
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+    }
+
+    function showToast(message) {
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    if (dateText) {
+      dateText.textContent = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function setGreeting() {
+      if (!greeting) return;
+
+      const hour = new Date().getHours();
+
+      if (hour < 12) {
+        greeting.textContent = "Morning flow. Big wins only.";
+      } else if (hour < 18) {
+        greeting.textContent = "Afternoon focus. Execute clean.";
+      } else {
+        greeting.textContent = "Evening reset. Finish strong.";
+      }
+    }
+
+    setGreeting();
+
+    function saveTheme(isLight) {
+      localStorage.setItem("coastalTheme", isLight ? "light" : "dark");
+    }
+
+    function updateThemeButton() {
+      const isLight = body.classList.contains("light");
+
+      if (themeBtnApp) {
+        themeBtnApp.textContent = isLight ? "☀" : "☾";
+      }
+    }
+
+    function toggleTheme() {
+      body.classList.toggle("light");
+      saveTheme(body.classList.contains("light"));
+      updateThemeButton();
+    }
+
+    function loadTheme() {
+      const theme = localStorage.getItem("coastalTheme");
+
+      if (theme === "light") {
+        body.classList.add("light");
+      }
+
+      updateThemeButton();
+    }
+
+    loadTheme();
+
+    if (themeBtnApp) {
+      themeBtnApp.addEventListener("click", toggleTheme);
+    }
+
+    function updateUserUI() {
+      const planText = isProUser ? "Pro" : "Free";
+      const label = currentUser ? `${currentUser.email} · ${planText}` : "Not logged in";
+
+      if (userEmailText) userEmailText.textContent = label;
+      if (mobileUserText) mobileUserText.textContent = label;
+      if (planPill) planPill.textContent = isProUser ? "Pro Plan Active" : "Free Plan";
+
+      if (userAvatar) {
+        const avatarUrl =
+          currentUser?.user_metadata?.avatar_url ||
+          currentUser?.user_metadata?.picture ||
+          "";
+
+        if (avatarUrl) {
+          userAvatar.src = avatarUrl;
+          userAvatar.style.display = "block";
+        } else {
+          userAvatar.removeAttribute("src");
+          userAvatar.style.display = "none";
+        }
+      }
+
+      if (upgradeCard) {
+        upgradeCard.classList.toggle("hidden", Boolean(isProUser));
+      }
+
+      if (upgradeBtn) {
+        upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
+        upgradeBtn.disabled = Boolean(isProUser);
+      }
+    }
+
+    function setLoadingState(isLoading) {
+      isLoadingTasks = isLoading;
+
+      if (loadingState) loadingState.classList.toggle("show", isLoading);
+      if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
+      if (emptyState && isLoading) emptyState.classList.remove("show");
+    }
+
+    function openApp() {
+      showOnly("app");
+      updateUserUI();
+      renderTasks();
+    }
+
+    async function getOrCreateProfile() {
+      if (!currentUser) return null;
+
+      const { data: existingProfile, error: selectError } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error("Profile select error:", selectError);
+        currentProfile = null;
+        isProUser = false;
+        updateUserUI();
+        return null;
+      }
+
+      if (existingProfile) {
+        currentProfile = existingProfile;
+        isProUser = Boolean(existingProfile.is_pro);
+        updateUserUI();
+        return existingProfile;
+      }
+
+      const { data: newProfile, error: insertError } = await supabaseClient
+        .from("profiles")
+        .insert([
+          {
+            id: currentUser.id,
+            email: currentUser.email,
+            is_pro: false
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Create profile error:", insertError);
+        currentProfile = null;
+        isProUser = false;
+        updateUserUI();
+        return null;
+      }
+
+      currentProfile = newProfile;
+      isProUser = Boolean(newProfile.is_pro);
+      updateUserUI();
+
+      return newProfile;
+    }
+
+    async function refreshProfile() {
+      if (!currentUser) return null;
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Refresh profile error:", error);
+        return null;
+      }
+
+      currentProfile = data;
+      isProUser = Boolean(data?.is_pro);
+      updateUserUI();
+
+      return data;
+    }
+
+    async function refreshProfileWithRetry(maxAttempts = 5) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const profile = await refreshProfile();
+
+        if (profile?.is_pro) {
+          showToast("Coastal Flow Pro activated 💎");
+          return profile;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1400));
+      }
+
+      showToast("Payment received. Pro may activate in a moment.");
+      return currentProfile;
+    }
+
+    async function handleCheckoutReturn() {
+      const params = new URLSearchParams(window.location.search);
+      const checkoutStatus = params.get("checkout");
+
+      if (!checkoutStatus) return;
+
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      if (checkoutStatus === "success") {
+        showToast("Payment complete. Activating Pro...");
+        await refreshProfileWithRetry(5);
+      }
+
+      if (checkoutStatus === "cancelled") {
+        showToast("Checkout cancelled.");
+      }
+    }
+
+    async function bootLoggedInUser(user) {
+      currentUser = user;
+      updateUserUI();
+
+      try {
+        await withTimeout(getOrCreateProfile(), 7000, "Profile");
+      } catch (error) {
+        console.error("Profile boot error:", error);
+        showToast("Profile took too long. Opening app anyway.");
+      }
+
+      try {
+        await withTimeout(loadTasks(), 9000, "Tasks");
+      } catch (error) {
+        console.error("Tasks boot error:", error);
+        setLoadingState(false);
+        tasks = [];
+        renderTasks();
+        showToast("Tasks took too long. Try refreshing once.");
+      }
+
+      try {
+        await withTimeout(handleCheckoutReturn(), 7000, "Checkout return");
+      } catch (error) {
+        console.error("Checkout return error:", error);
+      }
+
+      openApp();
+    }
+
+    async function bootLoggedOutUser() {
+      currentUser = null;
+      currentProfile = null;
+      isProUser = false;
+      tasks = [];
+
+      renderTasks();
+      updateUserUI();
+
+      window.location.replace(LANDING_URL);
+    }
+
+    async function loadCurrentUser() {
+      if (isBooting) return;
+
+      isBooting = true;
+      showOnly("loading");
+
+      try {
+        const { data, error } = await withTimeout(
+          supabaseClient.auth.getSession(),
+          7000,
+          "Auth session"
+        );
+
+        hasLoadedInitialSession = true;
+
+        if (error) {
+          console.error("Auth session error:", error);
+          await bootLoggedOutUser();
+          return;
+        }
+
+        const user = data.session?.user || null;
+
+        if (user) {
+          await bootLoggedInUser(user);
+        } else {
+          await bootLoggedOutUser();
+        }
+      } catch (error) {
+        console.error("Boot error:", error);
+
+        hasLoadedInitialSession = true;
+        currentUser = null;
+        currentProfile = null;
+        isProUser = false;
+        tasks = [];
+
+        renderTasks();
+        updateUserUI();
+
+        window.location.replace(LANDING_URL);
+      } finally {
+        isBooting = false;
+      }
+    }
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user || null;
+
+      if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
+        return;
+      }
+
+      if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        currentUser = user;
+        updateUserUI();
+        return;
+      }
+
+      if (user) {
+        await bootLoggedInUser(user);
+
+        if (event === "SIGNED_IN") {
+          showToast(`Logged in as ${user.email}`);
+        }
+      } else {
+        if (event === "SIGNED_OUT") {
+          showToast("Logged out.");
+        }
+
+        await bootLoggedOutUser();
+      }
+    });
+
+    if (homeBtn) {
+      homeBtn.addEventListener("click", () => {
+        window.location.href = LANDING_URL;
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          logoutBtn.disabled = true;
+          logoutBtn.textContent = "…";
+
+          const { error } = await supabaseClient.auth.signOut();
+
+          if (error) {
+            console.error("Logout error:", error);
+            showToast(error.message || "Logout failed.");
+            return;
+          }
+
+          currentUser = null;
+          currentProfile = null;
+          isProUser = false;
+          tasks = [];
+
+          renderTasks();
+          updateUserUI();
+
+          window.location.replace(LANDING_URL);
+        } catch (error) {
+          console.error("Logout crash:", error);
+          showToast("Logout failed.");
+        } finally {
+          logoutBtn.disabled = false;
+          logoutBtn.textContent = "⎋";
+        }
+      });
+    }
+
+    function getFilteredTasks() {
+      if (currentFilter === "active") return tasks.filter(task => !task.done);
+      if (currentFilter === "done") return tasks.filter(task => task.done);
+      return tasks;
+    }
+
+    function updateStats() {
+      const done = tasks.filter(task => task.done).length;
+      const active = tasks.length - done;
+
+      if (totalCount) totalCount.textContent = tasks.length;
+      if (activeCount) activeCount.textContent = active;
+      if (doneCount) doneCount.textContent = done;
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(".task:not(.dragging)")];
+
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+
+          if (offset < 0 && offset > closest.offset) {
+            return {
+              offset: offset,
+              element: child
+            };
+          }
+
+          return closest;
+        },
+        {
+          offset: Number.NEGATIVE_INFINITY,
+          element: null
+        }
+      ).element;
+    }
+
+    async function saveTaskOrder() {
+      if (!currentUser || !tasksContainer) return;
+
+      const orderedIds = [...tasksContainer.querySelectorAll(".task")].map(element => element.dataset.id);
+
+      const reorderedTasks = orderedIds
+        .map((id, index) => {
+          const task = tasks.find(item => String(item.id) === String(id));
+          if (!task) return null;
+
+          return {
+            ...task,
+            position: index
+          };
+        })
+        .filter(Boolean);
+
+      const hiddenTasks = tasks.filter(task => {
+        return !orderedIds.includes(String(task.id));
+      });
+
+      tasks = [...reorderedTasks, ...hiddenTasks];
+
+      const updates = reorderedTasks.map(task => {
+        return supabaseClient
+          .from("tasks")
+          .update({
+            position: task.position
+          })
+          .eq("id", task.id)
+          .eq("user_id", currentUser.id);
+      });
+
+      const results = await Promise.all(updates);
+      const failed = results.find(result => result.error);
+
+      if (failed) {
+        console.error("Save order error:", failed.error);
+        showToast(failed.error.message || "Could not save task order.");
+      }
+    }
+
+    function setupTaskDragEvents(taskElement, task) {
+      taskElement.draggable = true;
+
+      taskElement.addEventListener("dragstart", event => {
+        if (
+          event.target.closest(".check") ||
+          event.target.closest(".edit") ||
+          event.target.closest(".delete") ||
+          event.target.closest(".mini-btn")
+        ) {
+          event.preventDefault();
+          return;
+        }
+
+        taskElement.classList.add("dragging");
+
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", String(task.id));
+        }
+      });
+
+      taskElement.addEventListener("dragend", async () => {
+        taskElement.classList.remove("dragging");
+
+        document.querySelectorAll(".task.drag-over").forEach(element => {
+          element.classList.remove("drag-over");
+        });
+
+        await saveTaskOrder();
+      });
+
+      taskElement.addEventListener("dragover", event => {
+        event.preventDefault();
+        taskElement.classList.add("drag-over");
+      });
+
+      taskElement.addEventListener("dragleave", () => {
+        taskElement.classList.remove("drag-over");
+      });
+
+      taskElement.addEventListener("drop", event => {
+        event.preventDefault();
+        taskElement.classList.remove("drag-over");
+      });
+    }
+
+    if (tasksContainer) {
+      tasksContainer.addEventListener("dragover", event => {
+        event.preventDefault();
+
+        const dragging = document.querySelector(".task.dragging");
+        if (!dragging) return;
+
+        const afterElement = getDragAfterElement(tasksContainer, event.clientY);
+
+        if (afterElement == null) {
+          tasksContainer.appendChild(dragging);
+        } else {
+          tasksContainer.insertBefore(dragging, afterElement);
+        }
+      });
+    }
+
+    function renderTasks() {
+      if (!tasksContainer) return;
+
+      tasksContainer.innerHTML = "";
+
+      const filteredTasks = getFilteredTasks();
+
+      if (!isLoadingTasks && emptyState) {
+        emptyState.classList.toggle("show", filteredTasks.length === 0);
+      }
+
+      filteredTasks.forEach(task => {
+        const taskElement = document.createElement("article");
+
+        taskElement.className = `task ${task.done ? "done" : ""}`;
+        taskElement.dataset.id = task.id;
+
+        taskElement.innerHTML = `
+          <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
+
+          <div class="task-text"></div>
+
+          <div class="task-actions">
+            <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
+            <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
+          </div>
+        `;
+
+        taskElement.querySelector(".task-text").textContent = task.text;
+
+        setupTaskDragEvents(taskElement, task);
+
+        taskElement.querySelector(".check").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleTask(task.id);
+        });
+
+        taskElement.querySelector(".edit").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openEditModal(task.id);
+        });
+
+        taskElement.querySelector(".delete").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteTask(task.id);
+        });
+
+        tasksContainer.appendChild(taskElement);
+      });
+
+      updateStats();
+    }
+
+    async function loadTasks() {
+      if (!currentUser) return;
+
+      setLoadingState(true);
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("tasks")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("position", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Load tasks error:", error);
+          showToast(error.message || "Could not load tasks.");
+          return;
+        }
+
+        tasks = data || [];
+        renderTasks();
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    async function addTask(text) {
+      const cleanText = text.trim();
+      if (!cleanText) return;
+
+      if (!currentUser) {
+        showToast("Log in first to save tasks ☁️");
+        return;
+      }
+
+      try {
+        await withTimeout(refreshProfile(), 6000, "Profile refresh");
+      } catch (error) {
+        console.error("Profile refresh timeout:", error);
+      }
+
+      if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
+        showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
+        return;
+      }
+
+      const nextPosition =
+        tasks.length > 0
+          ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
+          : 0;
+
+      const { data, error } = await supabaseClient
+        .from("tasks")
+        .insert([
+          {
+            user_id: currentUser.id,
+            text: cleanText,
+            done: false,
+            position: nextPosition
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Add task error full:", error);
+        showToast(error.message || "Could not add task.");
+        return;
+      }
+
+      tasks.push(data);
+      renderTasks();
+
+      if (isProUser) {
+        showToast("Pro task saved. Unlimited mode 💎");
+      } else {
+        const remaining = FREE_TASK_LIMIT - tasks.length;
+        showToast(`Task saved. ${remaining} free tasks left.`);
+      }
+    }
+
+    async function toggleTask(id) {
+      const task = tasks.find(item => String(item.id) === String(id));
+      if (!task || !currentUser) return;
+
+      const newDoneValue = !task.done;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          done: newDoneValue
+        })
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Toggle task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      tasks = tasks.map(item => {
+        if (String(item.id) === String(id)) {
+          return {
+            ...item,
+            done: newDoneValue
+          };
+        }
+
+        return item;
+      });
+
+      renderTasks();
+    }
+
+    async function deleteTask(id) {
+      if (!currentUser) return;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Delete task error:", error);
+        showToast("Could not delete task.");
+        return;
+      }
+
+      tasks = tasks.filter(task => String(task.id) !== String(id));
+      renderTasks();
+      await saveTaskOrder();
+      showToast("Task deleted.");
+    }
+
+    function openEditModal(id) {
+      const task = tasks.find(item => String(item.id) === String(id));
+      if (!task) return;
+
+      editingTaskId = id;
+      editInput.value = task.text;
+      editModal.classList.add("show");
+
+      setTimeout(() => {
+        editInput.focus();
+      }, 80);
+    }
+
+    function closeEditModal() {
+      editingTaskId = null;
+      editInput.value = "";
+      editModal.classList.remove("show");
+    }
+
+    async function updateTask() {
+      const cleanText = editInput.value.trim();
+
+      if (!cleanText || editingTaskId === null || !currentUser) return;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          text: cleanText
+        })
+        .eq("id", editingTaskId)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Update task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      tasks = tasks.map(task => {
+        if (String(task.id) === String(editingTaskId)) {
+          return {
+            ...task,
+            text: cleanText
+          };
+        }
+
+        return task;
+      });
+
+      renderTasks();
+      closeEditModal();
+      showToast("Task updated.");
+    }
+
+    if (upgradeBtn) {
+      upgradeBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+          showToast("Log in first before upgrading.");
+          return;
+        }
+
+        if (isProUser) {
+          showToast("You already have Coastal Flow Pro 💎");
+          return;
+        }
+
+        try {
+          upgradeBtn.disabled = true;
+          upgradeBtn.textContent = "Opening Stripe...";
+
+          const response = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              email: currentUser.email,
+              userId: currentUser.id
+            })
+          });
+
+          const rawText = await response.text();
+
+          let data;
+
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            console.error("Non-JSON checkout API response:", rawText);
+            throw new Error("Server returned non-JSON. Check Vercel logs.");
+          }
+
+          if (!response.ok) {
+            throw new Error(data.error || "Could not start checkout.");
+          }
+
+          if (!data.url) {
+            throw new Error("Stripe checkout URL missing.");
+          }
+
+          window.location.href = data.url;
+        } catch (error) {
+          console.error("Checkout error:", error);
+          showToast(error.message || "Checkout failed.");
+          upgradeBtn.disabled = false;
+          upgradeBtn.textContent = "Upgrade 🔒";
+        }
+      });
+    }
+
+    if (taskForm) {
+      taskForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        addTask(taskInput.value);
+
+        taskInput.value = "";
+        taskInput.focus();
+      });
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        if (!button.dataset.filter) return;
+
+        currentFilter = button.dataset.filter;
+
+        filterButtons.forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+        });
+
+        renderTasks();
+      });
+    });
+
+    if (clearCompletedBtn) {
+      clearCompletedBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+          showToast("Log in first.");
+          return;
+        }
+
+        const completedCount = tasks.filter(task => task.done).length;
+
+        if (completedCount === 0) {
+          showToast("No completed tasks to clear yet.");
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from("tasks")
+          .delete()
+          .eq("user_id", currentUser.id)
+          .eq("done", true);
+
+        if (error) {
+          console.error("Clear completed error:", error);
+          showToast("Could not clear completed tasks.");
+          return;
+        }
+
+        tasks = tasks.filter(task => !task.done);
+
+        renderTasks();
+        await saveTaskOrder();
+        showToast("Completed tasks cleared. Clean board 🧼");
+      });
+    }
+
+    if (saveEdit) saveEdit.addEventListener("click", updateTask);
+    if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
+
+    if (editInput) {
+      editInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") updateTask();
+        if (event.key === "Escape") closeEditModal();
+      });
+    }
+
+    if (editModal) {
+      editModal.addEventListener("click", event => {
+        if (event.target === editModal) closeEditModal();
+      });
+    }
+
+    loadCurrentUser();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch(error => console.error("Service Worker failed:", error));
+      });
+    }
+  </script>
+</body>
+</html>
