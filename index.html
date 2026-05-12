@@ -1668,89 +1668,77 @@
   }
 
   async function loadCurrentUser() {
-    const { data, error } = await supabaseClient.auth.getSession();
+  const { data, error } = await supabaseClient.auth.getSession();
 
-    if (error) {
-      console.error("Auth session error:", error);
-      showToast("Could not check login status.");
-      return;
-    }
-
-    currentUser = data.session?.user || null;
-    appBooted = true;
-
-    if (currentUser) {
-      await getOrCreateProfile();
-      await loadTasks();
-      await handleCheckoutReturn();
-
-      const savedScreen = getSavedScreen();
-
-      if (savedScreen === "landing") {
-        openPrelaunch(false);
-      } else {
-        openApp(false);
-      }
-    } else {
-      currentProfile = null;
-      isProUser = false;
-      tasks = [];
-
-      renderTasks();
-      updateUserUI();
-      openPrelaunch(false);
-    }
+  if (error) {
+    console.error("Auth session error:", error);
+    showToast("Could not check login status.");
+    return;
   }
 
+  currentUser = data.session?.user || null;
+  appBooted = true;
+
+  if (currentUser) {
+    await getOrCreateProfile();
+    await loadTasks();
+    await handleCheckoutReturn();
+
+    saveCurrentScreen("app");
+    openApp(false);
+  } else {
+    currentProfile = null;
+    isProUser = false;
+    tasks = [];
+
+    renderTasks();
+    updateUserUI();
+    openPrelaunch(false);
+  }
+}
+
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    currentUser = session?.user || null;
+  currentUser = session?.user || null;
 
-    if (event === "INITIAL_SESSION" && !appBooted) {
-      return;
+  if (event === "INITIAL_SESSION" && !appBooted) {
+    return;
+  }
+
+  if (currentUser) {
+    await getOrCreateProfile();
+    await loadTasks();
+
+    saveCurrentScreen("app");
+    openApp(false);
+
+    if (event === "SIGNED_IN") {
+      showToast(`Logged in as ${currentUser.email}`);
+    }
+  } else {
+    currentProfile = null;
+    isProUser = false;
+    tasks = [];
+
+    if (event === "SIGNED_OUT") {
+      saveCurrentScreen("landing");
     }
 
-    if (currentUser) {
-      await getOrCreateProfile();
-      await loadTasks();
+    renderTasks();
+    updateUserUI();
+    openPrelaunch(false);
 
-      if (event === "SIGNED_IN") {
-        saveCurrentScreen("app");
-        openApp(false);
-        showToast(`Logged in as ${currentUser.email}`);
-      } else {
-        const savedScreen = getSavedScreen();
-
-        if (savedScreen === "landing") {
-          openPrelaunch(false);
-        } else {
-          openApp(false);
-        }
-      }
-    } else {
-      currentProfile = null;
-      isProUser = false;
-      tasks = [];
-
-      if (event === "SIGNED_OUT") {
-        saveCurrentScreen("landing");
-      }
-
-      renderTasks();
-      updateUserUI();
-      openPrelaunch(false);
-
-      if (event === "SIGNED_OUT") {
-        showToast("Logged out.");
-      }
+    if (event === "SIGNED_OUT") {
+      showToast("Logged out.");
     }
-  });
-
+  }
+});
+  
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener("click", async () => {
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "https://taskcoastal.com"
+          redirectTo: window.location.origin
         }
       });
 
@@ -1801,11 +1789,11 @@
     });
   }
 
-  if (backLaunchBtn) {
-    backLaunchBtn.addEventListener("click", () => {
-      openPrelaunch(true);
-    });
-  }
+ if (backLaunchBtn) {
+  backLaunchBtn.addEventListener("click", () => {
+    openPrelaunch(false);
+  });
+}
 
   if (waitlistForm) {
     waitlistForm.addEventListener("submit", async event => {
