@@ -1299,12 +1299,18 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
+      storageKey: "taskcoastal-auth-token",
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storage: window.localStorage
+      storage: window.localStorage,
+      flowType: "pkce"
     }
   });
+
+  if (window.location.hash === "#") {
+    history.replaceState(null, "", window.location.pathname);
+  }
 
   const FREE_TASK_LIMIT = 10;
   const body = document.body;
@@ -1364,8 +1370,7 @@
   let editingTaskId = null;
   let isLoadingTasks = false;
   let draggedTaskId = null;
-
-  let appBooted = false;
+  let hasLoadedInitialSession = false;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
 
@@ -1667,26 +1672,19 @@
     }
   }
 
-  async function loadCurrentUser() {
-  const { data, error } = await supabaseClient.auth.getSession();
+  async function bootLoggedInUser(user) {
+    currentUser = user;
 
-  if (error) {
-    console.error("Auth session error:", error);
-    showToast("Could not check login status.");
-    return;
-  }
-
-  currentUser = data.session?.user || null;
-  appBooted = true;
-
-  if (currentUser) {
     await getOrCreateProfile();
     await loadTasks();
     await handleCheckoutReturn();
 
     saveCurrentScreen("app");
     openApp(false);
-  } else {
+  }
+
+  async function bootLoggedOutUser() {
+    currentUser = null;
     currentProfile = null;
     isProUser = false;
     tasks = [];
@@ -1695,44 +1693,51 @@
     updateUserUI();
     openPrelaunch(false);
   }
-}
+
+  async function loadCurrentUser() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    hasLoadedInitialSession = true;
+
+    if (error) {
+      console.error("Auth session error:", error);
+      showToast("Could not check login status.");
+      await bootLoggedOutUser();
+      return;
+    }
+
+    const user = data.session?.user || null;
+
+    if (user) {
+      await bootLoggedInUser(user);
+    } else {
+      await bootLoggedOutUser();
+    }
+  }
 
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  currentUser = session?.user || null;
+    const user = session?.user || null;
 
-  if (event === "INITIAL_SESSION" && !appBooted) {
-    return;
-  }
-
-  if (currentUser) {
-    await getOrCreateProfile();
-    await loadTasks();
-
-    saveCurrentScreen("app");
-    openApp(false);
-
-    if (event === "SIGNED_IN") {
-      showToast(`Logged in as ${currentUser.email}`);
-    }
-  } else {
-    currentProfile = null;
-    isProUser = false;
-    tasks = [];
-
-    if (event === "SIGNED_OUT") {
-      saveCurrentScreen("landing");
+    if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
+      return;
     }
 
-    renderTasks();
-    updateUserUI();
-    openPrelaunch(false);
+    if (user) {
+      await bootLoggedInUser(user);
 
-    if (event === "SIGNED_OUT") {
-      showToast("Logged out.");
+      if (event === "SIGNED_IN") {
+        showToast(`Logged in as ${user.email}`);
+      }
+    } else {
+      if (event === "SIGNED_OUT") {
+        saveCurrentScreen("landing");
+        showToast("Logged out.");
+      }
+
+      await bootLoggedOutUser();
     }
-  }
-});
-  
+  });
+
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener("click", async () => {
       const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -1789,11 +1794,11 @@
     });
   }
 
- if (backLaunchBtn) {
-  backLaunchBtn.addEventListener("click", () => {
-    openPrelaunch(false);
-  });
-}
+  if (backLaunchBtn) {
+    backLaunchBtn.addEventListener("click", () => {
+      openPrelaunch(false);
+    });
+  }
 
   if (waitlistForm) {
     waitlistForm.addEventListener("submit", async event => {
