@@ -58,8 +58,8 @@ module.exports = async function handler(req, res) {
         }
       },
 
-      success_url: `${origin}?checkout=success`,
-      cancel_url: `${origin}?checkout=cancelled`
+      success_url: `https://taskcoastal.com/c/?checkout=success`,
+cancel_url: `https://taskcoastal.com/c/?checkout=cancelled`,
     });
 
     return res.status(200).json({
