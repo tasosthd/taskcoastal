@@ -1142,430 +1142,517 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const APP_PATH = "/c/";
-    const APP_URL = "https://taskcoastal.com/c/";
-    const LANDING_URL = "https://taskcoastal.com/";
+<script>
+  const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        storageKey: "taskcoastal-auth-token",
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-        storage: window.localStorage,
-        flowType: "pkce"
-      }
+  const APP_PATH = "/c/";
+  const APP_URL = "https://taskcoastal.com/c/";
+  const LANDING_URL = "https://taskcoastal.com/";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      storageKey: "taskcoastal-auth-token",
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      storage: window.localStorage,
+      flowType: "pkce"
+    }
+  });
+
+  const FREE_TASK_LIMIT = 10;
+  const body = document.body;
+
+  const loadingScreen = document.getElementById("loadingScreen");
+  const appScreen = document.getElementById("appScreen");
+  const bottomBar = document.getElementById("bottomBar");
+
+  const themeBtnApp = document.getElementById("themeBtnApp");
+  const homeBtn = document.getElementById("homeBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const dateText = document.getElementById("dateText");
+  const userEmailText = document.getElementById("userEmailText");
+  const mobileUserText = document.getElementById("mobileUserText");
+  const userAvatar = document.getElementById("userAvatar");
+  const greeting = document.getElementById("greeting");
+  const planPill = document.getElementById("planPill");
+
+  const taskForm = document.getElementById("taskForm");
+  const taskInput = document.getElementById("taskInput");
+  const tasksContainer = document.getElementById("tasks");
+  const emptyState = document.getElementById("emptyState");
+  const loadingState = document.getElementById("loadingState");
+
+  const totalCount = document.getElementById("totalCount");
+  const activeCount = document.getElementById("activeCount");
+  const doneCount = document.getElementById("doneCount");
+
+  const filterButtons = document.querySelectorAll("[data-filter]");
+  const clearCompletedBtn = document.getElementById("clearCompleted");
+
+  const editModal = document.getElementById("editModal");
+  const editInput = document.getElementById("editInput");
+  const saveEdit = document.getElementById("saveEdit");
+  const cancelEdit = document.getElementById("cancelEdit");
+
+  const upgradeBtn = document.getElementById("upgradeBtn");
+  const upgradeCard = document.getElementById("upgradeCard");
+
+  const toast = document.getElementById("toast");
+
+  let currentUser = null;
+  let currentProfile = null;
+  let isProUser = false;
+  let tasks = [];
+  let currentFilter = "all";
+  let editingTaskId = null;
+  let isLoadingTasks = false;
+  let hasLoadedInitialSession = false;
+  let isBooting = false;
+  let hasBootFallbackRun = false;
+
+  function withTimeout(promise, ms = 7000, label = "Request") {
+    let timeoutId;
+
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error(`${label} timed out`));
+      }, ms);
     });
 
-    const FREE_TASK_LIMIT = 10;
-    const body = document.body;
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      clearTimeout(timeoutId);
+    });
+  }
 
-    const loadingScreen = document.getElementById("loadingScreen");
-    const appScreen = document.getElementById("appScreen");
-    const bottomBar = document.getElementById("bottomBar");
+  function showOnly(screen) {
+    if (loadingScreen) loadingScreen.classList.add("hidden");
+    if (appScreen) appScreen.classList.add("hidden");
+    if (bottomBar) bottomBar.classList.add("hidden");
 
-    const themeBtnApp = document.getElementById("themeBtnApp");
-    const homeBtn = document.getElementById("homeBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    const dateText = document.getElementById("dateText");
-    const userEmailText = document.getElementById("userEmailText");
-    const mobileUserText = document.getElementById("mobileUserText");
-    const userAvatar = document.getElementById("userAvatar");
-    const greeting = document.getElementById("greeting");
-    const planPill = document.getElementById("planPill");
-
-    const taskForm = document.getElementById("taskForm");
-    const taskInput = document.getElementById("taskInput");
-    const tasksContainer = document.getElementById("tasks");
-    const emptyState = document.getElementById("emptyState");
-    const loadingState = document.getElementById("loadingState");
-
-    const totalCount = document.getElementById("totalCount");
-    const activeCount = document.getElementById("activeCount");
-    const doneCount = document.getElementById("doneCount");
-
-    const filterButtons = document.querySelectorAll("[data-filter]");
-    const clearCompletedBtn = document.getElementById("clearCompleted");
-
-    const editModal = document.getElementById("editModal");
-    const editInput = document.getElementById("editInput");
-    const saveEdit = document.getElementById("saveEdit");
-    const cancelEdit = document.getElementById("cancelEdit");
-
-    const upgradeBtn = document.getElementById("upgradeBtn");
-    const upgradeCard = document.getElementById("upgradeCard");
-
-    const toast = document.getElementById("toast");
-
-    let currentUser = null;
-    let currentProfile = null;
-    let isProUser = false;
-    let tasks = [];
-    let currentFilter = "all";
-    let editingTaskId = null;
-    let isLoadingTasks = false;
-    let hasLoadedInitialSession = false;
-    let isBooting = false;
-
-    function withTimeout(promise, ms = 7000, label = "Request") {
-      return Promise.race([
-        promise,
-        new Promise((_, reject) => {
-          setTimeout(() => {
-            reject(new Error(`${label} timed out`));
-          }, ms);
-        })
-      ]);
+    if (screen === "loading" && loadingScreen) {
+      loadingScreen.classList.remove("hidden");
     }
 
-    function showOnly(screen) {
-      if (loadingScreen) loadingScreen.classList.add("hidden");
-      if (appScreen) appScreen.classList.add("hidden");
-      if (bottomBar) bottomBar.classList.add("hidden");
-
-      if (screen === "loading" && loadingScreen) {
-        loadingScreen.classList.remove("hidden");
-      }
-
-      if (screen === "app") {
-        if (appScreen) appScreen.classList.remove("hidden");
-        if (bottomBar) bottomBar.classList.remove("hidden");
-      }
-
-      window.scrollTo({
-        top: 0,
-        behavior: "auto"
-      });
+    if (screen === "app") {
+      if (appScreen) appScreen.classList.remove("hidden");
+      if (bottomBar) bottomBar.classList.remove("hidden");
     }
 
-    function cleanUrlToDashboard() {
-      window.history.replaceState({}, document.title, APP_PATH);
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+    });
+  }
+
+  function cleanUrlToDashboard() {
+    window.history.replaceState({}, document.title, APP_PATH);
+  }
+
+  function showToast(message) {
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2200);
+  }
+
+  if (dateText) {
+    dateText.textContent = new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric"
+    });
+  }
+
+  function setGreeting() {
+    if (!greeting) return;
+
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      greeting.textContent = "Morning flow. Big wins only.";
+    } else if (hour < 18) {
+      greeting.textContent = "Afternoon focus. Execute clean.";
+    } else {
+      greeting.textContent = "Evening reset. Finish strong.";
     }
+  }
 
-    function showToast(message) {
-      if (!toast) return;
+  setGreeting();
 
-      toast.textContent = message;
-      toast.classList.add("show");
+  function saveTheme(isLight) {
+    localStorage.setItem("coastalTheme", isLight ? "light" : "dark");
+  }
 
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2200);
-    }
-
-    if (dateText) {
-      dateText.textContent = new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "short",
-        day: "numeric"
-      });
-    }
-
-    function setGreeting() {
-      if (!greeting) return;
-
-      const hour = new Date().getHours();
-
-      if (hour < 12) {
-        greeting.textContent = "Morning flow. Big wins only.";
-      } else if (hour < 18) {
-        greeting.textContent = "Afternoon focus. Execute clean.";
-      } else {
-        greeting.textContent = "Evening reset. Finish strong.";
-      }
-    }
-
-    setGreeting();
-
-    function saveTheme(isLight) {
-      localStorage.setItem("coastalTheme", isLight ? "light" : "dark");
-    }
-
-    function updateThemeButton() {
-      const isLight = body.classList.contains("light");
-
-      if (themeBtnApp) {
-        themeBtnApp.textContent = isLight ? "☀" : "☾";
-      }
-    }
-
-    function toggleTheme() {
-      body.classList.toggle("light");
-      saveTheme(body.classList.contains("light"));
-      updateThemeButton();
-    }
-
-    function loadTheme() {
-      const theme = localStorage.getItem("coastalTheme");
-
-      if (theme === "light") {
-        body.classList.add("light");
-      }
-
-      updateThemeButton();
-    }
-
-    loadTheme();
+  function updateThemeButton() {
+    const isLight = body.classList.contains("light");
 
     if (themeBtnApp) {
-      themeBtnApp.addEventListener("click", toggleTheme);
+      themeBtnApp.textContent = isLight ? "☀" : "☾";
+    }
+  }
+
+  function toggleTheme() {
+    body.classList.toggle("light");
+    saveTheme(body.classList.contains("light"));
+    updateThemeButton();
+  }
+
+  function loadTheme() {
+    const theme = localStorage.getItem("coastalTheme");
+
+    if (theme === "light") {
+      body.classList.add("light");
     }
 
-    function updateUserUI() {
-      const planText = isProUser ? "Pro" : "Free";
-      const label = currentUser ? `${currentUser.email} · ${planText}` : "Not logged in";
+    updateThemeButton();
+  }
 
-      if (userEmailText) userEmailText.textContent = label;
-      if (mobileUserText) mobileUserText.textContent = label;
-      if (planPill) planPill.textContent = isProUser ? "Pro Plan Active" : "Free Plan";
+  loadTheme();
 
-      if (userAvatar) {
-        const avatarUrl =
-          currentUser?.user_metadata?.avatar_url ||
-          currentUser?.user_metadata?.picture ||
-          "";
+  if (themeBtnApp) {
+    themeBtnApp.addEventListener("click", toggleTheme);
+  }
 
-        if (avatarUrl) {
-          userAvatar.src = avatarUrl;
-          userAvatar.style.display = "block";
-        } else {
-          userAvatar.removeAttribute("src");
-          userAvatar.style.display = "none";
-        }
-      }
+  function updateUserUI() {
+    const planText = isProUser ? "Pro" : "Free";
+    const label = currentUser ? `${currentUser.email} · ${planText}` : "Not logged in";
 
-      if (upgradeCard) {
-        upgradeCard.classList.toggle("hidden", Boolean(isProUser));
-      }
+    if (userEmailText) userEmailText.textContent = label;
+    if (mobileUserText) mobileUserText.textContent = label;
+    if (planPill) planPill.textContent = isProUser ? "Pro Plan Active" : "Free Plan";
 
-      if (upgradeBtn) {
-        upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
-        upgradeBtn.disabled = Boolean(isProUser);
-      }
-    }
+    if (userAvatar) {
+      const avatarUrl =
+        currentUser?.user_metadata?.avatar_url ||
+        currentUser?.user_metadata?.picture ||
+        "";
 
-    function setLoadingState(isLoading) {
-      isLoadingTasks = isLoading;
-
-      if (loadingState) loadingState.classList.toggle("show", isLoading);
-      if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
-      if (emptyState && isLoading) emptyState.classList.remove("show");
-    }
-
-    function openApp() {
-      showOnly("app");
-      updateUserUI();
-      renderTasks();
-    }
-
-    // ✅ IMPROVED OAuth exchange function with better error handling
-    async function exchangeOAuthCodeIfPresent() {
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get("code");
-      const authError = url.searchParams.get("error");
-      const errorDescription = url.searchParams.get("error_description");
-
-      // If there's an OAuth error, log it and redirect
-      if (authError) {
-        console.error("OAuth URL error:", authError, errorDescription);
-        showToast(`Login error: ${errorDescription || authError}`);
-        setTimeout(() => {
-          window.location.replace(LANDING_URL);
-        }, 1500);
-        return false;
-      }
-
-      // If there's no code, we're not in the OAuth callback
-      if (!code) {
-        console.log("No OAuth code present, proceeding with regular session check");
-        return true;
-      }
-
-      // We have a code, exchange it for a session
-      console.log("OAuth code detected, exchanging for session...");
-
-      try {
-        cconst { data, error } = await withTimeout(
-  supabaseClient.auth.exchangeCodeForSession(code),
-  15000,
-  "OAuth exchange"
-);
-
-        if (error) {
-          console.error("OAuth exchange error:", error);
-          console.error("Error details:", {
-            message: error.message,
-            status: error.status,
-            code: error.code
-          });
-          showToast(`Session error: ${error.message || "Could not establish session"}`);
-          setTimeout(() => {
-            window.location.replace(LANDING_URL);
-          }, 1500);
-          return false;
-        }
-
-        console.log("✅ OAuth exchange successful");
-        cleanUrlToDashboard();
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return true;
-      } catch (error) {
-        console.error("OAuth exchange exception:", error);
-        console.error("Error message:", error.message);
-        showToast(`Error: ${error.message}`);
-        setTimeout(() => {
-          window.location.replace(LANDING_URL);
-        }, 1500);
-        return false;
+      if (avatarUrl) {
+        userAvatar.src = avatarUrl;
+        userAvatar.style.display = "block";
+      } else {
+        userAvatar.removeAttribute("src");
+        userAvatar.style.display = "none";
       }
     }
 
-    async function getOrCreateProfile() {
-      if (!currentUser) return null;
-
-      const { data: existingProfile, error: selectError } = await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
-
-      if (selectError) {
-        console.error("Profile select error:", selectError);
-        currentProfile = null;
-        isProUser = false;
-        updateUserUI();
-        return null;
-      }
-
-      if (existingProfile) {
-        currentProfile = existingProfile;
-        isProUser = Boolean(existingProfile.is_pro);
-        updateUserUI();
-        return existingProfile;
-      }
-
-      const { data: newProfile, error: insertError } = await supabaseClient
-        .from("profiles")
-        .insert([
-          {
-            id: currentUser.id,
-            email: currentUser.email,
-            is_pro: false
-          }
-        ])
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Create profile error:", insertError);
-        currentProfile = null;
-        isProUser = false;
-        updateUserUI();
-        return null;
-      }
-
-      currentProfile = newProfile;
-      isProUser = Boolean(newProfile.is_pro);
-      updateUserUI();
-
-      return newProfile;
+    if (upgradeCard) {
+      upgradeCard.classList.toggle("hidden", Boolean(isProUser));
     }
 
-    async function refreshProfile() {
-      if (!currentUser) return null;
+    if (upgradeBtn) {
+      upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
+      upgradeBtn.disabled = Boolean(isProUser);
+    }
+  }
 
-      const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
+  function setLoadingState(isLoading) {
+    isLoadingTasks = isLoading;
+
+    if (loadingState) loadingState.classList.toggle("show", isLoading);
+    if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
+    if (emptyState && isLoading) emptyState.classList.remove("show");
+  }
+
+  function openApp() {
+    showOnly("app");
+    updateUserUI();
+    renderTasks();
+  }
+
+  async function exchangeOAuthCodeIfPresent() {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
+    const authError = url.searchParams.get("error");
+    const errorDescription = url.searchParams.get("error_description");
+
+    if (authError) {
+      console.error("OAuth URL error:", authError, errorDescription);
+      showToast(`Login error: ${errorDescription || authError}`);
+
+      setTimeout(() => {
+        window.location.replace(LANDING_URL);
+      }, 1500);
+
+      return false;
+    }
+
+    if (!code) {
+      console.log("No OAuth code present, proceeding with regular session check");
+      return true;
+    }
+
+    console.log("OAuth code detected, exchanging for session...");
+
+    try {
+      const { data, error } = await withTimeout(
+        supabaseClient.auth.exchangeCodeForSession(code),
+        15000,
+        "OAuth exchange"
+      );
 
       if (error) {
-        console.error("Refresh profile error:", error);
-        return null;
+        console.error("OAuth exchange error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          status: error.status,
+          code: error.code
+        });
+
+        showToast(`Session error: ${error.message || "Could not establish session"}`);
+
+        setTimeout(() => {
+          window.location.replace(LANDING_URL);
+        }, 1500);
+
+        return false;
       }
 
-      currentProfile = data;
-      isProUser = Boolean(data?.is_pro);
-      updateUserUI();
-
-      return data;
-    }
-
-    async function refreshProfileWithRetry(maxAttempts = 5) {
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        const profile = await refreshProfile();
-
-        if (profile?.is_pro) {
-          showToast("Coastal Flow Pro activated 💎");
-          return profile;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 1400));
-      }
-
-      showToast("Payment received. Pro may activate in a moment.");
-      return currentProfile;
-    }
-
-    async function handleCheckoutReturn() {
-      const params = new URLSearchParams(window.location.search);
-      const checkoutStatus = params.get("checkout");
-
-      if (!checkoutStatus) return;
-
+      console.log("✅ OAuth exchange successful", data);
       cleanUrlToDashboard();
 
-      if (checkoutStatus === "success") {
-        showToast("Payment complete. Activating Pro...");
-        await refreshProfileWithRetry(5);
-      }
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (checkoutStatus === "cancelled") {
-        showToast("Checkout cancelled.");
-      }
+      return true;
+    } catch (error) {
+      console.error("OAuth exchange exception:", error);
+      console.error("Error message:", error.message);
+
+      showToast(`Error: ${error.message}`);
+
+      setTimeout(() => {
+        window.location.replace(LANDING_URL);
+      }, 1500);
+
+      return false;
+    }
+  }
+
+  async function getOrCreateProfile() {
+    if (!currentUser) return null;
+
+    const { data: existingProfile, error: selectError } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (selectError) {
+      console.error("Profile select error:", selectError);
+      currentProfile = null;
+      isProUser = false;
+      updateUserUI();
+      return null;
     }
 
-    async function bootLoggedInUser(user) {
-      currentUser = user;
+    if (existingProfile) {
+      currentProfile = existingProfile;
+      isProUser = Boolean(existingProfile.is_pro);
       updateUserUI();
+      return existingProfile;
+    }
 
+    const { data: newProfile, error: insertError } = await supabaseClient
+      .from("profiles")
+      .insert([
+        {
+          id: currentUser.id,
+          email: currentUser.email,
+          is_pro: false
+        }
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error("Create profile error:", insertError);
+      currentProfile = null;
+      isProUser = false;
+      updateUserUI();
+      return null;
+    }
+
+    currentProfile = newProfile;
+    isProUser = Boolean(newProfile.is_pro);
+    updateUserUI();
+
+    return newProfile;
+  }
+
+  async function refreshProfile() {
+    if (!currentUser) return null;
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Refresh profile error:", error);
+      return null;
+    }
+
+    currentProfile = data;
+    isProUser = Boolean(data?.is_pro);
+    updateUserUI();
+
+    return data;
+  }
+
+  async function refreshProfileWithRetry(maxAttempts = 5) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const profile = await refreshProfile();
+
+      if (profile?.is_pro) {
+        showToast("Coastal Flow Pro activated 💎");
+        return profile;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1400));
+    }
+
+    showToast("Payment received. Pro may activate in a moment.");
+    return currentProfile;
+  }
+
+  async function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const checkoutStatus = params.get("checkout");
+
+    if (!checkoutStatus) return;
+
+    cleanUrlToDashboard();
+
+    if (checkoutStatus === "success") {
+      showToast("Payment complete. Activating Pro...");
+      await refreshProfileWithRetry(5);
+    }
+
+    if (checkoutStatus === "cancelled") {
+      showToast("Checkout cancelled.");
+    }
+  }
+
+  async function bootLoggedInUser(user) {
+    currentUser = user;
+    updateUserUI();
+
+    tasks = [];
+    renderTasks();
+    openApp();
+
+    try {
+      await withTimeout(getOrCreateProfile(), 7000, "Profile");
+    } catch (error) {
+      console.error("Profile boot error:", error);
+      showToast("Profile took too long. Opening app anyway.");
+    }
+
+    try {
+      await withTimeout(loadTasks(), 9000, "Tasks");
+    } catch (error) {
+      console.error("Tasks boot error:", error);
+      setLoadingState(false);
       tasks = [];
       renderTasks();
-      openApp();
-
-      try {
-        await withTimeout(getOrCreateProfile(), 7000, "Profile");
-      } catch (error) {
-        console.error("Profile boot error:", error);
-        showToast("Profile took too long. Opening app anyway.");
-      }
-
-      try {
-        await withTimeout(loadTasks(), 9000, "Tasks");
-      } catch (error) {
-        console.error("Tasks boot error:", error);
-        setLoadingState(false);
-        tasks = [];
-        renderTasks();
-        showToast("Tasks took too long. Try refreshing once.");
-      }
-
-      try {
-        await withTimeout(handleCheckoutReturn(), 7000, "Checkout return");
-      } catch (error) {
-        console.error("Checkout return error:", error);
-      }
-
-      openApp();
+      showToast("Tasks took too long. Try refreshing once.");
     }
 
-    async function bootLoggedOutUser() {
+    try {
+      await withTimeout(handleCheckoutReturn(), 7000, "Checkout return");
+    } catch (error) {
+      console.error("Checkout return error:", error);
+    }
+
+    openApp();
+  }
+
+  async function bootLoggedOutUser() {
+    currentUser = null;
+    currentProfile = null;
+    isProUser = false;
+    tasks = [];
+
+    renderTasks();
+    updateUserUI();
+
+    window.location.replace(LANDING_URL);
+  }
+
+  async function loadCurrentUser() {
+    if (isBooting) return;
+
+    isBooting = true;
+    showOnly("loading");
+
+    try {
+      console.log("Starting auth boot...");
+
+      const exchangeOk = await exchangeOAuthCodeIfPresent();
+
+      if (!exchangeOk) {
+        console.log("OAuth exchange failed");
+        return;
+      }
+
+      console.log("Getting session...");
+
+      const { data: sessionData, error: sessionError } = await withTimeout(
+        supabaseClient.auth.getSession(),
+        10000,
+        "Auth session"
+      );
+
+      hasLoadedInitialSession = true;
+
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        await bootLoggedOutUser();
+        return;
+      }
+
+      let user = sessionData?.session?.user || null;
+
+      console.log("Session check result:", user ? `User: ${user.email}` : "No user");
+
+      if (!user) {
+        console.log("No user found, retrying...");
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const { data: retrySessionData, error: retryError } = await withTimeout(
+          supabaseClient.auth.getSession(),
+          10000,
+          "Auth session retry"
+        );
+
+        if (!retryError) {
+          user = retrySessionData?.session?.user || null;
+          console.log("Retry result:", user ? `User: ${user.email}` : "Still no user");
+        }
+      }
+
+      if (user) {
+        console.log("✅ User authenticated:", user.email);
+        await bootLoggedInUser(user);
+      } else {
+        console.log("❌ No authenticated user");
+        await bootLoggedOutUser();
+      }
+    } catch (error) {
+      console.error("Fatal boot error:", error);
+      console.error("Error message:", error.message);
+
+      hasLoadedInitialSession = true;
       currentUser = null;
       currentProfile = null;
       isProUser = false;
@@ -1575,74 +1662,115 @@
       updateUserUI();
 
       window.location.replace(LANDING_URL);
+    } finally {
+      isBooting = false;
+    }
+  }
+
+  async function runBootFallback() {
+    if (hasBootFallbackRun) return;
+
+    const appStillHidden = appScreen && appScreen.classList.contains("hidden");
+
+    if (!appStillHidden) return;
+
+    hasBootFallbackRun = true;
+
+    console.warn("Boot fallback triggered. App was stuck on loading.");
+
+    try {
+      const { data, error } = await withTimeout(
+        supabaseClient.auth.getSession(),
+        8000,
+        "Fallback session"
+      );
+
+      if (error) {
+        console.error("Fallback session error:", error);
+        window.location.replace(LANDING_URL);
+        return;
+      }
+
+      const user = data?.session?.user || null;
+
+      if (user) {
+        currentUser = user;
+        updateUserUI();
+        showOnly("app");
+
+        try {
+          await withTimeout(getOrCreateProfile(), 6000, "Fallback profile");
+        } catch (profileError) {
+          console.error("Fallback profile error:", profileError);
+        }
+
+        try {
+          await withTimeout(loadTasks(), 8000, "Fallback tasks");
+        } catch (tasksError) {
+          console.error("Fallback load tasks error:", tasksError);
+          setLoadingState(false);
+          renderTasks();
+        }
+
+        openApp();
+      } else {
+        window.location.replace(LANDING_URL);
+      }
+    } catch (error) {
+      console.error("Fallback crash:", error);
+      window.location.replace(LANDING_URL);
+    }
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    const user = session?.user || null;
+
+    if (isBooting && event !== "SIGNED_OUT") {
+      return;
     }
 
-    // ✅ IMPROVED Main boot function
-    async function loadCurrentUser() {
-      if (isBooting) return;
+    if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
+      return;
+    }
 
-      isBooting = true;
-      showOnly("loading");
+    if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+      currentUser = user;
+      updateUserUI();
+      return;
+    }
 
+    if (event === "SIGNED_IN" && user) {
+      await bootLoggedInUser(user);
+      showToast(`Logged in as ${user.email}`);
+      return;
+    }
+
+    if (event === "SIGNED_OUT") {
+      showToast("Logged out.");
+      await bootLoggedOutUser();
+    }
+  });
+
+  if (homeBtn) {
+    homeBtn.addEventListener("click", () => {
+      window.location.href = LANDING_URL;
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
       try {
-        console.log("Starting auth boot...");
+        logoutBtn.disabled = true;
+        logoutBtn.textContent = "…";
 
-        // Step 1: Handle OAuth code exchange if present
-        const exchangeOk = await exchangeOAuthCodeIfPresent();
-        if (!exchangeOk) {
-          console.log("OAuth exchange failed");
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) {
+          console.error("Logout error:", error);
+          showToast(error.message || "Logout failed.");
           return;
         }
 
-        // Step 2: Get session
-        console.log("Getting session...");
-        const { data: sessionData, error: sessionError } = await withTimeout(
-          supabaseClient.auth.getSession(),
-          10000,
-          "Auth session"
-        );
-
-        hasLoadedInitialSession = true;
-
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          await bootLoggedOutUser();
-          return;
-        }
-
-        let user = sessionData?.session?.user || null;
-        console.log("Session check result:", user ? `User: ${user.email}` : "No user");
-
-        // Step 3: If no user, retry once (for race conditions)
-        if (!user) {
-          console.log("No user found, retrying...");
-          await new Promise(resolve => setTimeout(resolve, 800));
-
-          const { data: retrySessionData, error: retryError } = await withTimeout(
-            supabaseClient.auth.getSession(),
-            10000,
-            "Auth session retry"
-          );
-
-          if (!retryError) {
-            user = retrySessionData?.session?.user || null;
-            console.log("Retry result:", user ? `User: ${user.email}` : "Still no user");
-          }
-        }
-
-        // Step 4: Boot based on user presence
-        if (user) {
-          console.log("✅ User authenticated:", user.email);
-          await bootLoggedInUser(user);
-        } else {
-          console.log("❌ No authenticated user");
-          await bootLoggedOutUser();
-        }
-      } catch (error) {
-        console.error("Fatal boot error:", error);
-        console.error("Error message:", error.message);
-
-        hasLoadedInitialSession = true;
         currentUser = null;
         currentProfile = null;
         isProUser = false;
@@ -1652,612 +1780,554 @@
         updateUserUI();
 
         window.location.replace(LANDING_URL);
+      } catch (error) {
+        console.error("Logout crash:", error);
+        showToast("Logout failed.");
       } finally {
-        isBooting = false;
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = "⎋";
       }
+    });
+  }
+
+  function getFilteredTasks() {
+    if (currentFilter === "active") return tasks.filter(task => !task.done);
+    if (currentFilter === "done") return tasks.filter(task => task.done);
+    return tasks;
+  }
+
+  function updateStats() {
+    const done = tasks.filter(task => task.done).length;
+    const active = tasks.length - done;
+
+    if (totalCount) totalCount.textContent = tasks.length;
+    if (activeCount) activeCount.textContent = active;
+    if (doneCount) doneCount.textContent = done;
+  }
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll(".task:not(.dragging)")];
+
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+          return {
+            offset: offset,
+            element: child
+          };
+        }
+
+        return closest;
+      },
+      {
+        offset: Number.NEGATIVE_INFINITY,
+        element: null
+      }
+    ).element;
+  }
+
+  async function saveTaskOrder() {
+    if (!currentUser || !tasksContainer) return;
+
+    const orderedIds = [...tasksContainer.querySelectorAll(".task")].map(element => element.dataset.id);
+
+    const reorderedTasks = orderedIds
+      .map((id, index) => {
+        const task = tasks.find(item => String(item.id) === String(id));
+        if (!task) return null;
+
+        return {
+          ...task,
+          position: index
+        };
+      })
+      .filter(Boolean);
+
+    const hiddenTasks = tasks.filter(task => {
+      return !orderedIds.includes(String(task.id));
+    });
+
+    tasks = [...reorderedTasks, ...hiddenTasks];
+
+    const updates = reorderedTasks.map(task => {
+      return supabaseClient
+        .from("tasks")
+        .update({
+          position: task.position
+        })
+        .eq("id", task.id)
+        .eq("user_id", currentUser.id);
+    });
+
+    const results = await Promise.all(updates);
+    const failed = results.find(result => result.error);
+
+    if (failed) {
+      console.error("Save order error:", failed.error);
+      showToast(failed.error.message || "Could not save task order.");
     }
+  }
 
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      const user = session?.user || null;
+  function setupTaskDragEvents(taskElement, task) {
+    taskElement.draggable = true;
 
-      if (isBooting && event !== "SIGNED_OUT") {
+    taskElement.addEventListener("dragstart", event => {
+      if (
+        event.target.closest(".check") ||
+        event.target.closest(".edit") ||
+        event.target.closest(".delete") ||
+        event.target.closest(".mini-btn")
+      ) {
+        event.preventDefault();
         return;
       }
 
-      if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
-        return;
-      }
+      taskElement.classList.add("dragging");
 
-      if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-        currentUser = user;
-        updateUserUI();
-        return;
-      }
-
-      if (event === "SIGNED_IN" && user) {
-        await bootLoggedInUser(user);
-        showToast(`Logged in as ${user.email}`);
-        return;
-      }
-
-      if (event === "SIGNED_OUT") {
-        showToast("Logged out.");
-        await bootLoggedOutUser();
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", String(task.id));
       }
     });
 
-    if (homeBtn) {
-      homeBtn.addEventListener("click", () => {
-        window.location.href = LANDING_URL;
-      });
-    }
+    taskElement.addEventListener("dragend", async () => {
+      taskElement.classList.remove("dragging");
 
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async () => {
-        try {
-          logoutBtn.disabled = true;
-          logoutBtn.textContent = "…";
-
-          const { error } = await supabaseClient.auth.signOut();
-
-          if (error) {
-            console.error("Logout error:", error);
-            showToast(error.message || "Logout failed.");
-            return;
-          }
-
-          currentUser = null;
-          currentProfile = null;
-          isProUser = false;
-          tasks = [];
-
-          renderTasks();
-          updateUserUI();
-
-          window.location.replace(LANDING_URL);
-        } catch (error) {
-          console.error("Logout crash:", error);
-          showToast("Logout failed.");
-        } finally {
-          logoutBtn.disabled = false;
-          logoutBtn.textContent = "⎋";
-        }
-      });
-    }
-
-    function getFilteredTasks() {
-      if (currentFilter === "active") return tasks.filter(task => !task.done);
-      if (currentFilter === "done") return tasks.filter(task => task.done);
-      return tasks;
-    }
-
-    function updateStats() {
-      const done = tasks.filter(task => task.done).length;
-      const active = tasks.length - done;
-
-      if (totalCount) totalCount.textContent = tasks.length;
-      if (activeCount) activeCount.textContent = active;
-      if (doneCount) doneCount.textContent = done;
-    }
-
-    function getDragAfterElement(container, y) {
-      const draggableElements = [...container.querySelectorAll(".task:not(.dragging)")];
-
-      return draggableElements.reduce(
-        (closest, child) => {
-          const box = child.getBoundingClientRect();
-          const offset = y - box.top - box.height / 2;
-
-          if (offset < 0 && offset > closest.offset) {
-            return {
-              offset: offset,
-              element: child
-            };
-          }
-
-          return closest;
-        },
-        {
-          offset: Number.NEGATIVE_INFINITY,
-          element: null
-        }
-      ).element;
-    }
-
-    async function saveTaskOrder() {
-      if (!currentUser || !tasksContainer) return;
-
-      const orderedIds = [...tasksContainer.querySelectorAll(".task")].map(element => element.dataset.id);
-
-      const reorderedTasks = orderedIds
-        .map((id, index) => {
-          const task = tasks.find(item => String(item.id) === String(id));
-          if (!task) return null;
-
-          return {
-            ...task,
-            position: index
-          };
-        })
-        .filter(Boolean);
-
-      const hiddenTasks = tasks.filter(task => {
-        return !orderedIds.includes(String(task.id));
+      document.querySelectorAll(".task.drag-over").forEach(element => {
+        element.classList.remove("drag-over");
       });
 
-      tasks = [...reorderedTasks, ...hiddenTasks];
+      await saveTaskOrder();
+    });
 
-      const updates = reorderedTasks.map(task => {
-        return supabaseClient
-          .from("tasks")
-          .update({
-            position: task.position
-          })
-          .eq("id", task.id)
-          .eq("user_id", currentUser.id);
-      });
+    taskElement.addEventListener("dragover", event => {
+      event.preventDefault();
+      taskElement.classList.add("drag-over");
+    });
 
-      const results = await Promise.all(updates);
-      const failed = results.find(result => result.error);
+    taskElement.addEventListener("dragleave", () => {
+      taskElement.classList.remove("drag-over");
+    });
 
-      if (failed) {
-        console.error("Save order error:", failed.error);
-        showToast(failed.error.message || "Could not save task order.");
+    taskElement.addEventListener("drop", event => {
+      event.preventDefault();
+      taskElement.classList.remove("drag-over");
+    });
+  }
+
+  if (tasksContainer) {
+    tasksContainer.addEventListener("dragover", event => {
+      event.preventDefault();
+
+      const dragging = document.querySelector(".task.dragging");
+      if (!dragging) return;
+
+      const afterElement = getDragAfterElement(tasksContainer, event.clientY);
+
+      if (afterElement == null) {
+        tasksContainer.appendChild(dragging);
+      } else {
+        tasksContainer.insertBefore(dragging, afterElement);
       }
+    });
+  }
+
+  function renderTasks() {
+    if (!tasksContainer) return;
+
+    tasksContainer.innerHTML = "";
+
+    const filteredTasks = getFilteredTasks();
+
+    if (!isLoadingTasks && emptyState) {
+      emptyState.classList.toggle("show", filteredTasks.length === 0);
     }
 
-    function setupTaskDragEvents(taskElement, task) {
-      taskElement.draggable = true;
+    filteredTasks.forEach(task => {
+      const taskElement = document.createElement("article");
 
-      taskElement.addEventListener("dragstart", event => {
-        if (
-          event.target.closest(".check") ||
-          event.target.closest(".edit") ||
-          event.target.closest(".delete") ||
-          event.target.closest(".mini-btn")
-        ) {
-          event.preventDefault();
-          return;
-        }
+      taskElement.className = `task ${task.done ? "done" : ""}`;
+      taskElement.dataset.id = task.id;
 
-        taskElement.classList.add("dragging");
+      taskElement.innerHTML = `
+        <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
 
-        if (event.dataTransfer) {
-          event.dataTransfer.effectAllowed = "move";
-          event.dataTransfer.setData("text/plain", String(task.id));
-        }
-      });
+        <div class="task-text"></div>
 
-      taskElement.addEventListener("dragend", async () => {
-        taskElement.classList.remove("dragging");
+        <div class="task-actions">
+          <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
+          <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
+        </div>
+      `;
 
-        document.querySelectorAll(".task.drag-over").forEach(element => {
-          element.classList.remove("drag-over");
-        });
+      taskElement.querySelector(".task-text").textContent = task.text;
 
-        await saveTaskOrder();
-      });
+      setupTaskDragEvents(taskElement, task);
 
-      taskElement.addEventListener("dragover", event => {
+      taskElement.querySelector(".check").addEventListener("click", event => {
         event.preventDefault();
-        taskElement.classList.add("drag-over");
+        event.stopPropagation();
+        toggleTask(task.id);
       });
 
-      taskElement.addEventListener("dragleave", () => {
-        taskElement.classList.remove("drag-over");
-      });
-
-      taskElement.addEventListener("drop", event => {
+      taskElement.querySelector(".edit").addEventListener("click", event => {
         event.preventDefault();
-        taskElement.classList.remove("drag-over");
+        event.stopPropagation();
+        openEditModal(task.id);
       });
-    }
 
-    if (tasksContainer) {
-      tasksContainer.addEventListener("dragover", event => {
+      taskElement.querySelector(".delete").addEventListener("click", event => {
         event.preventDefault();
-
-        const dragging = document.querySelector(".task.dragging");
-        if (!dragging) return;
-
-        const afterElement = getDragAfterElement(tasksContainer, event.clientY);
-
-        if (afterElement == null) {
-          tasksContainer.appendChild(dragging);
-        } else {
-          tasksContainer.insertBefore(dragging, afterElement);
-        }
-      });
-    }
-
-    function renderTasks() {
-      if (!tasksContainer) return;
-
-      tasksContainer.innerHTML = "";
-
-      const filteredTasks = getFilteredTasks();
-
-      if (!isLoadingTasks && emptyState) {
-        emptyState.classList.toggle("show", filteredTasks.length === 0);
-      }
-
-      filteredTasks.forEach(task => {
-        const taskElement = document.createElement("article");
-
-        taskElement.className = `task ${task.done ? "done" : ""}`;
-        taskElement.dataset.id = task.id;
-
-        taskElement.innerHTML = `
-          <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
-
-          <div class="task-text"></div>
-
-          <div class="task-actions">
-            <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
-            <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
-          </div>
-        `;
-
-        taskElement.querySelector(".task-text").textContent = task.text;
-
-        setupTaskDragEvents(taskElement, task);
-
-        taskElement.querySelector(".check").addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
-          toggleTask(task.id);
-        });
-
-        taskElement.querySelector(".edit").addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
-          openEditModal(task.id);
-        });
-
-        taskElement.querySelector(".delete").addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
-          deleteTask(task.id);
-        });
-
-        tasksContainer.appendChild(taskElement);
+        event.stopPropagation();
+        deleteTask(task.id);
       });
 
-      updateStats();
-    }
+      tasksContainer.appendChild(taskElement);
+    });
 
-    async function loadTasks() {
-      if (!currentUser) return;
+    updateStats();
+  }
 
-      setLoadingState(true);
+  async function loadTasks() {
+    if (!currentUser) return;
 
-      try {
-        const { data, error } = await supabaseClient
-          .from("tasks")
-          .select("*")
-          .eq("user_id", currentUser.id)
-          .order("position", { ascending: true })
-          .order("created_at", { ascending: false });
+    setLoadingState(true);
 
-        if (error) {
-          console.error("Load tasks error:", error);
-          showToast(error.message || "Could not load tasks.");
-          return;
-        }
-
-        tasks = data || [];
-        renderTasks();
-      } finally {
-        setLoadingState(false);
-      }
-    }
-
-    async function addTask(text) {
-      const cleanText = text.trim();
-      if (!cleanText) return;
-
-      if (!currentUser) {
-        showToast("Log in first to save tasks ☁️");
-        return;
-      }
-
-      try {
-        await withTimeout(refreshProfile(), 6000, "Profile refresh");
-      } catch (error) {
-        console.error("Profile refresh timeout:", error);
-      }
-
-      if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
-        showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
-        return;
-      }
-
-      const nextPosition =
-        tasks.length > 0
-          ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
-          : 0;
-
+    try {
       const { data, error } = await supabaseClient
         .from("tasks")
-        .insert([
-          {
-            user_id: currentUser.id,
-            text: cleanText,
-            done: false,
-            position: nextPosition
-          }
-        ])
-        .select()
-        .single();
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Add task error full:", error);
-        showToast(error.message || "Could not add task.");
+        console.error("Load tasks error:", error);
+        showToast(error.message || "Could not load tasks.");
         return;
       }
 
-      tasks.push(data);
+      tasks = data || [];
       renderTasks();
+    } finally {
+      setLoadingState(false);
+    }
+  }
 
-      if (isProUser) {
-        showToast("Pro task saved. Unlimited mode 💎");
-      } else {
-        const remaining = FREE_TASK_LIMIT - tasks.length;
-        showToast(`Task saved. ${remaining} free tasks left.`);
-      }
+  async function addTask(text) {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    if (!currentUser) {
+      showToast("Log in first to save tasks ☁️");
+      return;
     }
 
-    async function toggleTask(id) {
-      const task = tasks.find(item => String(item.id) === String(id));
-      if (!task || !currentUser) return;
+    try {
+      await withTimeout(refreshProfile(), 6000, "Profile refresh");
+    } catch (error) {
+      console.error("Profile refresh timeout:", error);
+    }
 
-      const newDoneValue = !task.done;
+    if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
+      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
+      return;
+    }
 
-      const { error } = await supabaseClient
-        .from("tasks")
-        .update({
+    const nextPosition =
+      tasks.length > 0
+        ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
+        : 0;
+
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .insert([
+        {
+          user_id: currentUser.id,
+          text: cleanText,
+          done: false,
+          position: nextPosition
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Add task error full:", error);
+      showToast(error.message || "Could not add task.");
+      return;
+    }
+
+    tasks.push(data);
+    renderTasks();
+
+    if (isProUser) {
+      showToast("Pro task saved. Unlimited mode 💎");
+    } else {
+      const remaining = FREE_TASK_LIMIT - tasks.length;
+      showToast(`Task saved. ${remaining} free tasks left.`);
+    }
+  }
+
+  async function toggleTask(id) {
+    const task = tasks.find(item => String(item.id) === String(id));
+    if (!task || !currentUser) return;
+
+    const newDoneValue = !task.done;
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .update({
+        done: newDoneValue
+      })
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Toggle task error:", error);
+      showToast("Could not update task.");
+      return;
+    }
+
+    tasks = tasks.map(item => {
+      if (String(item.id) === String(id)) {
+        return {
+          ...item,
           done: newDoneValue
-        })
-        .eq("id", id)
-        .eq("user_id", currentUser.id);
+        };
+      }
 
-      if (error) {
-        console.error("Toggle task error:", error);
-        showToast("Could not update task.");
+      return item;
+    });
+
+    renderTasks();
+  }
+
+  async function deleteTask(id) {
+    if (!currentUser) return;
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Delete task error:", error);
+      showToast("Could not delete task.");
+      return;
+    }
+
+    tasks = tasks.filter(task => String(task.id) !== String(id));
+    renderTasks();
+    await saveTaskOrder();
+    showToast("Task deleted.");
+  }
+
+  function openEditModal(id) {
+    const task = tasks.find(item => String(item.id) === String(id));
+    if (!task) return;
+
+    editingTaskId = id;
+    editInput.value = task.text;
+    editModal.classList.add("show");
+
+    setTimeout(() => {
+      editInput.focus();
+    }, 80);
+  }
+
+  function closeEditModal() {
+    editingTaskId = null;
+    editInput.value = "";
+    editModal.classList.remove("show");
+  }
+
+  async function updateTask() {
+    const cleanText = editInput.value.trim();
+
+    if (!cleanText || editingTaskId === null || !currentUser) return;
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .update({
+        text: cleanText
+      })
+      .eq("id", editingTaskId)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Update task error:", error);
+      showToast("Could not update task.");
+      return;
+    }
+
+    tasks = tasks.map(task => {
+      if (String(task.id) === String(editingTaskId)) {
+        return {
+          ...task,
+          text: cleanText
+        };
+      }
+
+      return task;
+    });
+
+    renderTasks();
+    closeEditModal();
+    showToast("Task updated.");
+  }
+
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        showToast("Log in first before upgrading.");
         return;
       }
 
-      tasks = tasks.map(item => {
-        if (String(item.id) === String(id)) {
-          return {
-            ...item,
-            done: newDoneValue
-          };
+      if (isProUser) {
+        showToast("You already have Coastal Flow Pro 💎");
+        return;
+      }
+
+      try {
+        upgradeBtn.disabled = true;
+        upgradeBtn.textContent = "Opening Stripe...";
+
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: currentUser.email,
+            userId: currentUser.id
+          })
+        });
+
+        const rawText = await response.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          console.error("Non-JSON checkout API response:", rawText);
+          throw new Error("Server returned non-JSON. Check Vercel logs.");
         }
 
-        return item;
+        if (!response.ok) {
+          throw new Error(data.error || "Could not start checkout.");
+        }
+
+        if (!data.url) {
+          throw new Error("Stripe checkout URL missing.");
+        }
+
+        window.location.href = data.url;
+      } catch (error) {
+        console.error("Checkout error:", error);
+        showToast(error.message || "Checkout failed.");
+        upgradeBtn.disabled = false;
+        upgradeBtn.textContent = "Upgrade 🔒";
+      }
+    });
+  }
+
+  if (taskForm) {
+    taskForm.addEventListener("submit", event => {
+      event.preventDefault();
+
+      addTask(taskInput.value);
+
+      taskInput.value = "";
+      taskInput.focus();
+    });
+  }
+
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      if (!button.dataset.filter) return;
+
+      currentFilter = button.dataset.filter;
+
+      filterButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.filter === currentFilter);
       });
 
       renderTasks();
-    }
+    });
+  });
 
-    async function deleteTask(id) {
-      if (!currentUser) return;
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        showToast("Log in first.");
+        return;
+      }
+
+      const completedCount = tasks.filter(task => task.done).length;
+
+      if (completedCount === 0) {
+        showToast("No completed tasks to clear yet.");
+        return;
+      }
 
       const { error } = await supabaseClient
         .from("tasks")
         .delete()
-        .eq("id", id)
-        .eq("user_id", currentUser.id);
+        .eq("user_id", currentUser.id)
+        .eq("done", true);
 
       if (error) {
-        console.error("Delete task error:", error);
-        showToast("Could not delete task.");
+        console.error("Clear completed error:", error);
+        showToast("Could not clear completed tasks.");
         return;
       }
 
-      tasks = tasks.filter(task => String(task.id) !== String(id));
+      tasks = tasks.filter(task => !task.done);
+
       renderTasks();
       await saveTaskOrder();
-      showToast("Task deleted.");
-    }
-
-    function openEditModal(id) {
-      const task = tasks.find(item => String(item.id) === String(id));
-      if (!task) return;
-
-      editingTaskId = id;
-      editInput.value = task.text;
-      editModal.classList.add("show");
-
-      setTimeout(() => {
-        editInput.focus();
-      }, 80);
-    }
-
-    function closeEditModal() {
-      editingTaskId = null;
-      editInput.value = "";
-      editModal.classList.remove("show");
-    }
-
-    async function updateTask() {
-      const cleanText = editInput.value.trim();
-
-      if (!cleanText || editingTaskId === null || !currentUser) return;
-
-      const { error } = await supabaseClient
-        .from("tasks")
-        .update({
-          text: cleanText
-        })
-        .eq("id", editingTaskId)
-        .eq("user_id", currentUser.id);
-
-      if (error) {
-        console.error("Update task error:", error);
-        showToast("Could not update task.");
-        return;
-      }
-
-      tasks = tasks.map(task => {
-        if (String(task.id) === String(editingTaskId)) {
-          return {
-            ...task,
-            text: cleanText
-          };
-        }
-
-        return task;
-      });
-
-      renderTasks();
-      closeEditModal();
-      showToast("Task updated.");
-    }
-
-    if (upgradeBtn) {
-      upgradeBtn.addEventListener("click", async () => {
-        if (!currentUser) {
-          showToast("Log in first before upgrading.");
-          return;
-        }
-
-        if (isProUser) {
-          showToast("You already have Coastal Flow Pro 💎");
-          return;
-        }
-
-        try {
-          upgradeBtn.disabled = true;
-          upgradeBtn.textContent = "Opening Stripe...";
-
-          const response = await fetch("/api/create-checkout-session", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              email: currentUser.email,
-              userId: currentUser.id
-            })
-          });
-
-          const rawText = await response.text();
-
-          let data;
-
-          try {
-            data = JSON.parse(rawText);
-          } catch {
-            console.error("Non-JSON checkout API response:", rawText);
-            throw new Error("Server returned non-JSON. Check Vercel logs.");
-          }
-
-          if (!response.ok) {
-            throw new Error(data.error || "Could not start checkout.");
-          }
-
-          if (!data.url) {
-            throw new Error("Stripe checkout URL missing.");
-          }
-
-          window.location.href = data.url;
-        } catch (error) {
-          console.error("Checkout error:", error);
-          showToast(error.message || "Checkout failed.");
-          upgradeBtn.disabled = false;
-          upgradeBtn.textContent = "Upgrade 🔒";
-        }
-      });
-    }
-
-    if (taskForm) {
-      taskForm.addEventListener("submit", event => {
-        event.preventDefault();
-
-        addTask(taskInput.value);
-
-        taskInput.value = "";
-        taskInput.focus();
-      });
-    }
-
-    filterButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        if (!button.dataset.filter) return;
-
-        currentFilter = button.dataset.filter;
-
-        filterButtons.forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.filter === currentFilter);
-        });
-
-        renderTasks();
-      });
+      showToast("Completed tasks cleared. Clean board 🧼");
     });
+  }
 
-    if (clearCompletedBtn) {
-      clearCompletedBtn.addEventListener("click", async () => {
-        if (!currentUser) {
-          showToast("Log in first.");
-          return;
-        }
+  if (saveEdit) saveEdit.addEventListener("click", updateTask);
+  if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
 
-        const completedCount = tasks.filter(task => task.done).length;
+  if (editInput) {
+    editInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") updateTask();
+      if (event.key === "Escape") closeEditModal();
+    });
+  }
 
-        if (completedCount === 0) {
-          showToast("No completed tasks to clear yet.");
-          return;
-        }
+  if (editModal) {
+    editModal.addEventListener("click", event => {
+      if (event.target === editModal) closeEditModal();
+    });
+  }
 
-        const { error } = await supabaseClient
-          .from("tasks")
-          .delete()
-          .eq("user_id", currentUser.id)
-          .eq("done", true);
-
-        if (error) {
-          console.error("Clear completed error:", error);
-          showToast("Could not clear completed tasks.");
-          return;
-        }
-
-        tasks = tasks.filter(task => !task.done);
-
-        renderTasks();
-        await saveTaskOrder();
-        showToast("Completed tasks cleared. Clean board 🧼");
-      });
-    }
-
-    if (saveEdit) saveEdit.addEventListener("click", updateTask);
-    if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
-
-    if (editInput) {
-      editInput.addEventListener("keydown", event => {
-        if (event.key === "Enter") updateTask();
-        if (event.key === "Escape") closeEditModal();
-      });
-    }
-
-    if (editModal) {
-      editModal.addEventListener("click", event => {
-        if (event.target === editModal) closeEditModal();
-      });
-    }
-
-    // ✅ Initialize the app
+  window.addEventListener("DOMContentLoaded", () => {
     loadCurrentUser();
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then(() => console.log("Service Worker registered"))
-          .catch(error => console.error("Service Worker failed:", error));
-      });
-    }
-  </script>
+    setTimeout(() => {
+      runBootFallback();
+    }, 8000);
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch(error => console.error("Service Worker failed:", error));
+    });
+  }
+</script>
 </body>
 </html>
