@@ -1374,7 +1374,7 @@
   dragStyle.textContent = `
     .task {
       cursor: grab;
-      touch-action: none;
+      touch-action: auto;
     }
 
     .task.dragging {
@@ -1386,6 +1386,13 @@
     .task.drag-over {
       outline: 2px solid var(--accent);
       outline-offset: 4px;
+    }
+
+    .check,
+    .mini-btn,
+    .task-actions {
+      touch-action: manipulation;
+      pointer-events: auto;
     }
   `;
   document.head.appendChild(dragStyle);
@@ -1983,6 +1990,16 @@
     taskElement.draggable = true;
 
     taskElement.addEventListener("dragstart", event => {
+      if (
+        event.target.closest(".check") ||
+        event.target.closest(".edit") ||
+        event.target.closest(".delete") ||
+        event.target.closest(".mini-btn")
+      ) {
+        event.preventDefault();
+        return;
+      }
+
       draggedTaskId = task.id;
       taskElement.classList.add("dragging");
 
@@ -2054,13 +2071,13 @@
       taskElement.dataset.id = task.id;
 
       taskElement.innerHTML = `
-        <button class="check" aria-label="Complete task">✓</button>
+        <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
 
         <div class="task-text"></div>
 
         <div class="task-actions">
-          <button class="mini-btn edit" aria-label="Edit task">✎</button>
-          <button class="mini-btn delete" aria-label="Delete task">×</button>
+          <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
+          <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
         </div>
       `;
 
@@ -2068,15 +2085,21 @@
 
       setupTaskDragEvents(taskElement, task);
 
-      taskElement.querySelector(".check").addEventListener("click", () => {
+      taskElement.querySelector(".check").addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
         toggleTask(task.id);
       });
 
-      taskElement.querySelector(".edit").addEventListener("click", () => {
+      taskElement.querySelector(".edit").addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
         openEditModal(task.id);
       });
 
-      taskElement.querySelector(".delete").addEventListener("click", () => {
+      taskElement.querySelector(".delete").addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
         deleteTask(task.id);
       });
 
@@ -2163,7 +2186,7 @@
   }
 
   async function toggleTask(id) {
-    const task = tasks.find(item => item.id === id);
+    const task = tasks.find(item => String(item.id) === String(id));
 
     if (!task || !currentUser) return;
 
@@ -2184,7 +2207,7 @@
     }
 
     tasks = tasks.map(item => {
-      if (item.id === id) {
+      if (String(item.id) === String(id)) {
         return {
           ...item,
           done: newDoneValue
@@ -2212,14 +2235,14 @@
       return;
     }
 
-    tasks = tasks.filter(task => task.id !== id);
+    tasks = tasks.filter(task => String(task.id) !== String(id));
     renderTasks();
     await saveTaskOrder();
     showToast("Task deleted.");
   }
 
   function openEditModal(id) {
-    const task = tasks.find(item => item.id === id);
+    const task = tasks.find(item => String(item.id) === String(id));
 
     if (!task) return;
 
@@ -2258,7 +2281,7 @@
     }
 
     tasks = tasks.map(task => {
-      if (task.id === editingTaskId) {
+      if (String(task.id) === String(editingTaskId)) {
         return {
           ...task,
           text: cleanText
