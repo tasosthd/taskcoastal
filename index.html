@@ -2443,7 +2443,20 @@
     });
   }
 
-  loadCurrentUser();
+  loadCurrentUser().catch(error => {
+  console.error("Boot error:", error);
+
+  currentUser = null;
+  currentProfile = null;
+  isProUser = false;
+  tasks = [];
+
+  renderTasks();
+  updateUserUI();
+  openPrelaunch(false);
+
+  showToast("App boot failed. Check console.");
+});
 </script>
 </body>
 </html>
