@@ -1300,7 +1300,6 @@
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const FREE_TASK_LIMIT = 10;
-
   const body = document.body;
 
   const prelaunchPage = document.getElementById("prelaunchPage");
@@ -1357,8 +1356,29 @@
   let currentFilter = "all";
   let editingTaskId = null;
   let isLoadingTasks = false;
+  let draggedTaskId = null;
 
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
+
+  const dragStyle = document.createElement("style");
+  dragStyle.textContent = `
+    .task {
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .task.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+      cursor: grabbing;
+    }
+
+    .task.drag-over {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+  `;
+  document.head.appendChild(dragStyle);
 
   if (waitlistCount) {
     waitlistCount.textContent = currentWaitlistCount;
@@ -1415,21 +1435,13 @@
   function updateThemeButtons() {
     const isDark = body.classList.contains("dark");
 
-    if (themeBtnLaunch) {
-      themeBtnLaunch.textContent = isDark ? "☀" : "☾";
-    }
-
-    if (themeBtnApp) {
-      themeBtnApp.textContent = isDark ? "☀" : "☾";
-    }
+    if (themeBtnLaunch) themeBtnLaunch.textContent = isDark ? "☀" : "☾";
+    if (themeBtnApp) themeBtnApp.textContent = isDark ? "☀" : "☾";
   }
 
   function toggleTheme() {
     body.classList.toggle("dark");
-
-    const isDark = body.classList.contains("dark");
-
-    saveTheme(isDark);
+    saveTheme(body.classList.contains("dark"));
     updateThemeButtons();
   }
 
@@ -1445,23 +1457,16 @@
 
   loadTheme();
 
-  if (themeBtnLaunch) {
-    themeBtnLaunch.addEventListener("click", toggleTheme);
-  }
-
-  if (themeBtnApp) {
-    themeBtnApp.addEventListener("click", toggleTheme);
-  }
+  if (themeBtnLaunch) themeBtnLaunch.addEventListener("click", toggleTheme);
+  if (themeBtnApp) themeBtnApp.addEventListener("click", toggleTheme);
 
   function updateUserUI() {
     if (userEmailText) {
-      if (currentUser) {
-        userEmailText.textContent = isProUser
+      userEmailText.textContent = currentUser
+        ? isProUser
           ? `${currentUser.email} · Pro`
-          : `${currentUser.email} · Free`;
-      } else {
-        userEmailText.textContent = "Not logged in";
-      }
+          : `${currentUser.email} · Free`
+        : "Not logged in";
     }
 
     if (userAvatar) {
@@ -1492,17 +1497,9 @@
   function setLoadingState(isLoading) {
     isLoadingTasks = isLoading;
 
-    if (loadingState) {
-      loadingState.classList.toggle("show", isLoading);
-    }
-
-    if (tasksContainer) {
-      tasksContainer.style.display = isLoading ? "none" : "grid";
-    }
-
-    if (emptyState && isLoading) {
-      emptyState.classList.remove("show");
-    }
+    if (loadingState) loadingState.classList.toggle("show", isLoading);
+    if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
+    if (emptyState && isLoading) emptyState.classList.remove("show");
   }
 
   function openApp() {
@@ -1735,13 +1732,8 @@
     });
   }
 
-  if (openAppBtn) {
-    openAppBtn.addEventListener("click", openApp);
-  }
-
-  if (backLaunchBtn) {
-    backLaunchBtn.addEventListener("click", openPrelaunch);
-  }
+  if (openAppBtn) openAppBtn.addEventListener("click", openApp);
+  if (backLaunchBtn) backLaunchBtn.addEventListener("click", openPrelaunch);
 
   if (waitlistForm) {
     waitlistForm.addEventListener("submit", async event => {
@@ -1769,10 +1761,10 @@
         const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
           method: "POST",
           headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             "Content-Type": "application/json",
-            "Prefer": "return=minimal"
+            Prefer: "return=minimal"
           },
           body: JSON.stringify({
             email: email,
@@ -1812,25 +1804,21 @@
         }
 
         waitlistMsg.textContent =
-  "You're on the beta list 🌊 Check Spam/Promotions if the welcome email is missing.";
+          "You're on the beta list 🌊 Check Spam/Promotions if the welcome email is missing.";
+        waitlistMsg.style.color = "var(--success)";
+        waitlistEmail.value = "";
 
-waitlistMsg.style.color = "var(--success)";
-waitlistEmail.value = "";
-waitlistMsg.style.color = "var(--success)";
-waitlistEmail.value = "";
-
-fetch("/api/send-welcome", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    email: email
-  })
-}).catch(error => {
-  console.error("Welcome email failed:", error);
-});
-
+        fetch("/api/send-welcome", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email
+          })
+        }).catch(error => {
+          console.error("Welcome email failed:", error);
+        });
       } catch (error) {
         console.error("Waitlist crash:", error);
 
@@ -1873,6 +1861,136 @@ fetch("/api/send-welcome", {
     if (doneCount) doneCount.textContent = done;
   }
 
+  function getDragAfterElement(container, y) {
+    const draggableElements = [
+      ...container.querySelectorAll(".task:not(.dragging)")
+    ];
+
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+          return {
+            offset: offset,
+            element: child
+          };
+        }
+
+        return closest;
+      },
+      {
+        offset: Number.NEGATIVE_INFINITY,
+        element: null
+      }
+    ).element;
+  }
+
+  async function saveTaskOrder() {
+    if (!currentUser || !tasksContainer) return;
+
+    const orderedIds = [...tasksContainer.querySelectorAll(".task")]
+      .map(element => element.dataset.id);
+
+    const reorderedTasks = orderedIds
+      .map((id, index) => {
+        const task = tasks.find(item => String(item.id) === String(id));
+
+        if (!task) return null;
+
+        return {
+          ...task,
+          position: index
+        };
+      })
+      .filter(Boolean);
+
+    const hiddenTasks = tasks.filter(task => {
+      return !orderedIds.includes(String(task.id));
+    });
+
+    tasks = [...reorderedTasks, ...hiddenTasks];
+
+    const updates = reorderedTasks.map(task => {
+      return supabaseClient
+        .from("tasks")
+        .update({
+          position: task.position
+        })
+        .eq("id", task.id)
+        .eq("user_id", currentUser.id);
+    });
+
+    const results = await Promise.all(updates);
+    const failed = results.find(result => result.error);
+
+    if (failed) {
+      console.error("Save order error:", failed.error);
+      showToast(failed.error.message || "Could not save task order.");
+      return;
+    }
+
+    showToast("Task order saved 🌊");
+  }
+
+  function setupTaskDragEvents(taskElement, task) {
+    taskElement.draggable = true;
+
+    taskElement.addEventListener("dragstart", event => {
+      draggedTaskId = task.id;
+      taskElement.classList.add("dragging");
+
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", String(task.id));
+      }
+    });
+
+    taskElement.addEventListener("dragend", async () => {
+      draggedTaskId = null;
+      taskElement.classList.remove("dragging");
+
+      document.querySelectorAll(".task.drag-over").forEach(element => {
+        element.classList.remove("drag-over");
+      });
+
+      await saveTaskOrder();
+    });
+
+    taskElement.addEventListener("dragover", event => {
+      event.preventDefault();
+      taskElement.classList.add("drag-over");
+    });
+
+    taskElement.addEventListener("dragleave", () => {
+      taskElement.classList.remove("drag-over");
+    });
+
+    taskElement.addEventListener("drop", event => {
+      event.preventDefault();
+      taskElement.classList.remove("drag-over");
+    });
+  }
+
+  if (tasksContainer) {
+    tasksContainer.addEventListener("dragover", event => {
+      event.preventDefault();
+
+      const dragging = document.querySelector(".task.dragging");
+
+      if (!dragging) return;
+
+      const afterElement = getDragAfterElement(tasksContainer, event.clientY);
+
+      if (afterElement == null) {
+        tasksContainer.appendChild(dragging);
+      } else {
+        tasksContainer.insertBefore(dragging, afterElement);
+      }
+    });
+  }
+
   function renderTasks() {
     if (!tasksContainer) return;
 
@@ -1903,6 +2021,8 @@ fetch("/api/send-welcome", {
 
       taskElement.querySelector(".task-text").textContent = task.text;
 
+      setupTaskDragEvents(taskElement, task);
+
       taskElement.querySelector(".check").addEventListener("click", () => {
         toggleTask(task.id);
       });
@@ -1930,13 +2050,14 @@ fetch("/api/send-welcome", {
       .from("tasks")
       .select("*")
       .eq("user_id", currentUser.id)
+      .order("position", { ascending: true })
       .order("created_at", { ascending: false });
 
     setLoadingState(false);
 
     if (error) {
       console.error("Load tasks error:", error);
-      showToast("Could not load tasks.");
+      showToast(error.message || "Could not load tasks.");
       return;
     }
 
@@ -1961,25 +2082,31 @@ fetch("/api/send-welcome", {
       return;
     }
 
+    const nextPosition =
+      tasks.length > 0
+        ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
+        : 0;
+
     const { data, error } = await supabaseClient
       .from("tasks")
       .insert([
         {
           user_id: currentUser.id,
           text: cleanText,
-          done: false
+          done: false,
+          position: nextPosition
         }
       ])
       .select()
       .single();
 
     if (error) {
-  console.error("Add task error full:", error);
-  showToast(error.message || "Could not add task.");
-  return;
-}
+      console.error("Add task error full:", error);
+      showToast(error.message || "Could not add task.");
+      return;
+    }
 
-    tasks.unshift(data);
+    tasks.push(data);
     renderTasks();
 
     if (isProUser) {
@@ -2042,6 +2169,7 @@ fetch("/api/send-welcome", {
 
     tasks = tasks.filter(task => task.id !== id);
     renderTasks();
+    await saveTaskOrder();
     showToast("Task deleted.");
   }
 
@@ -2210,27 +2338,18 @@ fetch("/api/send-welcome", {
       tasks = tasks.filter(task => !task.done);
 
       renderTasks();
+      await saveTaskOrder();
       showToast("Completed tasks cleared. Clean board 🧼");
     });
   }
 
-  if (saveEdit) {
-    saveEdit.addEventListener("click", updateTask);
-  }
-
-  if (cancelEdit) {
-    cancelEdit.addEventListener("click", closeEditModal);
-  }
+  if (saveEdit) saveEdit.addEventListener("click", updateTask);
+  if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
 
   if (editInput) {
     editInput.addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        updateTask();
-      }
-
-      if (event.key === "Escape") {
-        closeEditModal();
-      }
+      if (event.key === "Enter") updateTask();
+      if (event.key === "Escape") closeEditModal();
     });
   }
 
@@ -2244,7 +2363,5 @@ fetch("/api/send-welcome", {
 
   loadCurrentUser();
 </script>
-</body>
-</html>
 </body>
 </html>
