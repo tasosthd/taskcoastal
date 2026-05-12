@@ -1519,13 +1519,15 @@
     if (emptyState && isLoading) emptyState.classList.remove("show");
   }
 
-  function openApp() {
+  function openApp(shouldSave = true) {
     if (!currentUser) {
       showToast("Log in with Google first to save your tasks ☁️");
       return;
     }
 
-    saveCurrentScreen("app");
+    if (shouldSave) {
+      saveCurrentScreen("app");
+    }
 
     if (prelaunchPage) prelaunchPage.classList.add("hidden");
     if (appPage) appPage.classList.remove("hidden");
@@ -1535,8 +1537,10 @@
     renderTasks();
   }
 
-  function openPrelaunch() {
-    saveCurrentScreen("landing");
+  function openPrelaunch(shouldSave = false) {
+    if (shouldSave) {
+      saveCurrentScreen("landing");
+    }
 
     if (appPage) appPage.classList.add("hidden");
     if (bottomBar) bottomBar.classList.add("hidden");
@@ -1676,20 +1680,18 @@
       const savedScreen = getSavedScreen();
 
       if (savedScreen === "app") {
-        openApp();
+        openApp(false);
       } else {
-        openPrelaunch();
+        openPrelaunch(false);
       }
     } else {
       currentProfile = null;
       isProUser = false;
       tasks = [];
 
-      saveCurrentScreen("landing");
-
       renderTasks();
       updateUserUI();
-      openPrelaunch();
+      openPrelaunch(false);
     }
   }
 
@@ -1706,15 +1708,15 @@
 
       if (event === "SIGNED_IN") {
         saveCurrentScreen("app");
-        openApp();
+        openApp(false);
         showToast(`Logged in as ${currentUser.email}`);
       } else {
         const savedScreen = getSavedScreen();
 
         if (savedScreen === "app") {
-          openApp();
+          openApp(false);
         } else {
-          openPrelaunch();
+          openPrelaunch(false);
         }
       }
     } else {
@@ -1722,11 +1724,13 @@
       isProUser = false;
       tasks = [];
 
-      saveCurrentScreen("landing");
+      if (event === "SIGNED_OUT") {
+        saveCurrentScreen("landing");
+      }
 
       renderTasks();
       updateUserUI();
-      openPrelaunch();
+      openPrelaunch(false);
 
       if (event === "SIGNED_OUT") {
         showToast("Logged out.");
@@ -1773,7 +1777,7 @@
 
         renderTasks();
         updateUserUI();
-        openPrelaunch();
+        openPrelaunch(false);
       } catch (error) {
         console.error("Logout crash:", error);
         showToast("Logout failed.");
@@ -1784,8 +1788,17 @@
     });
   }
 
-  if (openAppBtn) openAppBtn.addEventListener("click", openApp);
-  if (backLaunchBtn) backLaunchBtn.addEventListener("click", openPrelaunch);
+  if (openAppBtn) {
+    openAppBtn.addEventListener("click", () => {
+      openApp(true);
+    });
+  }
+
+  if (backLaunchBtn) {
+    backLaunchBtn.addEventListener("click", () => {
+      openPrelaunch(true);
+    });
+  }
 
   if (waitlistForm) {
     waitlistForm.addEventListener("submit", async event => {
