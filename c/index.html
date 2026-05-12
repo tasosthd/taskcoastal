@@ -1146,6 +1146,7 @@
     const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
+    const APP_PATH = "/c/";
     const APP_URL = "https://taskcoastal.com/c/";
     const LANDING_URL = "https://taskcoastal.com/";
 
@@ -1154,7 +1155,7 @@
         storageKey: "taskcoastal-auth-token",
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        detectSessionInUrl: false,
         storage: window.localStorage,
         flowType: "pkce"
       }
@@ -1243,8 +1244,7 @@
     }
 
     function cleanUrlToDashboard() {
-      const cleanUrl = window.location.origin + "/c/";
-      window.history.replaceState({}, document.title, cleanUrl);
+      window.history.replaceState({}, document.title, APP_PATH);
     }
 
     function showToast(message) {
@@ -1363,6 +1363,51 @@
       renderTasks();
     }
 
+    async function exchangeOAuthCodeIfPresent() {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const authError = url.searchParams.get("error");
+
+      if (authError) {
+        console.error("OAuth URL error:", window.location.search);
+        showToast("Login failed. Try again.");
+        setTimeout(() => {
+          window.location.replace(LANDING_URL);
+        }, 900);
+        return false;
+      }
+
+      if (!code) return true;
+
+      try {
+        const { error } = await withTimeout(
+          supabaseClient.auth.exchangeCodeForSession(window.location.href),
+          12000,
+          "OAuth exchange"
+        );
+
+        if (error) {
+          console.error("OAuth exchange error:", error);
+          showToast("Login session failed. Try again.");
+          setTimeout(() => {
+            window.location.replace(LANDING_URL);
+          }, 900);
+          return false;
+        }
+
+        cleanUrlToDashboard();
+        await new Promise(resolve => setTimeout(resolve, 350));
+        return true;
+      } catch (error) {
+        console.error("OAuth exchange crash:", error);
+        showToast("Login took too long. Try again.");
+        setTimeout(() => {
+          window.location.replace(LANDING_URL);
+        }, 900);
+        return false;
+      }
+    }
+
     async function getOrCreateProfile() {
       if (!currentUser) return null;
 
@@ -1473,6 +1518,10 @@
       currentUser = user;
       updateUserUI();
 
+      tasks = [];
+      renderTasks();
+      openApp();
+
       try {
         await withTimeout(getOrCreateProfile(), 7000, "Profile");
       } catch (error) {
@@ -1511,46 +1560,6 @@
       window.location.replace(LANDING_URL);
     }
 
-    async function exchangeOAuthCodeIfPresent() {
-      const url = new URL(window.location.href);
-      const hasCode = url.searchParams.has("code");
-      const hasError = url.searchParams.has("error");
-
-      if (hasError) {
-        console.error("OAuth URL error:", url.search);
-        window.location.replace(LANDING_URL);
-        return false;
-      }
-
-      if (!hasCode) {
-        return true;
-      }
-
-      try {
-        const { data, error } = await withTimeout(
-          supabaseClient.auth.exchangeCodeForSession(window.location.href),
-          9000,
-          "OAuth exchange"
-        );
-
-        if (error) {
-          console.error("OAuth exchange error:", error);
-          window.location.replace(LANDING_URL);
-          return false;
-        }
-
-        console.log("OAuth session exchanged:", data);
-        cleanUrlToDashboard();
-
-        await new Promise(resolve => setTimeout(resolve, 250));
-        return true;
-      } catch (error) {
-        console.error("OAuth exchange crash:", error);
-        window.location.replace(LANDING_URL);
-        return false;
-      }
-    }
-
     async function loadCurrentUser() {
       if (isBooting) return;
 
@@ -1560,11 +1569,9 @@
       try {
         const exchangeOk = await exchangeOAuthCodeIfPresent();
 
-        if (!exchangeOk) {
-          return;
-        }
+        if (!exchangeOk) return;
 
-        const { data, error } = await withTimeout(
+        let sessionResult = await withTimeout(
           supabaseClient.auth.getSession(),
           9000,
           "Auth session"
@@ -1572,13 +1579,25 @@
 
         hasLoadedInitialSession = true;
 
-        if (error) {
-          console.error("Auth session error:", error);
+        if (sessionResult.error) {
+          console.error("Auth session error:", sessionResult.error);
           await bootLoggedOutUser();
           return;
         }
 
-        const user = data.session?.user || null;
+        let user = sessionResult.data.session?.user || null;
+
+        if (!user) {
+          await new Promise(resolve => setTimeout(resolve, 700));
+
+          sessionResult = await withTimeout(
+            supabaseClient.auth.getSession(),
+            9000,
+            "Auth session retry"
+          );
+
+          user = sessionResult.data.session?.user || null;
+        }
 
         if (user) {
           await bootLoggedInUser(user);
@@ -1605,6 +1624,10 @@
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       const user = session?.user || null;
+
+      if (isBooting && event !== "SIGNED_OUT") {
+        return;
+      }
 
       if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
         return;
