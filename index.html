@@ -1974,10 +1974,10 @@ fetch("/api/send-welcome", {
       .single();
 
     if (error) {
-      console.error("Add task error:", error);
-      showToast("Could not add task.");
-      return;
-    }
+  console.error("Add task error full:", error);
+  showToast(error.message || "Could not add task.");
+  return;
+}
 
     tasks.unshift(data);
     renderTasks();
