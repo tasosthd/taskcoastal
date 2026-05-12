@@ -1363,47 +1363,64 @@
       renderTasks();
     }
 
+    // ✅ IMPROVED OAuth exchange function with better error handling
     async function exchangeOAuthCodeIfPresent() {
       const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
       const authError = url.searchParams.get("error");
+      const errorDescription = url.searchParams.get("error_description");
 
+      // If there's an OAuth error, log it and redirect
       if (authError) {
-        console.error("OAuth URL error:", window.location.search);
-        showToast("Login failed. Try again.");
+        console.error("OAuth URL error:", authError, errorDescription);
+        showToast(`Login error: ${errorDescription || authError}`);
         setTimeout(() => {
           window.location.replace(LANDING_URL);
-        }, 900);
+        }, 1500);
         return false;
       }
 
-      if (!code) return true;
+      // If there's no code, we're not in the OAuth callback
+      if (!code) {
+        console.log("No OAuth code present, proceeding with regular session check");
+        return true;
+      }
+
+      // We have a code, exchange it for a session
+      console.log("OAuth code detected, exchanging for session...");
 
       try {
-        const { error } = await withTimeout(
+        const { data, error } = await withTimeout(
           supabaseClient.auth.exchangeCodeForSession(window.location.href),
-          12000,
+          15000,  // Increased to 15 seconds
           "OAuth exchange"
         );
 
         if (error) {
           console.error("OAuth exchange error:", error);
-          showToast("Login session failed. Try again.");
+          console.error("Error details:", {
+            message: error.message,
+            status: error.status,
+            code: error.code
+          });
+          showToast(`Session error: ${error.message || "Could not establish session"}`);
           setTimeout(() => {
             window.location.replace(LANDING_URL);
-          }, 900);
+          }, 1500);
           return false;
         }
 
+        console.log("✅ OAuth exchange successful");
         cleanUrlToDashboard();
-        await new Promise(resolve => setTimeout(resolve, 350));
+        await new Promise(resolve => setTimeout(resolve, 500));
         return true;
       } catch (error) {
-        console.error("OAuth exchange crash:", error);
-        showToast("Login took too long. Try again.");
+        console.error("OAuth exchange exception:", error);
+        console.error("Error message:", error.message);
+        showToast(`Error: ${error.message}`);
         setTimeout(() => {
           window.location.replace(LANDING_URL);
-        }, 900);
+        }, 1500);
         return false;
       }
     }
@@ -1560,6 +1577,7 @@
       window.location.replace(LANDING_URL);
     }
 
+    // ✅ IMPROVED Main boot function
     async function loadCurrentUser() {
       if (isBooting) return;
 
@@ -1567,45 +1585,62 @@
       showOnly("loading");
 
       try {
+        console.log("Starting auth boot...");
+
+        // Step 1: Handle OAuth code exchange if present
         const exchangeOk = await exchangeOAuthCodeIfPresent();
+        if (!exchangeOk) {
+          console.log("OAuth exchange failed");
+          return;
+        }
 
-        if (!exchangeOk) return;
-
-        let sessionResult = await withTimeout(
+        // Step 2: Get session
+        console.log("Getting session...");
+        const { data: sessionData, error: sessionError } = await withTimeout(
           supabaseClient.auth.getSession(),
-          9000,
+          10000,
           "Auth session"
         );
 
         hasLoadedInitialSession = true;
 
-        if (sessionResult.error) {
-          console.error("Auth session error:", sessionResult.error);
+        if (sessionError) {
+          console.error("Session error:", sessionError);
           await bootLoggedOutUser();
           return;
         }
 
-        let user = sessionResult.data.session?.user || null;
+        let user = sessionData?.session?.user || null;
+        console.log("Session check result:", user ? `User: ${user.email}` : "No user");
 
+        // Step 3: If no user, retry once (for race conditions)
         if (!user) {
-          await new Promise(resolve => setTimeout(resolve, 700));
+          console.log("No user found, retrying...");
+          await new Promise(resolve => setTimeout(resolve, 800));
 
-          sessionResult = await withTimeout(
+          const { data: retrySessionData, error: retryError } = await withTimeout(
             supabaseClient.auth.getSession(),
-            9000,
+            10000,
             "Auth session retry"
           );
 
-          user = sessionResult.data.session?.user || null;
+          if (!retryError) {
+            user = retrySessionData?.session?.user || null;
+            console.log("Retry result:", user ? `User: ${user.email}` : "Still no user");
+          }
         }
 
+        // Step 4: Boot based on user presence
         if (user) {
+          console.log("✅ User authenticated:", user.email);
           await bootLoggedInUser(user);
         } else {
+          console.log("❌ No authenticated user");
           await bootLoggedOutUser();
         }
       } catch (error) {
-        console.error("Boot error:", error);
+        console.error("Fatal boot error:", error);
+        console.error("Error message:", error.message);
 
         hasLoadedInitialSession = true;
         currentUser = null;
@@ -2212,6 +2247,7 @@
       });
     }
 
+    // ✅ Initialize the app
     loadCurrentUser();
 
     if ("serviceWorker" in navigator) {
