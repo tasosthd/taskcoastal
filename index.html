@@ -1358,7 +1358,17 @@
   let isLoadingTasks = false;
   let draggedTaskId = null;
 
+  let appBooted = false;
+
   let currentWaitlistCount = Number(localStorage.getItem("coastalWaitlistCount")) || 127;
+
+  function saveCurrentScreen(screen) {
+    localStorage.setItem("coastalCurrentScreen", screen);
+  }
+
+  function getSavedScreen() {
+    return localStorage.getItem("coastalCurrentScreen") || "landing";
+  }
 
   const dragStyle = document.createElement("style");
   dragStyle.textContent = `
@@ -1508,6 +1518,8 @@
       return;
     }
 
+    saveCurrentScreen("app");
+
     if (prelaunchPage) prelaunchPage.classList.add("hidden");
     if (appPage) appPage.classList.remove("hidden");
     if (bottomBar) bottomBar.classList.remove("hidden");
@@ -1517,6 +1529,8 @@
   }
 
   function openPrelaunch() {
+    saveCurrentScreen("landing");
+
     if (appPage) appPage.classList.add("hidden");
     if (bottomBar) bottomBar.classList.add("hidden");
     if (prelaunchPage) prelaunchPage.classList.remove("hidden");
@@ -1624,11 +1638,13 @@
     window.history.replaceState({}, document.title, cleanUrl);
 
     if (checkoutStatus === "success") {
+      saveCurrentScreen("app");
       showToast("Payment complete. Activating Pro...");
       await refreshProfileWithRetry(5);
     }
 
     if (checkoutStatus === "cancelled") {
+      saveCurrentScreen("app");
       showToast("Checkout cancelled.");
     }
   }
@@ -1643,16 +1659,27 @@
     }
 
     currentUser = data.session?.user || null;
+    appBooted = true;
 
     if (currentUser) {
       await getOrCreateProfile();
-      openApp();
       await loadTasks();
       await handleCheckoutReturn();
+
+      const savedScreen = getSavedScreen();
+
+      if (savedScreen === "app") {
+        openApp();
+      } else {
+        openPrelaunch();
+      }
     } else {
       currentProfile = null;
       isProUser = false;
       tasks = [];
+
+      saveCurrentScreen("landing");
+
       renderTasks();
       updateUserUI();
       openPrelaunch();
@@ -1662,18 +1689,34 @@
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     currentUser = session?.user || null;
 
+    if (event === "INITIAL_SESSION" && !appBooted) {
+      return;
+    }
+
     if (currentUser) {
       await getOrCreateProfile();
-      openApp();
       await loadTasks();
 
       if (event === "SIGNED_IN") {
+        saveCurrentScreen("app");
+        openApp();
         showToast(`Logged in as ${currentUser.email}`);
+      } else {
+        const savedScreen = getSavedScreen();
+
+        if (savedScreen === "app") {
+          openApp();
+        } else {
+          openPrelaunch();
+        }
       }
     } else {
       currentProfile = null;
       isProUser = false;
       tasks = [];
+
+      saveCurrentScreen("landing");
+
       renderTasks();
       updateUserUI();
       openPrelaunch();
@@ -1718,6 +1761,8 @@
         currentProfile = null;
         isProUser = false;
         tasks = [];
+
+        saveCurrentScreen("landing");
 
         renderTasks();
         updateUserUI();
@@ -2274,6 +2319,7 @@
           throw new Error("Stripe checkout URL missing.");
         }
 
+        saveCurrentScreen("app");
         window.location.href = data.url;
       } catch (error) {
         console.error("Checkout error:", error);
