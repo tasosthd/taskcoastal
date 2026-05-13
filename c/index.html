@@ -1187,13 +1187,7 @@ body.light .composer {
   </div>
 
   <div class="toast" id="toast"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -1253,6 +1247,9 @@ body.light .composer {
 
   const upgradeBtn = document.getElementById("upgradeBtn");
   const upgradeCard = document.getElementById("upgradeCard");
+
+  const billingCard = document.getElementById("billingCard");
+  const manageBillingBtn = document.getElementById("manageBillingBtn");
 
   const toast = document.getElementById("toast");
 
@@ -1409,9 +1406,18 @@ body.light .composer {
       upgradeCard.classList.toggle("hidden", Boolean(isProUser));
     }
 
+    if (billingCard) {
+      billingCard.classList.toggle("hidden", !Boolean(isProUser));
+    }
+
     if (upgradeBtn) {
       upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
       upgradeBtn.disabled = Boolean(isProUser);
+    }
+
+    if (manageBillingBtn) {
+      manageBillingBtn.disabled = false;
+      manageBillingBtn.textContent = "Manage billing";
     }
   }
 
@@ -2290,6 +2296,56 @@ body.light .composer {
         showToast(error.message || "Checkout failed.");
         upgradeBtn.disabled = false;
         upgradeBtn.textContent = "Upgrade 🔒";
+      }
+    });
+  }
+
+  if (manageBillingBtn) {
+    manageBillingBtn.addEventListener("click", async () => {
+      try {
+        if (!currentUser) {
+          showToast("Please log in first.");
+          return;
+        }
+
+        manageBillingBtn.disabled = true;
+        manageBillingBtn.textContent = "Opening billing...";
+
+        const response = await fetch("/.netlify/functions/create-portal-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userId: currentUser.id
+          })
+        });
+
+        const rawText = await response.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          console.error("Non-JSON portal API response:", rawText);
+          throw new Error("Server returned non-JSON. Check Netlify function logs.");
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not open billing portal.");
+        }
+
+        if (!data.url) {
+          throw new Error("Stripe billing portal URL missing.");
+        }
+
+        window.location.href = data.url;
+      } catch (error) {
+        console.error("Billing portal error:", error);
+        showToast(error.message || "Could not open billing.");
+        manageBillingBtn.disabled = false;
+        manageBillingBtn.textContent = "Manage billing";
       }
     });
   }
