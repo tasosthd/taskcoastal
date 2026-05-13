@@ -718,7 +718,7 @@
     const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
-    const APP_URL = "https://taskcoastal.com/c/";
+    const APP_URL = `${window.location.origin}/c/`;
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
