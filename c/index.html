@@ -215,9 +215,10 @@
     min-width: 0;
     display: grid;
     gap: 16px;
+    padding-top: 78px;
     padding-bottom: 20px;
   }
-
+  
   .loader-screen {
     min-height: 100vh;
     display: grid;
@@ -495,6 +496,12 @@
   }
 
   .app-main > .topbar {
+    position: fixed;
+    top: calc(18px + env(safe-area-inset-top));
+    left: clamp(18px, 3vw, 42px);
+    right: calc(clamp(18px, 3vw, 42px) + 358px);
+    z-index: 100;
+  
     margin-bottom: 0;
     padding: 7px;
     border-radius: 28px;
@@ -502,6 +509,7 @@
     border: 1px solid var(--border);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-md);
   }
 
   body.light .app-main > .topbar {
