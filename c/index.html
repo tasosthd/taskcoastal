@@ -193,7 +193,7 @@
     padding:
       calc(18px + env(safe-area-inset-top))
       clamp(18px, 3vw, 42px)
-      calc(155px + env(safe-area-inset-bottom));
+      calc(215px + env(safe-area-inset-bottom));
   }
 
   .app-shell {
@@ -1198,23 +1198,23 @@
     stroke-linejoin: round;
   }
 
-  .bottom-bar {
-    position: fixed;
-    left: 50%;
-    bottom: calc(86px + env(safe-area-inset-bottom));
-    transform: translateX(-50%);
-    width: min(calc(100% - 28px), 620px);
-    display: flex;
-    gap: 8px;
-    padding: 9px;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
-    box-shadow: var(--shadow-lg);
-    z-index: 30;
-  }
+.bottom-bar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(122px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(calc(100% - 28px), 620px);
+  display: flex;
+  gap: 8px;
+  padding: 9px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: var(--shadow-lg);
+  z-index: 30;
+}
 
   body.light .bottom-bar {
     background: rgba(255, 255, 255, 0.9);
@@ -1431,12 +1431,13 @@
     }
   }
 
-  @media (max-width: 520px) {
-    .screen {
-      padding:
-        calc(14px + env(safe-area-inset-top))
-        14px
-        calc(150px + env(safe-area-inset-bottom));
+    @media (max-width: 520px) {
+      .screen {
+        padding:
+          calc(14px + env(safe-area-inset-top))
+          14px
+          calc(215px + env(safe-area-inset-bottom));
+      }
     }
 
     .loader-card {
@@ -1591,7 +1592,7 @@
     }
 
     .bottom-bar {
-      bottom: calc(86px + env(safe-area-inset-bottom));
+      bottom: calc(118px + env(safe-area-inset-bottom));
       width: calc(100% - 24px);
     }
   }
