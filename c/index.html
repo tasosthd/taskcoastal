@@ -1856,6 +1856,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
@@ -2099,6 +2101,12 @@
       if (manageBillingBtn) {
         manageBillingBtn.classList.toggle("hidden", !Boolean(isProUser));
         manageBillingBtn.disabled = false;
+      }
+
+      // Hide hero section for Pro users
+      const appHero = document.querySelector(".app-hero");
+      if (appHero) {
+        appHero.classList.toggle("hidden", Boolean(isProUser));
       }
     }
 
