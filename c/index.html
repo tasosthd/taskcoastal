@@ -18,55 +18,113 @@
 
 <style>
   /* =========================================================
-     COASTAL FLOW — FULL DASHBOARD STYLE
+     COASTAL FLOW — WIDE DASHBOARD STYLE
      Page: DASHBOARD /c/
-
      Goals:
-     - Premium dark/light contrast
-     - PWA safe-area fix for iPhone home-screen mode
-     - ChatGPT-style bottom input
-     - Smaller hero so tasks are visible immediately
-     - Left menu drawer
-     - Centered main dashboard content on desktop
-     - No huge empty task gap
-     - Clean blue-black gradient
+     - Wide centered layout
+     - Hero no longer clipped
+     - Tasks visible faster
+     - Bottom input like ChatGPT
+     - PWA safe-area fix for iPhone
+     - Strong contrast dark + light mode
   ========================================================= */
 
-  /* =========================================================
-     1. RESET
-  ========================================================= */
-
-  *,
-  *::before,
-  *::after {
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-
-  * {
-    font-family:
-      "Poppins",
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 
-  html {
-    min-height: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
+  :root {
+    --bg: #020611;
+    --bg-soft: #030712;
+
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-2: rgba(255, 255, 255, 0.085);
+    --surface-3: rgba(255, 255, 255, 0.13);
+
+    --text: #f5f8ff;
+    --muted: rgba(245, 248, 255, 0.64);
+    --muted-2: rgba(245, 248, 255, 0.42);
+
+    --accent: #3b8cff;
+    --accent-dark: #1767e8;
+    --green: #23d18b;
+    --red: #ff5c78;
+    --yellow: #ffd36b;
+
+    --border: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(59, 140, 255, 0.45);
+
+    --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.26);
+    --shadow-md: 0 24px 70px rgba(0, 0, 0, 0.34);
+    --shadow-lg: 0 36px 120px rgba(0, 0, 0, 0.48);
+
+    --radius-sm: 14px;
+    --radius-md: 18px;
+    --radius-lg: 26px;
+    --radius-xl: 34px;
+
+    --blur: blur(22px);
+    --ease: 0.22s ease;
   }
 
+  body.light {
+    --bg: #ffffff;
+    --bg-soft: #edf7ff;
+
+    --surface: rgba(255, 255, 255, 0.86);
+    --surface-2: rgba(255, 255, 255, 0.94);
+    --surface-3: rgba(255, 255, 255, 1);
+
+    --text: #06111f;
+    --muted: rgba(6, 17, 31, 0.62);
+    --muted-2: rgba(6, 17, 31, 0.42);
+
+    --accent: #1767e8;
+    --accent-dark: #0050c8;
+    --green: #0c9f68;
+    --red: #d93050;
+    --yellow: #c48700;
+
+    --border: rgba(6, 17, 31, 0.12);
+    --border-strong: rgba(0, 102, 255, 0.3);
+
+    --shadow-sm: 0 10px 30px rgba(0, 40, 100, 0.08);
+    --shadow-md: 0 24px 70px rgba(0, 40, 100, 0.12);
+    --shadow-lg: 0 36px 120px rgba(0, 40, 100, 0.16);
+  }
+
+  html,
   body {
     min-height: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    position: relative;
+    isolation: isolate;
+    color: var(--text);
+    background: linear-gradient(180deg, #020611 0%, #030712 45%, #000000 100%);
+    background-attachment: fixed;
+  }
+
+  body.light {
+    background: linear-gradient(180deg, #ffffff 0%, #edf7ff 48%, #dbeeff 100%);
+    background-attachment: fixed;
+  }
+
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: none;
   }
 
   button,
@@ -104,155 +162,9 @@
     touch-action: manipulation;
   }
 
-  img,
-  svg {
-    display: block;
-  }
-
   ::selection {
     background: rgba(59, 140, 255, 0.32);
   }
-
-  /* =========================================================
-     2. THEME VARIABLES
-  ========================================================= */
-
-  :root {
-    --bg: #020611;
-    --bg-soft: #030712;
-    --bg-deep: #000000;
-
-    --surface: rgba(255, 255, 255, 0.055);
-    --surface-2: rgba(255, 255, 255, 0.085);
-    --surface-3: rgba(255, 255, 255, 0.13);
-    --surface-4: rgba(255, 255, 255, 0.18);
-
-    --text: #f5f8ff;
-    --muted: rgba(245, 248, 255, 0.62);
-    --muted-2: rgba(245, 248, 255, 0.42);
-    --muted-3: rgba(245, 248, 255, 0.28);
-
-    --accent: #3b8cff;
-    --accent-dark: #1767e8;
-    --accent-soft: rgba(59, 140, 255, 0.12);
-    --accent-border: rgba(59, 140, 255, 0.22);
-
-    --green: #23d18b;
-    --green-soft: rgba(35, 209, 139, 0.12);
-
-    --red: #ff5c78;
-    --red-soft: rgba(255, 92, 120, 0.12);
-
-    --yellow: #ffd36b;
-    --yellow-soft: rgba(255, 211, 107, 0.14);
-
-    --border: rgba(255, 255, 255, 0.12);
-    --border-soft: rgba(255, 255, 255, 0.075);
-    --border-strong: rgba(59, 140, 255, 0.45);
-
-    --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.26);
-    --shadow-md: 0 24px 70px rgba(0, 0, 0, 0.34);
-    --shadow-lg: 0 36px 120px rgba(0, 0, 0, 0.48);
-
-    --radius-xs: 10px;
-    --radius-sm: 14px;
-    --radius-md: 18px;
-    --radius-lg: 26px;
-    --radius-xl: 34px;
-    --radius-2xl: 42px;
-
-    --blur: blur(22px);
-    --blur-strong: blur(30px);
-
-    --ease: 0.22s ease;
-    --ease-fast: 0.16s ease;
-
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-
-    --composer-height: 78px;
-    --bottom-bar-height: 72px;
-  }
-
-  body.light {
-    --bg: #ffffff;
-    --bg-soft: #edf7ff;
-    --bg-deep: #dbeeff;
-
-    --surface: rgba(255, 255, 255, 0.86);
-    --surface-2: rgba(255, 255, 255, 0.94);
-    --surface-3: rgba(255, 255, 255, 1);
-    --surface-4: rgba(6, 17, 31, 0.055);
-
-    --text: #06111f;
-    --muted: rgba(6, 17, 31, 0.62);
-    --muted-2: rgba(6, 17, 31, 0.42);
-    --muted-3: rgba(6, 17, 31, 0.28);
-
-    --accent: #1767e8;
-    --accent-dark: #0050c8;
-    --accent-soft: rgba(23, 103, 232, 0.08);
-    --accent-border: rgba(23, 103, 232, 0.18);
-
-    --green: #0c9f68;
-    --green-soft: rgba(12, 159, 104, 0.1);
-
-    --red: #d93050;
-    --red-soft: rgba(217, 48, 80, 0.1);
-
-    --yellow: #c48700;
-    --yellow-soft: rgba(196, 135, 0, 0.1);
-
-    --border: rgba(6, 17, 31, 0.12);
-    --border-soft: rgba(6, 17, 31, 0.075);
-    --border-strong: rgba(0, 102, 255, 0.3);
-
-    --shadow-sm: 0 10px 30px rgba(0, 40, 100, 0.08);
-    --shadow-md: 0 24px 70px rgba(0, 40, 100, 0.12);
-    --shadow-lg: 0 36px 120px rgba(0, 40, 100, 0.16);
-  }
-
-  /* =========================================================
-     3. PAGE BACKGROUND
-  ========================================================= */
-
-  body {
-    position: relative;
-    isolation: isolate;
-    color: var(--text);
-    background:
-      linear-gradient(
-        180deg,
-        #020611 0%,
-        #030712 45%,
-        #000000 100%
-      );
-    background-attachment: fixed;
-  }
-
-  body.light {
-    background:
-      linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #edf7ff 48%,
-        #dbeeff 100%
-      );
-    background-attachment: fixed;
-  }
-
-  body::before,
-  body::after {
-    content: none;
-  }
-
-  body.menu-open {
-    overflow: hidden;
-  }
-
-  /* =========================================================
-     4. SCROLLBAR
-  ========================================================= */
 
   ::-webkit-scrollbar {
     width: 10px;
@@ -260,10 +172,6 @@
 
   ::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.035);
-  }
-
-  body.light ::-webkit-scrollbar-track {
-    background: rgba(6, 17, 31, 0.035);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -275,10 +183,6 @@
     background: rgba(59, 140, 255, 0.5);
   }
 
-  /* =========================================================
-     5. UTILITIES
-  ========================================================= */
-
   .hidden {
     display: none !important;
   }
@@ -287,37 +191,79 @@
     width: 100%;
     min-height: 100vh;
     padding:
-      calc(clamp(14px, 2vw, 30px) + var(--safe-top))
-      clamp(14px, 2vw, 30px)
-      calc(150px + var(--safe-bottom));
+      calc(18px + env(safe-area-inset-top))
+      clamp(18px, 3vw, 42px)
+      calc(155px + env(safe-area-inset-bottom));
   }
 
-  /* =========================================================
-     6. MAIN LAYOUT
-  ========================================================= */
-
   .app-shell {
-    width: min(100%, 1400px);
+    width: min(100%, 1500px);
     margin: 0 auto;
     min-height: calc(100vh - 52px);
     display: grid;
-    grid-template-columns: 340px minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: 330px minmax(0, 1fr);
+    gap: 28px;
     align-items: start;
   }
 
   .app-main {
-    width: min(100%, 980px);
-    margin: 0 auto;
-    display: grid;
-    gap: 14px;
+    width: 100%;
     min-width: 0;
+    display: grid;
+    gap: 16px;
     padding-bottom: 20px;
   }
 
-  /* =========================================================
-     7. SHARED GLASS CARDS
-  ========================================================= */
+  .loader-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding:
+      calc(22px + env(safe-area-inset-top))
+      22px
+      calc(22px + env(safe-area-inset-bottom));
+  }
+
+  .loader-card {
+    width: min(100%, 430px);
+    padding: 34px;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    text-align: center;
+  }
+
+  .loader-card img {
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    object-fit: cover;
+    box-shadow: 0 0 0 8px rgba(59, 140, 255, 0.08);
+  }
+
+  .loader-card h2 {
+    font-size: 1.35rem;
+    letter-spacing: -0.045em;
+  }
+
+  .loader-card p {
+    color: var(--muted);
+    font-weight: 750;
+    margin-top: 8px;
+    font-size: 0.92rem;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: calc(26px + env(safe-area-inset-top));
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+  }
 
   .profile-card,
   .panel,
@@ -353,24 +299,14 @@
     inset: 0;
     pointer-events: none;
     border-radius: inherit;
-    background:
-      linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0.055),
-        transparent 38%
-      );
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.055), transparent 38%);
   }
 
   body.light .profile-card::before,
   body.light .panel::before,
   body.light .app-hero::before,
   body.light .menu-drawer::before {
-    background:
-      linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0.8),
-        transparent 42%
-      );
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.8), transparent 42%);
   }
 
   .profile-card > *,
@@ -381,68 +317,8 @@
     z-index: 1;
   }
 
-  /* =========================================================
-     8. LOADING SCREEN
-  ========================================================= */
-
-  .loader-screen {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding:
-      calc(22px + var(--safe-top))
-      22px
-      calc(22px + var(--safe-bottom));
-  }
-
-  .loader-card {
-    width: min(100%, 430px);
-    padding: 34px;
-    border-radius: var(--radius-xl);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
-    text-align: center;
-  }
-
-  .loader-card img {
-    width: 62px;
-    height: 62px;
-    border-radius: 20px;
-    margin: 0 auto 18px;
-    object-fit: cover;
-    box-shadow:
-      0 0 0 8px rgba(59, 140, 255, 0.08);
-  }
-
-  .loader-card h2 {
-    font-size: 1.35rem;
-    letter-spacing: -0.045em;
-  }
-
-  .loader-card p {
-    color: var(--muted);
-    font-weight: 750;
-    margin-top: 8px;
-    font-size: 0.92rem;
-  }
-
-  /* =========================================================
-     9. SIDEBAR
-  ========================================================= */
-
-  .sidebar {
-    position: sticky;
-    top: calc(26px + var(--safe-top));
-    display: grid;
-    gap: 16px;
-    min-width: 0;
-  }
-
   .profile-card {
-    min-height: 330px;
+    min-height: 310px;
     padding: 24px;
     border-radius: var(--radius-xl);
   }
@@ -463,20 +339,12 @@
   .profile-row h2 {
     font-size: 1.05rem;
     letter-spacing: -0.04em;
-    line-height: 1.05;
   }
 
   .profile-row p {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-
-  #userEmailText {
-    color: var(--muted);
-    font-size: 0.76rem;
-    font-weight: 800;
-    max-width: 230px;
   }
 
   .brand-logo {
@@ -506,28 +374,15 @@
     display: none;
     border: 1px solid var(--border);
     flex: 0 0 auto;
-    box-shadow:
-      0 0 0 5px rgba(59, 140, 255, 0.08);
+    box-shadow: 0 0 0 5px rgba(59, 140, 255, 0.08);
   }
 
-  .app-title {
-    font-size: clamp(2.7rem, 4vw, 3.65rem);
-    line-height: 0.9;
-    letter-spacing: -0.1em;
-    margin-bottom: 14px;
-    color: var(--text);
-  }
-
-  .profile-card p,
-  .panel p {
+  #userEmailText {
     color: var(--muted);
-    font-weight: 720;
-    line-height: 1.55;
+    font-size: 0.76rem;
+    font-weight: 800;
+    max-width: 230px;
   }
-
-  /* =========================================================
-     10. PLAN BADGES
-  ========================================================= */
 
   .plan-pill,
   .badge,
@@ -538,13 +393,20 @@
     gap: 8px;
     padding: 8px 12px;
     border-radius: 999px;
-    background: var(--accent-soft);
-    border: 1px solid var(--accent-border);
+    background: rgba(59, 140, 255, 0.1);
+    border: 1px solid rgba(59, 140, 255, 0.22);
     color: var(--muted);
     font-size: 0.7rem;
     font-weight: 1000;
     letter-spacing: 0.07em;
     text-transform: uppercase;
+  }
+
+  body.light .plan-pill,
+  body.light .badge,
+  body.light .pricing-label {
+    background: rgba(23, 103, 232, 0.08);
+    border: 1px solid rgba(23, 103, 232, 0.18);
   }
 
   .plan-pill {
@@ -555,9 +417,20 @@
     margin-bottom: 14px;
   }
 
-  /* =========================================================
-     11. UPGRADE PANEL
-  ========================================================= */
+  .app-title {
+    font-size: clamp(2.4rem, 3.4vw, 3.35rem);
+    line-height: 0.92;
+    letter-spacing: -0.09em;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+
+  .profile-card p,
+  .panel p {
+    color: var(--muted);
+    font-weight: 720;
+    line-height: 1.55;
+  }
 
   .panel {
     padding: 24px;
@@ -577,21 +450,13 @@
 
   #upgradeCard {
     background:
-      linear-gradient(
-        145deg,
-        rgba(59, 140, 255, 0.11),
-        rgba(255, 255, 255, 0.035)
-      ),
+      linear-gradient(145deg, rgba(59, 140, 255, 0.11), rgba(255, 255, 255, 0.035)),
       var(--surface);
   }
 
   body.light #upgradeCard {
     background:
-      linear-gradient(
-        145deg,
-        rgba(23, 103, 232, 0.08),
-        rgba(255, 255, 255, 0.92)
-      ),
+      linear-gradient(145deg, rgba(23, 103, 232, 0.08), rgba(255, 255, 255, 0.92)),
       var(--surface);
   }
 
@@ -616,20 +481,17 @@
     font-size: 0.8rem;
   }
 
-  /* =========================================================
-     12. TOPBAR
-  ========================================================= */
-
   .topbar {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 0;
+    margin-bottom: 20px;
   }
 
   .app-main > .topbar {
+    margin-bottom: 0;
     padding: 7px;
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.035);
@@ -673,10 +535,6 @@
     flex: 0 0 auto;
   }
 
-  /* =========================================================
-     13. BUTTONS
-  ========================================================= */
-
   .icon-btn,
   .btn,
   .filter-btn,
@@ -710,16 +568,10 @@
     border: 0;
     border-radius: 18px;
     padding: 14px 18px;
-    background:
-      linear-gradient(
-        135deg,
-        var(--accent),
-        var(--accent-dark)
-      );
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #ffffff;
     font-weight: 1000;
-    box-shadow:
-      0 18px 42px rgba(23, 103, 232, 0.28);
+    box-shadow: 0 18px 42px rgba(23, 103, 232, 0.28);
     white-space: nowrap;
     text-align: center;
   }
@@ -766,10 +618,6 @@
     cursor: not-allowed;
   }
 
-  /* =========================================================
-     14. HAMBURGER
-  ========================================================= */
-
   .hamburger-btn {
     display: inline-grid;
     place-items: center;
@@ -791,9 +639,7 @@
     height: 2px;
     border-radius: 999px;
     background: currentColor;
-    transition:
-      transform var(--ease),
-      opacity var(--ease);
+    transition: transform var(--ease), opacity var(--ease);
   }
 
   body.menu-open .hamburger-lines span:nth-child(1) {
@@ -807,10 +653,6 @@
   body.menu-open .hamburger-lines span:nth-child(3) {
     transform: translateY(-6px) rotate(-45deg);
   }
-
-  /* =========================================================
-     15. MENU OVERLAY + DRAWER
-  ========================================================= */
 
   .menu-overlay {
     position: fixed;
@@ -835,9 +677,9 @@
 
   .menu-drawer {
     position: fixed;
-    top: calc(16px + var(--safe-top));
+    top: calc(16px + env(safe-area-inset-top));
     left: 16px;
-    bottom: calc(16px + var(--safe-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
     z-index: 130;
     width: min(calc(100% - 32px), 380px);
     padding: 18px;
@@ -873,8 +715,7 @@
     border-radius: 17px;
     object-fit: cover;
     border: 1px solid var(--border);
-    box-shadow:
-      0 0 0 7px rgba(59, 140, 255, 0.06);
+    box-shadow: 0 0 0 7px rgba(59, 140, 255, 0.06);
   }
 
   .menu-brand h3 {
@@ -941,8 +782,8 @@
     display: grid;
     place-items: center;
     border-radius: 13px;
-    background: var(--accent-soft);
-    border: 1px solid var(--accent-border);
+    background: rgba(59, 140, 255, 0.12);
+    border: 1px solid rgba(59, 140, 255, 0.18);
     color: var(--accent);
     font-size: 0.95rem;
   }
@@ -978,37 +819,30 @@
     font-weight: 750;
     padding: 12px;
     border-radius: 18px;
-    background: var(--accent-soft);
-    border: 1px solid var(--accent-border);
+    background: rgba(59, 140, 255, 0.08);
+    border: 1px solid rgba(59, 140, 255, 0.16);
   }
 
-  /* =========================================================
-     16. HERO — COMPACT 30% HEIGHT
-  ========================================================= */
-
-  .app-hero {
-    min-height: 30vh;
-    max-height: 30vh;
-    padding: clamp(22px, 3vw, 34px);
-    border-radius: 34px;
-  }
-
-  .app-hero::after {
-    content: none;
-  }
-
+  .app-hero,
   .dashboard-hero {
+    min-height: clamp(220px, 30vh, 320px);
+    padding: clamp(28px, 4vw, 54px);
+    border-radius: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 30vh;
-    max-height: 30vh;
-    text-align: center;
+  }
+
+  .app-hero::after,
+  .dashboard-hero::after {
+    content: none;
   }
 
   .hero-content {
-    width: min(100%, 840px);
-    margin: 0 auto;
+    width: 100%;
+    max-width: 980px;
+    min-width: 0;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1017,33 +851,27 @@
 
   .dashboard-hero .hero-content h1,
   .app-hero h1 {
-    max-width: 860px;
-    margin: 14px auto 10px;
-    font-size: clamp(2.35rem, 4.2vw, 4.6rem);
-    line-height: 0.92;
-    letter-spacing: -0.095em;
+    max-width: 1000px;
+    margin: 16px 0 12px;
+    font-size: clamp(3rem, 6vw, 6.2rem);
+    line-height: 0.88;
+    letter-spacing: -0.105em;
     text-wrap: balance;
     color: var(--text);
   }
 
-  .dashboard-hero .hero-content p,
-  .app-hero p {
-    max-width: 640px;
-    margin: 0 auto;
+  .app-hero p,
+  .dashboard-hero p {
+    max-width: 720px;
     color: var(--muted);
     font-weight: 800;
-    font-size: 0.95rem;
-    line-height: 1.45;
+    font-size: 1rem;
   }
 
   .hero-side,
   .hero-mini-card {
     display: none !important;
   }
-
-  /* =========================================================
-     17. STATS
-  ========================================================= */
 
   .app-stats {
     display: grid;
@@ -1055,7 +883,7 @@
     position: relative;
     overflow: hidden;
     min-width: 0;
-    padding: 18px 12px;
+    padding: 22px 12px;
     border-radius: 24px;
     text-align: center;
   }
@@ -1072,7 +900,7 @@
 
   .stat strong {
     display: block;
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     letter-spacing: -0.05em;
   }
 
@@ -1085,10 +913,6 @@
     letter-spacing: 0.09em;
     text-transform: uppercase;
   }
-
-  /* =========================================================
-     18. FILTERS
-  ========================================================= */
 
   .filters {
     display: grid;
@@ -1128,10 +952,6 @@
     color: #ffffff;
   }
 
-  /* =========================================================
-     19. TASK LIST
-  ========================================================= */
-
   .tasks {
     display: grid;
     gap: 12px;
@@ -1159,11 +979,7 @@
     bottom: 14px;
     width: 4px;
     border-radius: 999px;
-    background:
-      linear-gradient(
-        var(--accent),
-        var(--accent-dark)
-      );
+    background: linear-gradient(var(--accent), var(--accent-dark));
     opacity: 0.72;
   }
 
@@ -1174,11 +990,7 @@
   }
 
   .task.done::before {
-    background:
-      linear-gradient(
-        var(--green),
-        var(--accent)
-      );
+    background: linear-gradient(var(--green), var(--accent));
     opacity: 0.9;
   }
 
@@ -1213,14 +1025,8 @@
 
   .task.done .check {
     color: #ffffff;
-    background:
-      linear-gradient(
-        135deg,
-        var(--accent),
-        var(--accent-dark)
-      );
-    box-shadow:
-      0 12px 28px rgba(23, 103, 232, 0.24);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    box-shadow: 0 12px 28px rgba(23, 103, 232, 0.24);
   }
 
   .task-text {
@@ -1260,10 +1066,6 @@
     color: var(--red);
   }
 
-  /* =========================================================
-     20. EMPTY STATE
-  ========================================================= */
-
   .empty {
     display: none;
     text-align: center;
@@ -1284,17 +1086,25 @@
     margin-bottom: 10px;
   }
 
-  /* =========================================================
-     21. COMPOSER — CHATGPT STYLE BOTTOM INPUT
-  ========================================================= */
+  @keyframes pop {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 
   .composer {
     position: fixed;
     left: 50%;
-    bottom: calc(14px + var(--safe-bottom));
+    bottom: calc(14px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     z-index: 80;
-    width: min(calc(100% - 28px), 780px);
+    width: min(calc(100% - 28px), 920px);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1353,12 +1163,7 @@
     flex: 0 0 auto;
     border: 0;
     border-radius: 18px;
-    background:
-      linear-gradient(
-        135deg,
-        var(--accent),
-        var(--accent-dark)
-      );
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #ffffff;
     display: grid;
     place-items: center;
@@ -1393,16 +1198,12 @@
     stroke-linejoin: round;
   }
 
-  /* =========================================================
-     22. BOTTOM FILTER BAR
-  ========================================================= */
-
   .bottom-bar {
     position: fixed;
     left: 50%;
-    bottom: calc(86px + var(--safe-bottom));
+    bottom: calc(86px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
-    width: min(calc(100% - 28px), 560px);
+    width: min(calc(100% - 28px), 620px);
     display: flex;
     gap: 8px;
     padding: 9px;
@@ -1439,10 +1240,6 @@
     color: #ffffff;
   }
 
-  /* =========================================================
-     23. MODAL
-  ========================================================= */
-
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -1450,9 +1247,9 @@
     align-items: end;
     justify-content: center;
     padding:
-      calc(18px + var(--safe-top))
+      calc(18px + env(safe-area-inset-top))
       18px
-      calc(18px + var(--safe-bottom));
+      calc(18px + env(safe-area-inset-bottom));
     background: rgba(0, 0, 0, 0.56);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -1504,14 +1301,10 @@
     flex: 1;
   }
 
-  /* =========================================================
-     24. TOAST
-  ========================================================= */
-
   .toast {
     position: fixed;
     left: 50%;
-    bottom: calc(92px + var(--safe-bottom));
+    bottom: calc(92px + env(safe-area-inset-bottom));
     transform: translateX(-50%) translateY(20px);
     width: min(calc(100% - 36px), 460px);
     padding: 14px 16px;
@@ -1539,30 +1332,10 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* =========================================================
-     25. ANIMATIONS
-  ========================================================= */
-
-  @keyframes pop {
-    from {
-      transform: translateY(8px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  /* =========================================================
-     26. DESKTOP RESPONSIVE
-  ========================================================= */
-
   @media (min-width: 901px) {
     .app-main > .topbar {
       position: sticky;
-      top: calc(26px + var(--safe-top));
+      top: calc(26px + env(safe-area-inset-top));
       z-index: 10;
     }
 
@@ -1585,32 +1358,32 @@
     .app-hero:hover {
       transform: translateY(-2px);
     }
-
-    .bottom-bar {
-      display: none !important;
-    }
   }
 
-  /* =========================================================
-     27. TABLET RESPONSIVE
-  ========================================================= */
+  @media (max-width: 1100px) {
+    .app-shell {
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .dashboard-hero .hero-content h1,
+    .app-hero h1 {
+      font-size: clamp(2.6rem, 6vw, 4.9rem);
+    }
+  }
 
   @media (max-width: 900px) {
     .screen {
       padding:
-        calc(16px + var(--safe-top))
+        calc(16px + env(safe-area-inset-top))
         16px
-        calc(150px + var(--safe-bottom));
+        calc(150px + env(safe-area-inset-bottom));
     }
 
     .app-shell {
-      grid-template-columns: 1fr;
       width: min(100%, 760px);
-    }
-
-    .app-main {
-      width: 100%;
-      padding-bottom: 0;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
     .sidebar {
@@ -1622,42 +1395,48 @@
       display: none;
     }
 
+    .app-main {
+      padding-bottom: 0;
+    }
+
     .app-main > .topbar {
       position: sticky;
-      top: calc(10px + var(--safe-top));
+      top: calc(10px + env(safe-area-inset-top));
       z-index: 20;
     }
 
     .app-hero,
     .dashboard-hero {
-      min-height: 28vh;
-      max-height: none;
-      padding: 24px;
+      min-height: 230px;
+      padding: 28px;
       border-radius: 32px;
     }
 
     .dashboard-hero .hero-content h1,
     .app-hero h1 {
-      font-size: clamp(2.2rem, 10vw, 3.6rem);
-      line-height: 0.94;
-      letter-spacing: -0.085em;
+      font-size: clamp(2.55rem, 12vw, 4.4rem);
+      line-height: 0.9;
+    }
+
+    .app-stats {
+      grid-template-columns: repeat(3, 1fr);
     }
 
     #upgradeCard {
       order: 2;
     }
-  }
 
-  /* =========================================================
-     28. PHONE RESPONSIVE
-  ========================================================= */
+    .composer {
+      width: min(calc(100% - 28px), 720px);
+    }
+  }
 
   @media (max-width: 520px) {
     .screen {
       padding:
-        calc(14px + var(--safe-top))
+        calc(14px + env(safe-area-inset-top))
         14px
-        calc(150px + var(--safe-bottom));
+        calc(150px + env(safe-area-inset-bottom));
     }
 
     .loader-card {
@@ -1665,7 +1444,7 @@
     }
 
     .topbar {
-      margin-bottom: 0;
+      margin-bottom: 14px;
     }
 
     .brand {
@@ -1699,37 +1478,30 @@
     }
 
     .menu-drawer {
-      top: calc(10px + var(--safe-top));
+      top: calc(10px + env(safe-area-inset-top));
       left: 10px;
-      bottom: calc(10px + var(--safe-bottom));
+      bottom: calc(10px + env(safe-area-inset-bottom));
       width: min(calc(100% - 20px), 380px);
       border-radius: 28px;
     }
 
     .app-hero,
     .dashboard-hero {
-      min-height: 27vh;
-      padding: 20px;
-      border-radius: 28px;
+      min-height: 210px;
+      padding: 22px;
+      border-radius: 30px;
     }
 
     .dashboard-hero .hero-content h1,
     .app-hero h1 {
-      font-size: clamp(2rem, 10.5vw, 3rem);
-      line-height: 0.95;
-      letter-spacing: -0.075em;
-      margin: 12px 0 8px;
+      font-size: clamp(2.15rem, 12vw, 3.35rem);
+      letter-spacing: -0.085em;
+      line-height: 0.92;
     }
 
     .app-hero p,
-    .dashboard-hero .hero-content p,
     .panel p {
-      font-size: 0.84rem;
-    }
-
-    .badge {
-      font-size: 0.62rem;
-      padding: 7px 10px;
+      font-size: 0.88rem;
     }
 
     .panel {
@@ -1752,30 +1524,32 @@
     }
 
     .stat {
-      padding: 12px 8px;
+      padding: 14px 8px;
       border-radius: 18px;
     }
 
     .stat strong {
-      font-size: 1.08rem;
+      font-size: 1.1rem;
     }
 
     .stat span {
-      font-size: 0.56rem;
+      font-size: 0.58rem;
     }
 
     .filters {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
       padding: 7px;
     }
 
     .filter-btn {
-      padding: 11px;
-      font-size: 0.78rem;
+      padding: 12px 6px;
+      font-size: 0.74rem;
+      border-radius: 15px;
     }
 
     .composer {
-      bottom: calc(12px + var(--safe-bottom));
+      bottom: calc(12px + env(safe-area-inset-bottom));
       width: calc(100% - 24px);
       padding: 8px;
       border-radius: 24px;
@@ -1799,12 +1573,7 @@
     }
 
     .empty {
-      padding: 28px 18px;
       margin-bottom: 16px;
-    }
-
-    .empty .emoji {
-      font-size: 2.2rem;
     }
 
     .task {
@@ -1822,50 +1591,31 @@
     }
 
     .bottom-bar {
-      bottom: calc(86px + var(--safe-bottom));
+      bottom: calc(86px + env(safe-area-inset-bottom));
       width: calc(100% - 24px);
     }
   }
 
-  /* =========================================================
-     29. SMALL PHONE FIXES
-  ========================================================= */
-
   @media (max-width: 380px) {
-    .brand p {
-      max-width: 138px;
-    }
-
     .dashboard-hero .hero-content h1,
     .app-hero h1 {
-      font-size: clamp(1.9rem, 10vw, 2.75rem);
+      font-size: clamp(1.95rem, 11vw, 2.75rem);
     }
 
     .app-hero,
     .dashboard-hero {
-      padding: 18px;
+      min-height: 190px;
+      padding: 20px;
     }
 
-    .stat span {
-      letter-spacing: 0.06em;
+    .brand p {
+      max-width: 135px;
     }
 
-    .filter-btn {
-      padding: 10px 8px;
-    }
-
-    .composer {
-      width: calc(100% - 18px);
-    }
-
-    .bottom-bar {
-      width: calc(100% - 18px);
+    .filters {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
-
-  /* =========================================================
-     30. REDUCED MOTION
-  ========================================================= */
 
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -1877,124 +1627,6 @@
       transition-duration: 0.01ms !important;
     }
   }
-    /* =========================================================
-   FINAL FIX — CENTER DASHBOARD + STOP HERO TEXT CLIPPING
-========================================================= */
-
-/* Center the whole dashboard instead of sticking it left */
-.app-shell {
-  width: min(100%, 1180px);
-  margin-left: auto;
-  margin-right: auto;
-  grid-template-columns: 320px minmax(0, 1fr);
-  justify-content: center;
-}
-
-/* Keep main content centered and not too wide */
-.app-main {
-  width: min(100%, 860px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Fix hero clipping */
-.app-hero,
-.dashboard-hero {
-  min-height: 260px;
-  max-height: none;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Make the hero content fit inside the card */
-.hero-content {
-  width: 100%;
-  max-width: 720px;
-  align-items: center;
-  text-align: center;
-}
-
-.dashboard-hero .hero-content h1,
-.app-hero h1 {
-  font-size: clamp(2.4rem, 4.4vw, 4.2rem);
-  line-height: 0.92;
-  letter-spacing: -0.08em;
-  margin: 14px 0 10px;
-  max-width: 720px;
-}
-
-/* Hide the old right-side section completely */
-.hero-side,
-.hero-mini-card {
-  display: none !important;
-}
-
-/* Make the task input align with the app content, not the entire screen */
-.composer {
-  width: min(calc(100% - 28px), 760px);
-}
-
-/* Better desktop spacing */
-@media (min-width: 901px) {
-  .screen {
-    display: flex;
-    justify-content: center;
-  }
-
-  .app-shell {
-    align-self: flex-start;
-  }
-
-  .app-main > .topbar {
-    top: calc(26px + env(safe-area-inset-top));
-  }
-}
-
-/* Tablet/mobile layout */
-@media (max-width: 900px) {
-  .app-shell {
-    width: min(100%, 720px);
-    grid-template-columns: 1fr;
-  }
-
-  .app-main {
-    width: 100%;
-  }
-
-  .app-hero,
-  .dashboard-hero {
-    min-height: 230px;
-    max-height: none;
-  }
-
-  .dashboard-hero .hero-content h1,
-  .app-hero h1 {
-    font-size: clamp(2.2rem, 10vw, 3.6rem);
-  }
-}
-
-/* Phone layout */
-@media (max-width: 520px) {
-  .app-hero,
-  .dashboard-hero {
-    min-height: 220px;
-    padding: 22px;
-  }
-
-  .dashboard-hero .hero-content h1,
-  .app-hero h1 {
-    font-size: clamp(2.1rem, 11vw, 3.1rem);
-    line-height: 0.95;
-  }
-
-  .composer {
-    width: calc(100% - 24px);
-  }
-}
-
-  
 </style>
 </head>
 
