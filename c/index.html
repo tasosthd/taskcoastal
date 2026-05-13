@@ -16,12 +16,15 @@
   <meta name="apple-mobile-web-app-title" content="Coastal Flow" />
   <link rel="apple-touch-icon" href="/index.png" />
 
-  <style>
+<style>
   /* =========================================================
      COASTAL FLOW — CLEAN CONTRAST DASHBOARD STYLE
-     Dark mode: blue/black focus UI
-     Light mode: clean white/soft blue contrast
-     Fixed bottom composer like ChatGPT
+     Page: DASHBOARD /c/
+     Fixes:
+     - PWA iPhone safe-area top padding
+     - Bottom composer like ChatGPT
+     - No huge empty task gap
+     - Dark + light contrast
   ========================================================= */
 
   * {
@@ -185,7 +188,10 @@
   .screen {
     width: 100%;
     min-height: 100vh;
-    padding: clamp(14px, 2vw, 30px);
+    padding:
+      calc(clamp(14px, 2vw, 30px) + env(safe-area-inset-top))
+      clamp(14px, 2vw, 30px)
+      calc(150px + env(safe-area-inset-bottom));
   }
 
   .app-shell {
@@ -202,14 +208,17 @@
     display: grid;
     gap: 16px;
     min-width: 0;
-    padding-bottom: 170px;
+    padding-bottom: 20px;
   }
 
   .loader-screen {
     min-height: 100vh;
     display: grid;
     place-items: center;
-    padding: 22px;
+    padding:
+      calc(22px + env(safe-area-inset-top))
+      22px
+      calc(22px + env(safe-area-inset-bottom));
   }
 
   .loader-card {
@@ -246,7 +255,7 @@
 
   .sidebar {
     position: sticky;
-    top: 26px;
+    top: calc(26px + env(safe-area-inset-top));
     display: grid;
     gap: 16px;
     min-width: 0;
@@ -660,9 +669,9 @@
 
   .menu-drawer {
     position: fixed;
-    top: 16px;
+    top: calc(16px + env(safe-area-inset-top));
     left: 16px;
-    bottom: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
     z-index: 130;
     width: min(calc(100% - 32px), 380px);
     padding: 18px;
@@ -917,7 +926,7 @@
   .tasks {
     display: grid;
     gap: 12px;
-    padding-bottom: 0;
+    padding-bottom: 18px;
   }
 
   .task {
@@ -1031,17 +1040,15 @@
   .empty {
     display: none;
     text-align: center;
-    padding: 38px 22px;
+    padding: 34px 22px;
     border-radius: 28px;
     color: var(--muted);
     font-weight: 850;
-    margin-bottom: 0;
-    min-height: 150px;
-    place-items: center;
+    margin-bottom: 18px;
   }
 
   .empty.show {
-    display: grid;
+    display: block;
   }
 
   .empty .emoji {
@@ -1065,23 +1072,19 @@
   .composer {
     position: fixed;
     left: 50%;
-    bottom: 18px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
-    z-index: 90;
-
+    z-index: 80;
     width: min(calc(100% - 28px), 780px);
     display: flex;
     align-items: center;
     gap: 10px;
-
     padding: 10px;
     border-radius: 28px;
-
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-
     box-shadow:
       0 28px 90px rgba(0, 0, 0, 0.42),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -1129,20 +1132,15 @@
     width: 54px;
     height: 54px;
     flex: 0 0 auto;
-
     border: 0;
     border-radius: 18px;
-
     background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #ffffff;
-
     display: grid;
     place-items: center;
-
     box-shadow:
       0 16px 34px rgba(23, 103, 232, 0.34),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
-
     transition:
       transform 0.18s ease,
       box-shadow 0.18s ease,
@@ -1174,20 +1172,18 @@
   .bottom-bar {
     position: fixed;
     left: 50%;
-    bottom: 96px;
+    bottom: calc(86px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     width: min(calc(100% - 28px), 560px);
-
     display: flex;
     gap: 8px;
     padding: 9px;
-
     border-radius: 26px;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
     backdrop-filter: blur(28px);
     box-shadow: var(--shadow-lg);
-    z-index: 80;
+    z-index: 30;
   }
 
   body.light .bottom-bar {
@@ -1220,7 +1216,10 @@
     display: none;
     align-items: end;
     justify-content: center;
-    padding: 18px;
+    padding:
+      calc(18px + env(safe-area-inset-top))
+      18px
+      calc(18px + env(safe-area-inset-bottom));
     background: rgba(0, 0, 0, 0.56);
     backdrop-filter: blur(14px);
     z-index: 60;
@@ -1274,7 +1273,7 @@
   .toast {
     position: fixed;
     left: 50%;
-    bottom: 92px;
+    bottom: calc(92px + env(safe-area-inset-bottom));
     transform: translateX(-50%) translateY(20px);
     width: min(calc(100% - 36px), 460px);
     padding: 14px 16px;
@@ -1304,12 +1303,8 @@
   @media (min-width: 901px) {
     .app-main > .topbar {
       position: sticky;
-      top: 26px;
+      top: calc(26px + env(safe-area-inset-top));
       z-index: 10;
-    }
-
-    .bottom-bar {
-      display: none !important;
     }
 
     .profile-card,
@@ -1335,7 +1330,10 @@
 
   @media (max-width: 900px) {
     .screen {
-      padding: 16px;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        16px
+        calc(150px + env(safe-area-inset-bottom));
     }
 
     .app-shell {
@@ -1352,12 +1350,12 @@
     }
 
     .app-main {
-      padding-bottom: 165px;
+      padding-bottom: 0;
     }
 
     .app-main > .topbar {
       position: sticky;
-      top: 10px;
+      top: calc(10px + env(safe-area-inset-top));
       z-index: 20;
     }
 
@@ -1378,7 +1376,10 @@
 
   @media (max-width: 520px) {
     .screen {
-      padding: 14px;
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        14px
+        calc(150px + env(safe-area-inset-bottom));
     }
 
     .loader-card {
@@ -1420,9 +1421,9 @@
     }
 
     .menu-drawer {
-      top: 10px;
+      top: calc(10px + env(safe-area-inset-top));
       left: 10px;
-      bottom: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
       width: min(calc(100% - 20px), 380px);
       border-radius: 28px;
     }
@@ -1480,7 +1481,7 @@
     }
 
     .composer {
-      bottom: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
       width: calc(100% - 24px);
       padding: 8px;
       border-radius: 24px;
@@ -1499,19 +1500,12 @@
       border-radius: 17px;
     }
 
-    .bottom-bar {
-      bottom: 86px;
-      width: calc(100% - 24px);
-    }
-
     .tasks {
-      padding-bottom: 0;
+      padding-bottom: 16px;
     }
 
     .empty {
-      margin-bottom: 0;
-      min-height: 170px;
-      padding: 34px 18px;
+      margin-bottom: 16px;
     }
 
     .task {
@@ -1526,6 +1520,11 @@
     .mini-btn {
       width: 32px;
       height: 32px;
+    }
+
+    .bottom-bar {
+      bottom: calc(86px + env(safe-area-inset-bottom));
+      width: calc(100% - 24px);
     }
   }
 
