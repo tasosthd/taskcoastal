@@ -24,6 +24,7 @@
      - PWA iPhone safe-area top padding
      - Bottom composer like ChatGPT
      - No huge empty task gap
+     - Split hero layout with right card
      - Dark + light contrast
   ========================================================= */
 
@@ -229,6 +230,7 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
     backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
     text-align: center;
   }
 
@@ -275,6 +277,7 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
     backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
   }
 
   .profile-card,
@@ -492,6 +495,7 @@
     background: rgba(255, 255, 255, 0.035);
     border: 1px solid var(--border);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   body.light .app-main > .topbar {
@@ -555,6 +559,7 @@
     font-size: 1rem;
     font-weight: 900;
     backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .btn {
@@ -653,6 +658,7 @@
     z-index: 120;
     background: rgba(0, 0, 0, 0.56);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--ease);
@@ -819,9 +825,6 @@
     min-height: 300px;
     padding: clamp(28px, 4vw, 48px);
     border-radius: 38px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   .app-hero::after {
@@ -843,6 +846,72 @@
     color: var(--muted);
     font-weight: 800;
     font-size: 1rem;
+  }
+
+  .dashboard-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);
+    align-items: stretch;
+    gap: 22px;
+    min-height: 320px;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .dashboard-hero .hero-content h1 {
+    max-width: 760px;
+    margin: 18px 0 12px;
+    font-size: clamp(2.8rem, 4.8vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: -0.095em;
+  }
+
+  .hero-side {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .hero-mini-card {
+    width: 100%;
+    min-height: 100%;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(145deg, rgba(59, 140, 255, 0.12), rgba(255, 255, 255, 0.035)),
+      rgba(255, 255, 255, 0.035);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  body.light .hero-mini-card {
+    background:
+      linear-gradient(145deg, rgba(23, 103, 232, 0.08), rgba(255, 255, 255, 0.9)),
+      rgba(255, 255, 255, 0.76);
+  }
+
+  .hero-mini-card span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .hero-mini-card strong {
+    color: var(--text);
+    font-size: clamp(1.6rem, 3vw, 3rem);
+    line-height: 0.95;
+    letter-spacing: -0.08em;
   }
 
   .app-stats {
@@ -895,6 +964,7 @@
     background: rgba(255, 255, 255, 0.035);
     border: 1px solid var(--border);
     backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   body.light .filters {
@@ -1182,6 +1252,7 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
     backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     box-shadow: var(--shadow-lg);
     z-index: 30;
   }
@@ -1222,6 +1293,7 @@
       calc(18px + env(safe-area-inset-bottom));
     background: rgba(0, 0, 0, 0.56);
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     z-index: 60;
   }
 
@@ -1280,6 +1352,7 @@
     border-radius: 20px;
     background: rgba(8, 12, 22, 0.94);
     backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     color: var(--text);
@@ -1359,12 +1432,22 @@
       z-index: 20;
     }
 
+    .dashboard-hero {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .hero-side {
+      display: none;
+    }
+
     .app-hero {
       min-height: 260px;
       padding: 28px;
       border-radius: 32px;
     }
 
+    .dashboard-hero .hero-content h1,
     .app-hero h1 {
       font-size: clamp(2.7rem, 12vw, 4.5rem);
     }
@@ -1434,6 +1517,7 @@
       border-radius: 30px;
     }
 
+    .dashboard-hero .hero-content h1,
     .app-hero h1 {
       font-size: clamp(2.65rem, 14vw, 4.2rem);
       letter-spacing: -0.085em;
@@ -1617,11 +1701,24 @@
           </div>
         </header>
 
-        <section class="app-hero">
-          <span class="badge">✨ Minimal task manager</span>
-          <h1 id="greeting">Build your calm empire.</h1>
-          <p>One clean board. One focused day. No chaos.</p>
-        </section>
+        <section class="app-hero dashboard-hero">
+  <div class="hero-content">
+    <span class="badge">✨ Minimal task manager</span>
+
+    <h1 id="greeting">Build your calm empire.</h1>
+
+    <p>
+      One clean board. One focused day. No chaos.
+    </p>
+  </div>
+
+  <div class="hero-side">
+    <div class="hero-mini-card">
+      <span>Today’s mode</span>
+      <strong>Execute clean</strong>
+    </div>
+  </div>
+</section>
 
         <section class="app-stats">
           <div class="stat">
