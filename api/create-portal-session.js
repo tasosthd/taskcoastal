@@ -1,61 +1,32 @@
 const Stripe = require("stripe");
 const { createClient } = require("@supabase/supabase-js");
 
-exports.handler = async function (event) {
-  const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  };
+module.exports = async function handler(req, res) {
+  res.setHeader("Content-Type", "application/json");
 
-  if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers,
-      body: ""
-    };
-  }
-
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({
-        error: "Method not allowed. Use POST."
-      })
-    };
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Method not allowed. Use POST."
+    });
   }
 
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: "Missing STRIPE_SECRET_KEY in Netlify environment variables."
-        })
-      };
+      return res.status(500).json({
+        error: "Missing STRIPE_SECRET_KEY in Vercel environment variables."
+      });
     }
 
     if (!process.env.SUPABASE_URL) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: "Missing SUPABASE_URL in Netlify environment variables."
-        })
-      };
+      return res.status(500).json({
+        error: "Missing SUPABASE_URL in Vercel environment variables."
+      });
     }
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: "Missing SUPABASE_SERVICE_ROLE_KEY in Netlify environment variables."
-        })
-      };
+      return res.status(500).json({
+        error: "Missing SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables."
+      });
     }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -65,17 +36,12 @@ exports.handler = async function (event) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const body = JSON.parse(event.body || "{}");
-    const userId = body.userId;
+    const { userId } = req.body || {};
 
     if (!userId) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: "Missing userId."
-        })
-      };
+      return res.status(400).json({
+        error: "Missing userId."
+      });
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -85,60 +51,39 @@ exports.handler = async function (event) {
       .maybeSingle();
 
     if (profileError) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: profileError.message
-        })
-      };
+      return res.status(500).json({
+        error: profileError.message
+      });
     }
 
     if (!profile) {
-      return {
-        statusCode: 404,
-        headers,
-        body: JSON.stringify({
-          error: "Profile not found."
-        })
-      };
+      return res.status(404).json({
+        error: "Profile not found."
+      });
     }
 
     if (!profile.stripe_customer_id) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: "No Stripe customer ID found for this user. Your webhook must save stripe_customer_id."
-        })
-      };
+      return res.status(400).json({
+        error:
+          "No Stripe customer ID found for this user. Make a fresh subscription after the webhook is deployed."
+      });
     }
 
-    const origin =
-      event.headers.origin ||
-      "https://taskcoastal.com";
+    const origin = req.headers.origin || "https://taskcoastal.com";
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${origin}/c/`
     });
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        url: portalSession.url
-      })
-    };
+    return res.status(200).json({
+      url: portalSession.url
+    });
   } catch (error) {
     console.error("Create portal session error:", error);
 
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: error.message || "Something went wrong."
-      })
-    };
+    return res.status(500).json({
+      error: error.message || "Something went wrong."
+    });
   }
 };
