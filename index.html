@@ -809,33 +809,33 @@
       });
     }
 
-    if (googleLoginBtn) {
-      googleLoginBtn.addEventListener("click", async () => {
-        try {
-          googleLoginBtn.disabled = true;
-          googleLoginBtn.textContent = "Opening Google...";
+if (googleLoginBtn) {
+  googleLoginBtn.addEventListener("click", async () => {
+    try {
+      googleLoginBtn.disabled = true;
+      googleLoginBtn.textContent = "Opening Google...";
 
-          const { error } = await supabaseClient.auth.signInWithOAuth({
-  provider: "google",
-  options: {
-    redirectTo: APP_URL
-  }
-});
-
-          if (error) {
-            console.error("Google login error:", error);
-            showToast(error.message || "Google login failed.");
-            googleLoginBtn.disabled = false;
-            googleLoginBtn.textContent = "Continue with Google";
-          }
-        } catch (error) {
-          console.error("Google login crash:", error);
-          showToast("Google login failed.");
-          googleLoginBtn.disabled = false;
-          googleLoginBtn.textContent = "Continue with Google";
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: APP_URL
         }
       });
+
+      if (error) {
+        console.error("Google login error:", error);
+        showToast(error.message || "Google login failed.");
+        googleLoginBtn.disabled = false;
+        googleLoginBtn.textContent = "Continue with Google";
+      }
+    } catch (error) {
+      console.error("Google login crash:", error);
+      showToast("Google login failed.");
+      googleLoginBtn.disabled = false;
+      googleLoginBtn.textContent = "Continue with Google";
     }
+  });
+}
 
     if (waitlistForm) {
       waitlistForm.addEventListener("submit", async event => {
