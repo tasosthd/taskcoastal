@@ -1877,6 +1877,124 @@
       transition-duration: 0.01ms !important;
     }
   }
+    /* =========================================================
+   FINAL FIX — CENTER DASHBOARD + STOP HERO TEXT CLIPPING
+========================================================= */
+
+/* Center the whole dashboard instead of sticking it left */
+.app-shell {
+  width: min(100%, 1180px);
+  margin-left: auto;
+  margin-right: auto;
+  grid-template-columns: 320px minmax(0, 1fr);
+  justify-content: center;
+}
+
+/* Keep main content centered and not too wide */
+.app-main {
+  width: min(100%, 860px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Fix hero clipping */
+.app-hero,
+.dashboard-hero {
+  min-height: 260px;
+  max-height: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make the hero content fit inside the card */
+.hero-content {
+  width: 100%;
+  max-width: 720px;
+  align-items: center;
+  text-align: center;
+}
+
+.dashboard-hero .hero-content h1,
+.app-hero h1 {
+  font-size: clamp(2.4rem, 4.4vw, 4.2rem);
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+  margin: 14px 0 10px;
+  max-width: 720px;
+}
+
+/* Hide the old right-side section completely */
+.hero-side,
+.hero-mini-card {
+  display: none !important;
+}
+
+/* Make the task input align with the app content, not the entire screen */
+.composer {
+  width: min(calc(100% - 28px), 760px);
+}
+
+/* Better desktop spacing */
+@media (min-width: 901px) {
+  .screen {
+    display: flex;
+    justify-content: center;
+  }
+
+  .app-shell {
+    align-self: flex-start;
+  }
+
+  .app-main > .topbar {
+    top: calc(26px + env(safe-area-inset-top));
+  }
+}
+
+/* Tablet/mobile layout */
+@media (max-width: 900px) {
+  .app-shell {
+    width: min(100%, 720px);
+    grid-template-columns: 1fr;
+  }
+
+  .app-main {
+    width: 100%;
+  }
+
+  .app-hero,
+  .dashboard-hero {
+    min-height: 230px;
+    max-height: none;
+  }
+
+  .dashboard-hero .hero-content h1,
+  .app-hero h1 {
+    font-size: clamp(2.2rem, 10vw, 3.6rem);
+  }
+}
+
+/* Phone layout */
+@media (max-width: 520px) {
+  .app-hero,
+  .dashboard-hero {
+    min-height: 220px;
+    padding: 22px;
+  }
+
+  .dashboard-hero .hero-content h1,
+  .app-hero h1 {
+    font-size: clamp(2.1rem, 11vw, 3.1rem);
+    line-height: 0.95;
+  }
+
+  .composer {
+    width: calc(100% - 24px);
+  }
+}
+
+  
 </style>
 </head>
 
