@@ -5,10 +5,11 @@
   "description": "TaskCoastal productivity app with Supabase, Stripe, and Resend.",
   "main": "index.html",
   "scripts": {
-    "start": "vercel dev"
+    "start": "netlify dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.10",
-    "stripe": "^17.5.0"
+    "stripe": "^17.5.0",
+    "resend": "^4.0.1"
   }
 }
