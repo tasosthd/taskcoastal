@@ -27,6 +27,7 @@
      - Bottom input like ChatGPT
      - PWA safe-area fix for iPhone
      - Strong contrast dark + light mode
+     - Fixed premium floating controls on desktop + mobile
   ========================================================= */
 
   * {
@@ -69,6 +70,9 @@
 
     --blur: blur(22px);
     --ease: 0.22s ease;
+
+    --floating-control-width: 620px;
+    --floating-control-mobile-width: calc(100% - 24px);
   }
 
   body.light {
@@ -184,8 +188,8 @@
   }
 
   .hidden {
-  display: none !important;
-}
+    display: none !important;
+  }
 
   .screen {
     width: 100%;
@@ -1104,7 +1108,10 @@
     bottom: calc(14px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     z-index: 80;
-    width: min(calc(100% - 28px), 920px);
+
+    width: min(var(--floating-control-width), calc(100% - 42px));
+    max-width: var(--floating-control-width);
+
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1198,23 +1205,26 @@
     stroke-linejoin: round;
   }
 
-.bottom-bar {
-  position: fixed;
-  left: 50%;
-  bottom: calc(122px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(calc(100% - 28px), 620px);
-  display: flex;
-  gap: 8px;
-  padding: 9px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow: var(--shadow-lg);
-  z-index: 30;
-}
+  .bottom-bar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(122px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 30;
+
+    width: min(var(--floating-control-width), calc(100% - 42px));
+    max-width: var(--floating-control-width);
+
+    display: flex;
+    gap: 8px;
+    padding: 9px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow: var(--shadow-lg);
+  }
 
   body.light .bottom-bar {
     background: rgba(255, 255, 255, 0.9);
@@ -1377,7 +1387,7 @@
       padding:
         calc(16px + env(safe-area-inset-top))
         16px
-        calc(150px + env(safe-area-inset-bottom));
+        calc(215px + env(safe-area-inset-bottom));
     }
 
     .app-shell {
@@ -1425,19 +1435,14 @@
     #upgradeCard {
       order: 2;
     }
-
-    .composer {
-      width: min(calc(100% - 28px), 720px);
-    }
   }
 
-    @media (max-width: 520px) {
-      .screen {
-        padding:
-          calc(14px + env(safe-area-inset-top))
-          14px
-          calc(215px + env(safe-area-inset-bottom));
-      }
+  @media (max-width: 520px) {
+    .screen {
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        14px
+        calc(215px + env(safe-area-inset-bottom));
     }
 
     .loader-card {
@@ -1551,7 +1556,8 @@
 
     .composer {
       bottom: calc(12px + env(safe-area-inset-bottom));
-      width: calc(100% - 24px);
+      width: var(--floating-control-mobile-width);
+      max-width: var(--floating-control-mobile-width);
       padding: 8px;
       border-radius: 24px;
     }
@@ -1593,7 +1599,8 @@
 
     .bottom-bar {
       bottom: calc(118px + env(safe-area-inset-bottom));
-      width: calc(100% - 24px);
+      width: var(--floating-control-mobile-width);
+      max-width: var(--floating-control-mobile-width);
     }
   }
 
