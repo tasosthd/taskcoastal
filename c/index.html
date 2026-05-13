@@ -1172,13 +1172,15 @@ body.light .composer {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
   const APP_PATH = "/c/";
-  const APP_URL = "https://taskcoastal.com/c/";
-  const LANDING_URL = "https://taskcoastal.com/";
+  const APP_URL = `${window.location.origin}${APP_PATH}`;
+  const LANDING_URL = `${window.location.origin}/`;
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
@@ -1279,6 +1281,14 @@ body.light .composer {
 
   function cleanUrlToDashboard() {
     window.history.replaceState({}, document.title, APP_PATH);
+  }
+
+  function setLoadingMessage(message) {
+    const loadingText = document.querySelector(".loader-card p");
+
+    if (loadingText) {
+      loadingText.textContent = message;
+    }
   }
 
   function showToast(message) {
@@ -1399,22 +1409,23 @@ body.light .composer {
 
   async function exchangeOAuthCodeIfPresent() {
     const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
+    const hasCode = url.searchParams.has("code");
     const authError = url.searchParams.get("error");
     const errorDescription = url.searchParams.get("error_description");
 
     if (authError) {
       console.error("OAuth URL error:", authError, errorDescription);
+      setLoadingMessage(`Login error: ${errorDescription || authError}`);
       showToast(`Login error: ${errorDescription || authError}`);
 
       setTimeout(() => {
         window.location.replace(LANDING_URL);
-      }, 1500);
+      }, 1600);
 
       return false;
     }
 
-    if (!code) {
+    if (!hasCode) {
       console.log("No OAuth code present, proceeding with regular session check");
       return true;
     }
@@ -1423,43 +1434,40 @@ body.light .composer {
 
     try {
       const { data, error } = await withTimeout(
-        supabaseClient.auth.exchangeCodeForSession(code),
+        supabaseClient.auth.exchangeCodeForSession(window.location.href),
         15000,
         "OAuth exchange"
       );
 
       if (error) {
         console.error("OAuth exchange error:", error);
-        console.error("Error details:", {
-          message: error.message,
-          status: error.status,
-          code: error.code
-        });
 
+        setLoadingMessage(`Session error: ${error.message || "Could not establish session"}`);
         showToast(`Session error: ${error.message || "Could not establish session"}`);
 
         setTimeout(() => {
           window.location.replace(LANDING_URL);
-        }, 1500);
+        }, 2200);
 
         return false;
       }
 
       console.log("✅ OAuth exchange successful", data);
+
       cleanUrlToDashboard();
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 400));
 
       return true;
     } catch (error) {
       console.error("OAuth exchange exception:", error);
-      console.error("Error message:", error.message);
 
+      setLoadingMessage(`Error: ${error.message}`);
       showToast(`Error: ${error.message}`);
 
       setTimeout(() => {
         window.location.replace(LANDING_URL);
-      }, 1500);
+      }, 2200);
 
       return false;
     }
@@ -1678,7 +1686,6 @@ body.light .composer {
       }
     } catch (error) {
       console.error("Fatal boot error:", error);
-      console.error("Error message:", error.message);
 
       hasLoadedInitialSession = true;
       currentUser = null;
@@ -2244,7 +2251,7 @@ body.light .composer {
           data = JSON.parse(rawText);
         } catch {
           console.error("Non-JSON checkout API response:", rawText);
-          throw new Error("Server returned non-JSON. Check Vercel logs.");
+          throw new Error("Server returned non-JSON. Check Netlify function logs.");
         }
 
         if (!response.ok) {
