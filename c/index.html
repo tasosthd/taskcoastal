@@ -1190,6 +1190,8 @@ body.light .composer {
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
@@ -2279,7 +2281,7 @@ body.light .composer {
           data = JSON.parse(rawText);
         } catch {
           console.error("Non-JSON checkout API response:", rawText);
-          throw new Error("Server returned non-JSON. Check Netlify function logs.");
+          throw new Error("Server returned non-JSON. Check Vercel function logs.");
         }
 
         if (!response.ok) {
@@ -2311,7 +2313,7 @@ body.light .composer {
         manageBillingBtn.disabled = true;
         manageBillingBtn.textContent = "Opening billing...";
 
-        const response = await fetch("/.netlify/functions/create-portal-session", {
+        const response = await fetch("/api/create-portal-session", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -2329,7 +2331,7 @@ body.light .composer {
           data = JSON.parse(rawText);
         } catch {
           console.error("Non-JSON portal API response:", rawText);
-          throw new Error("Server returned non-JSON. Check Netlify function logs.");
+          throw new Error("Server returned non-JSON. Check Vercel function logs.");
         }
 
         if (!response.ok) {
