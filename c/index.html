@@ -1174,6 +1174,8 @@ body.light .composer {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
   const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
@@ -1409,7 +1411,7 @@ body.light .composer {
 
   async function exchangeOAuthCodeIfPresent() {
     const url = new URL(window.location.href);
-    const hasCode = url.searchParams.has("code");
+    const code = url.searchParams.get("code");
     const authError = url.searchParams.get("error");
     const errorDescription = url.searchParams.get("error_description");
 
@@ -1425,7 +1427,7 @@ body.light .composer {
       return false;
     }
 
-    if (!hasCode) {
+    if (!code) {
       console.log("No OAuth code present, proceeding with regular session check");
       return true;
     }
@@ -1434,7 +1436,7 @@ body.light .composer {
 
     try {
       const { data, error } = await withTimeout(
-        supabaseClient.auth.exchangeCodeForSession(window.location.href),
+        supabaseClient.auth.exchangeCodeForSession(code),
         15000,
         "OAuth exchange"
       );
