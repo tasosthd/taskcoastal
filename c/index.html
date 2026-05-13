@@ -16,1326 +16,1509 @@
   <meta name="apple-mobile-web-app-title" content="Coastal Flow" />
   <link rel="apple-touch-icon" href="/index.png" />
 
-<style>
-  /* =========================================================
-     COASTAL FLOW — MODERN SAAS DASHBOARD STYLE
-     Clean, premium, responsive, monetizable product UI
-  ========================================================= */
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  :root {
-    --bg: #041b22;
-    --bg-soft: #062832;
-    --surface: rgba(255, 255, 255, 0.075);
-    --surface-2: rgba(255, 255, 255, 0.115);
-    --surface-3: rgba(255, 255, 255, 0.16);
-
-    --text: #f0fdff;
-    --muted: rgba(240, 253, 255, 0.64);
-    --muted-2: rgba(240, 253, 255, 0.42);
-
-    --accent: #4de7ff;
-    --accent-dark: #0fa7c2;
-    --green: #39e4a6;
-    --red: #ff6f87;
-    --yellow: #ffd36b;
-
-    --border: rgba(255, 255, 255, 0.13);
-    --border-strong: rgba(77, 231, 255, 0.34);
-
-    --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.18);
-    --shadow-md: 0 24px 70px rgba(0, 0, 0, 0.24);
-    --shadow-lg: 0 36px 120px rgba(0, 0, 0, 0.38);
-
-    --radius-sm: 14px;
-    --radius-md: 18px;
-    --radius-lg: 26px;
-    --radius-xl: 34px;
-
-    --blur: blur(28px);
-    --ease: 0.22s ease;
-  }
-
-  body.light {
-    --bg: #effcff;
-    --bg-soft: #d9f8ff;
-    --surface: rgba(255, 255, 255, 0.62);
-    --surface-2: rgba(255, 255, 255, 0.82);
-    --surface-3: rgba(255, 255, 255, 0.94);
-
-    --text: #062936;
-    --muted: rgba(6, 41, 54, 0.64);
-    --muted-2: rgba(6, 41, 54, 0.42);
-
-    --border: rgba(6, 41, 54, 0.11);
-    --border-strong: rgba(15, 167, 194, 0.28);
-
-    --shadow-sm: 0 10px 30px rgba(15, 167, 194, 0.10);
-    --shadow-md: 0 24px 70px rgba(15, 167, 194, 0.16);
-    --shadow-lg: 0 36px 120px rgba(15, 167, 194, 0.22);
-  }
-
-  html,
-  body {
-    min-height: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    position: relative;
-    isolation: isolate;
-    color: var(--text);
-    background:
-      radial-gradient(circle at 12% 8%, rgba(77, 231, 255, 0.22), transparent 28%),
-      radial-gradient(circle at 88% 12%, rgba(255, 255, 255, 0.16), transparent 26%),
-      radial-gradient(circle at 50% 100%, rgba(77, 231, 255, 0.13), transparent 34%),
-      linear-gradient(145deg, var(--bg), var(--bg-soft));
-    background-attachment: fixed;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-    opacity: 0.32;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-    background-size: 56px 56px;
-    mask-image: radial-gradient(circle at 50% 20%, black, transparent 72%);
-  }
-
-  body::after {
-    content: "";
-    position: fixed;
-    width: 580px;
-    height: 580px;
-    right: -220px;
-    top: -220px;
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(77, 231, 255, 0.22), transparent 65%);
-    filter: blur(22px);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  button,
-  input,
-  textarea,
-  select,
-  a {
-    font: inherit;
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  button:disabled {
-    cursor: not-allowed;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  input,
-  textarea,
-  select,
-  button {
-    font-size: 16px;
-  }
-
-  input,
-  textarea,
-  select {
-    -webkit-text-size-adjust: 100%;
-    touch-action: manipulation;
-  }
-
-  ::selection {
-    background: rgba(77, 231, 255, 0.28);
-  }
-
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(77, 231, 255, 0.28);
-    border-radius: 999px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(77, 231, 255, 0.44);
-  }
-
-  .hidden {
-    display: none !important;
-  }
-
-  .screen {
-    width: 100%;
-    min-height: 100vh;
-    padding: clamp(14px, 2vw, 30px);
-  }
-
-  .app-shell {
-    width: min(100%, 1400px);
-    margin: 0 auto;
-    min-height: calc(100vh - 52px);
-    display: grid;
-    grid-template-columns: 340px minmax(0, 1fr);
-    gap: 24px;
-    align-items: start;
-  }
-
-  .app-main {
-    display: grid;
-    gap: 16px;
-    min-width: 0;
-    padding-bottom: 180px;
-  }
-
-  .loader-screen {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding: 22px;
-  }
-
-  .loader-card {
-    width: min(100%, 430px);
-    padding: 34px;
-    border-radius: var(--radius-xl);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-    backdrop-filter: var(--blur);
-    text-align: center;
-  }
-
-  .loader-card img {
-    width: 62px;
-    height: 62px;
-    border-radius: 20px;
-    margin-bottom: 18px;
-    object-fit: cover;
-    box-shadow: 0 0 0 8px rgba(77, 231, 255, 0.08);
-  }
-
-  .loader-card h2 {
-    font-size: 1.35rem;
-    letter-spacing: -0.045em;
-  }
-
-  .loader-card p {
-    color: var(--muted);
-    font-weight: 750;
-    margin-top: 8px;
-    font-size: 0.92rem;
-  }
-
-  .sidebar {
-    position: sticky;
-    top: 26px;
-    display: grid;
-    gap: 16px;
-    min-width: 0;
-  }
-
-  .profile-card,
-  .panel,
-  .app-hero,
-  .stat,
-  .task,
-  .empty,
-  .composer,
-  .bottom-bar,
-  .modal {
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.04)),
-      var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-    backdrop-filter: var(--blur);
-  }
-
-  body.light .profile-card,
-  body.light .panel,
-  body.light .app-hero,
-  body.light .stat,
-  body.light .task,
-  body.light .empty,
-  body.light .composer,
-  body.light .bottom-bar,
-  body.light .modal {
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58)),
-      var(--surface);
-  }
-
-  .profile-card,
-  .panel,
-  .app-hero {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .profile-card::before,
-  .panel::before,
-  .app-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    background:
-      linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 34%),
-      radial-gradient(circle at 100% 0%, rgba(77, 231, 255, 0.12), transparent 32%);
-  }
-
-  .profile-card > *,
-  .panel > *,
-  .app-hero > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .profile-card {
-    min-height: 330px;
-    padding: 24px;
-    border-radius: var(--radius-xl);
-  }
-
-  .profile-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    min-width: 0;
-  }
-
-  .profile-row > div {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .profile-row h2 {
-    font-size: 1.05rem;
-    letter-spacing: -0.04em;
-  }
-
-  .profile-row p {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .brand-logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 18px;
-    object-fit: cover;
-    flex: 0 0 auto;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    box-shadow:
-      0 0 0 7px rgba(77, 231, 255, 0.06),
-      0 18px 38px rgba(0, 0, 0, 0.18);
-  }
-
-  .user-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    object-fit: cover;
-    display: none;
-    border: 1px solid var(--border);
-    flex: 0 0 auto;
-    box-shadow: 0 0 0 5px rgba(77, 231, 255, 0.08);
-  }
-
-  #userEmailText {
-    color: var(--muted);
-    font-size: 0.76rem;
-    font-weight: 800;
-    max-width: 230px;
-  }
-
-  .plan-pill,
-  .badge,
-  .pricing-label {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(77, 231, 255, 0.08);
-    border: 1px solid rgba(77, 231, 255, 0.18);
-    color: var(--muted);
-    font-size: 0.7rem;
-    font-weight: 1000;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .plan-pill {
-    margin-bottom: 16px;
-  }
-
-  .pricing-label {
-    margin-bottom: 14px;
-  }
-
-  .app-title {
-    font-size: clamp(2.7rem, 4vw, 3.65rem);
-    line-height: 0.9;
-    letter-spacing: -0.1em;
-    margin-bottom: 14px;
-    background: linear-gradient(135deg, var(--text), rgba(77, 231, 255, 0.72));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .profile-card p,
-  .panel p {
-    color: var(--muted);
-    font-weight: 720;
-    line-height: 1.55;
-  }
-
-  .panel {
-    padding: 24px;
-    border-radius: 30px;
-  }
-
-  .panel h3 {
-    font-size: 1.42rem;
-    line-height: 1;
-    letter-spacing: -0.065em;
-    margin-bottom: 10px;
-  }
-
-  .panel p {
-    font-size: 0.92rem;
-  }
-
-  #upgradeCard {
-    background:
-      radial-gradient(circle at 100% 0%, rgba(57, 228, 166, 0.15), transparent 36%),
-      linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.04)),
-      var(--surface);
-  }
-
-  #billingCard {
-    background:
-      radial-gradient(circle at 100% 0%, rgba(77, 231, 255, 0.18), transparent 36%),
-      linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.04)),
-      var(--surface);
-  }
-
-  .price-row {
-    margin-top: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-  }
-
-  .price-row strong {
-    display: block;
-    font-size: 1.55rem;
-    letter-spacing: -0.07em;
-  }
-
-  .price-row span {
-    display: block;
-    color: var(--muted);
-    font-weight: 800;
-    font-size: 0.8rem;
-  }
-
-  .topbar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .app-main > .topbar {
-    margin-bottom: 0;
-    padding: 7px;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.045);
-    border: 1px solid rgba(255, 255, 255, 0.075);
-    backdrop-filter: blur(24px);
-  }
-
-  body.light .app-main > .topbar {
-    background: rgba(255, 255, 255, 0.52);
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-  }
-
-  .brand h2 {
-    font-size: 1.08rem;
-    letter-spacing: -0.045em;
-    line-height: 1.05;
-  }
-
-  .brand p {
-    color: var(--muted);
-    font-size: 0.76rem;
-    font-weight: 800;
-    margin-top: 4px;
-    max-width: 280px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .top-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 0 0 auto;
-  }
-
-  .icon-btn,
-  .btn,
-  .filter-btn,
-  .mini-btn,
-  .add-btn,
-  .bottom-bar button {
-    transition:
-      transform var(--ease),
-      box-shadow var(--ease),
-      background var(--ease),
-      border-color var(--ease),
-      opacity var(--ease);
-  }
-
-  .icon-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 1rem;
-    font-weight: 900;
-    backdrop-filter: blur(22px);
-  }
-
-  .btn {
-    border: 0;
-    border-radius: 18px;
-    padding: 14px 18px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    color: #04232e;
-    font-weight: 1000;
-    box-shadow: 0 18px 42px rgba(77, 231, 255, 0.22);
-    white-space: nowrap;
-    text-align: center;
-  }
-
-  .btn.secondary {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    box-shadow: none;
-  }
-
-  .btn:hover,
-  .add-btn:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 22px 58px rgba(77, 231, 255, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  }
-
-  .btn.secondary:hover,
-  .icon-btn:hover,
-  .filter-btn:hover,
-  .mini-btn:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-    background: var(--surface-2);
-  }
-
-  .btn:active,
-  .icon-btn:active,
-  .filter-btn:active,
-  .mini-btn:active,
-  .add-btn:active {
-    transform: scale(0.95);
-  }
-
-  .btn:disabled {
-    opacity: 0.58;
-    cursor: not-allowed;
-  }
-
-  .app-hero {
-    min-height: 300px;
-    padding: clamp(28px, 4vw, 48px);
-    border-radius: 38px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .app-hero::after {
-    content: "";
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    right: -140px;
-    top: -170px;
-    border-radius: 999px;
-    background:
-      radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 60%),
-      radial-gradient(circle at 30% 30%, rgba(77, 231, 255, 0.18), transparent 58%);
-    pointer-events: none;
-  }
-
-  .app-hero h1 {
-    max-width: 900px;
-    margin: 18px 0 12px;
-    font-size: clamp(3rem, 6vw, 6.3rem);
-    line-height: 0.86;
-    letter-spacing: -0.105em;
-    text-wrap: balance;
-    background:
-      linear-gradient(135deg, var(--text), rgba(240, 253, 255, 0.74), rgba(77, 231, 255, 0.76));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .app-hero p {
-    max-width: 680px;
-    color: var(--muted);
-    font-weight: 800;
-    font-size: 1rem;
-  }
-
-  .app-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-
-  .stat {
-    position: relative;
-    overflow: hidden;
-    min-width: 0;
-    padding: 22px 12px;
-    border-radius: 24px;
-    text-align: center;
-  }
-
-  .stat::after {
-    content: "";
-    position: absolute;
-    width: 105px;
-    height: 105px;
-    right: -48px;
-    top: -48px;
-    border-radius: 999px;
-    background: rgba(77, 231, 255, 0.13);
-  }
-
-  .stat strong,
-  .stat span {
-    position: relative;
-    z-index: 1;
-  }
-
-  .stat strong {
-    display: block;
-    font-size: 1.4rem;
-    letter-spacing: -0.05em;
-  }
-
-  .stat span {
-    display: block;
-    margin-top: 4px;
-    color: var(--muted);
-    font-size: 0.68rem;
-    font-weight: 1000;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-  }
-
-  .filters {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 9px;
-    padding: 8px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.045);
-    border: 1px solid rgba(255, 255, 255, 0.075);
-    backdrop-filter: blur(22px);
-  }
-
-  .filter-btn {
-    border: 1px solid transparent;
-    border-radius: 17px;
-    background: transparent;
-    color: var(--muted);
-    padding: 13px;
-    font-size: 0.82rem;
-    font-weight: 1000;
-  }
-
-  .filter-btn.active {
-    background:
-      linear-gradient(135deg, rgba(77, 231, 255, 0.22), rgba(255, 255, 255, 0.10));
-    border-color: rgba(77, 231, 255, 0.28);
-    color: var(--text);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .tasks {
-    display: grid;
-    gap: 12px;
-    padding-bottom: 190px;
-  }
-
-  .task {
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    padding: 16px;
-    border-radius: 22px;
-    cursor: grab;
-    animation: pop 0.22s ease both;
-  }
-
-  .task::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 14px;
-    bottom: 14px;
-    width: 4px;
-    border-radius: 999px;
-    background: linear-gradient(var(--accent), var(--accent-dark));
-    opacity: 0.58;
-  }
-
-  .task:hover {
-    transform: translateY(-2px);
-    border-color: rgba(77, 231, 255, 0.25);
-    box-shadow: var(--shadow-md);
-  }
-
-  .task.done::before {
-    background: linear-gradient(var(--green), var(--accent));
-    opacity: 0.85;
-  }
-
-  .task.dragging {
-    opacity: 0.55;
-    transform: scale(0.98);
-    cursor: grabbing;
-  }
-
-  .task.drag-over {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
-
-  .check {
-    flex: 0 0 auto;
-    width: 28px;
-    height: 28px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: transparent;
-    font-weight: 1000;
-    display: grid;
-    place-items: center;
-    font-size: 0.8rem;
-  }
-
-  .task.done .check {
-    color: #04232e;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    box-shadow: 0 12px 28px rgba(77, 231, 255, 0.22);
-  }
-
-  .task-text {
-    flex: 1;
-    min-width: 0;
-    font-weight: 850;
-    line-height: 1.35;
-    word-break: break-word;
-  }
-
-  .task.done .task-text {
-    color: var(--muted);
-    text-decoration: line-through;
-  }
-
-  .task-actions {
-    display: flex;
-    gap: 6px;
-    flex: 0 0 auto;
-  }
-
-  .mini-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 13px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
-    font-weight: 900;
-  }
-
-  .mini-btn.delete {
-    color: var(--red);
-  }
-
-  .empty {
-    display: none;
-    text-align: center;
-    padding: 34px 22px;
-    border-radius: 28px;
-    color: var(--muted);
-    font-weight: 850;
-    margin-bottom: 190px;
-  }
-
-  .empty.show {
-    display: block;
-  }
-
-  .empty .emoji {
-    display: block;
-    font-size: 2.6rem;
-    margin-bottom: 10px;
-  }
-
-  @keyframes pop {
-    from {
-      transform: translateY(8px);
-      opacity: 0;
+  <style>
+    /* =========================================================
+       COASTAL FLOW — DASHBOARD WITH LEFT MENU DRAWER
+       Desktop + mobile sidebar menu, modern SaaS UI
+    ========================================================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    to {
-      transform: translateY(0);
-      opacity: 1;
+    :root {
+      --bg: #041b22;
+      --bg-soft: #062832;
+      --surface: rgba(255, 255, 255, 0.075);
+      --surface-2: rgba(255, 255, 255, 0.115);
+      --surface-3: rgba(255, 255, 255, 0.16);
+
+      --text: #f0fdff;
+      --muted: rgba(240, 253, 255, 0.64);
+      --muted-2: rgba(240, 253, 255, 0.42);
+
+      --accent: #4de7ff;
+      --accent-dark: #0fa7c2;
+      --green: #39e4a6;
+      --red: #ff6f87;
+      --yellow: #ffd36b;
+
+      --border: rgba(255, 255, 255, 0.13);
+      --border-strong: rgba(77, 231, 255, 0.34);
+
+      --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.18);
+      --shadow-md: 0 24px 70px rgba(0, 0, 0, 0.24);
+      --shadow-lg: 0 36px 120px rgba(0, 0, 0, 0.38);
+
+      --radius-sm: 14px;
+      --radius-md: 18px;
+      --radius-lg: 26px;
+      --radius-xl: 34px;
+
+      --blur: blur(28px);
+      --ease: 0.22s ease;
     }
-  }
 
-  .composer {
-  position: fixed;
-  left: 50%;
-  bottom: 86px;
-  transform: translateX(-50%);
-  z-index: 80;
+    body.light {
+      --bg: #effcff;
+      --bg-soft: #d9f8ff;
+      --surface: rgba(255, 255, 255, 0.62);
+      --surface-2: rgba(255, 255, 255, 0.82);
+      --surface-3: rgba(255, 255, 255, 0.94);
 
-  width: min(calc(100% - 28px), 780px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+      --text: #062936;
+      --muted: rgba(6, 41, 54, 0.64);
+      --muted-2: rgba(6, 41, 54, 0.42);
 
-  padding: 10px;
-  border-radius: 28px;
+      --border: rgba(6, 41, 54, 0.11);
+      --border-strong: rgba(15, 167, 194, 0.28);
 
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
-    rgba(4, 27, 34, 0.9);
+      --shadow-sm: 0 10px 30px rgba(15, 167, 194, 0.10);
+      --shadow-md: 0 24px 70px rgba(15, 167, 194, 0.16);
+      --shadow-lg: 0 36px 120px rgba(15, 167, 194, 0.22);
+    }
 
-  border: 1px solid rgba(77, 231, 255, 0.2);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+    html,
+    body {
+      min-height: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
 
-  box-shadow:
-    0 28px 90px rgba(0, 0, 0, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
+    body {
+      position: relative;
+      isolation: isolate;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(77, 231, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 50% 100%, rgba(77, 231, 255, 0.13), transparent 34%),
+        linear-gradient(145deg, var(--bg), var(--bg-soft));
+      background-attachment: fixed;
+    }
 
-body.light .composer {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)),
-    rgba(255, 255, 255, 0.92);
+    body.menu-open {
+      overflow: hidden;
+    }
 
-  box-shadow:
-    0 24px 70px rgba(15, 167, 194, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.32;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 20%, black, transparent 72%);
+    }
 
-.composer:focus-within {
-  border-color: rgba(77, 231, 255, 0.55);
-  box-shadow:
-    0 30px 100px rgba(0, 0, 0, 0.45),
-    0 0 0 6px rgba(77, 231, 255, 0.08);
-}
+    body::after {
+      content: "";
+      position: fixed;
+      width: 580px;
+      height: 580px;
+      right: -220px;
+      top: -220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(77, 231, 255, 0.22), transparent 65%);
+      filter: blur(22px);
+      z-index: -1;
+      pointer-events: none;
+    }
 
-.composer input {
-  flex: 1;
-  min-width: 0;
-  height: 54px;
+    button,
+    input,
+    textarea,
+    select,
+    a {
+      font: inherit;
+    }
 
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text);
+    button {
+      cursor: pointer;
+    }
 
-  padding: 0 12px;
-  font-size: 16px;
-  font-weight: 850;
-}
+    button:disabled {
+      cursor: not-allowed;
+    }
 
-.composer input::placeholder {
-  color: var(--muted);
-}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-.add-btn {
-  width: 54px;
-  height: 54px;
-  flex: 0 0 auto;
+    input,
+    textarea,
+    select,
+    button {
+      font-size: 16px;
+    }
 
-  border: 0;
-  border-radius: 18px;
+    input,
+    textarea,
+    select {
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
 
-  background: linear-gradient(135deg, #35d9f7, #0878d8);
-  color: #ffffff;
+    ::selection {
+      background: rgba(77, 231, 255, 0.28);
+    }
 
-  display: grid;
-  place-items: center;
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
 
-  box-shadow:
-    0 16px 34px rgba(53, 217, 247, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+    }
 
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    filter 0.18s ease;
-}
+    ::-webkit-scrollbar-thumb {
+      background: rgba(77, 231, 255, 0.28);
+      border-radius: 999px;
+    }
 
-.add-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.04);
-  box-shadow:
-    0 22px 52px rgba(53, 217, 247, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
-}
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(77, 231, 255, 0.44);
+    }
 
-.add-btn:active {
-  transform: scale(0.94);
-}
+    .hidden {
+      display: none !important;
+    }
 
-.send-arrow {
-  width: 25px;
-  height: 25px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .screen {
+      width: 100%;
+      min-height: 100vh;
+      padding: clamp(14px, 2vw, 30px);
+    }
 
-  .bottom-bar {
-    position: fixed;
-    left: 50%;
-    bottom: 18px;
-    transform: translateX(-50%);
-    width: min(calc(100% - 28px), 560px);
-    display: flex;
-    gap: 8px;
-    padding: 9px;
-    border-radius: 26px;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
-      rgba(4, 27, 34, 0.86);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(30px);
-    box-shadow: var(--shadow-lg);
-    z-index: 30;
-  }
+    .app-shell {
+      width: min(100%, 1400px);
+      margin: 0 auto;
+      min-height: calc(100vh - 52px);
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
 
-  body.light .bottom-bar {
-    background: rgba(255, 255, 255, 0.88);
-  }
+    .app-main {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+      padding-bottom: 180px;
+    }
 
-  .bottom-bar button {
-    flex: 1;
-    border: 0;
-    border-radius: 18px;
-    padding: 12px 8px;
-    background: transparent;
-    color: var(--muted);
-    font-weight: 1000;
-  }
+    .loader-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+    }
 
-  .bottom-bar button.active {
-    background: var(--surface-2);
-    color: var(--text);
-  }
+    .loader-card {
+      width: min(100%, 430px);
+      padding: 34px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: var(--blur);
+      text-align: center;
+    }
 
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: end;
-    justify-content: center;
-    padding: 18px;
-    background: rgba(0, 0, 0, 0.42);
-    backdrop-filter: blur(14px);
-    z-index: 60;
-  }
+    .loader-card img {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      object-fit: cover;
+      box-shadow: 0 0 0 8px rgba(77, 231, 255, 0.08);
+    }
 
-  .modal-overlay.show {
-    display: flex;
-  }
+    .loader-card h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.045em;
+    }
 
-  .modal {
-    width: min(100%, 520px);
-    padding: 22px;
-    border-radius: 30px;
-  }
+    .loader-card p {
+      color: var(--muted);
+      font-weight: 750;
+      margin-top: 8px;
+      font-size: 0.92rem;
+    }
 
-  .modal h3 {
-    font-size: 1.25rem;
-    letter-spacing: -0.04em;
-    margin-bottom: 12px;
-  }
-
-  .modal input {
-    width: 100%;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    background: var(--surface);
-    color: var(--text);
-    outline: 0;
-    padding: 15px;
-    font-weight: 850;
-    margin-bottom: 12px;
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-  }
-
-  .modal-actions button {
-    flex: 1;
-  }
-
-  .toast {
-    position: fixed;
-    left: 50%;
-    bottom: 92px;
-    transform: translateX(-50%) translateY(20px);
-    width: min(calc(100% - 36px), 460px);
-    padding: 14px 16px;
-    border-radius: 20px;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05)),
-      rgba(4, 27, 34, 0.94);
-    backdrop-filter: blur(30px);
-    border: 1px solid rgba(77, 231, 255, 0.22);
-    box-shadow: var(--shadow-lg);
-    color: var(--text);
-    font-weight: 900;
-    text-align: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.25s ease;
-    z-index: 90;
-  }
-
-  body.light .toast {
-    background: rgba(255, 255, 255, 0.92);
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  @media (min-width: 901px) {
-    .app-main > .topbar {
+    .sidebar {
       position: sticky;
       top: 26px;
-      z-index: 10;
-    }
-
-    .bottom-bar {
-      display: none !important;
+      display: grid;
+      gap: 16px;
+      min-width: 0;
     }
 
     .profile-card,
     .panel,
     .app-hero,
-    .composer,
     .stat,
     .task,
-    .empty {
-      transition:
-        transform var(--ease),
-        background var(--ease),
-        border-color var(--ease),
-        box-shadow var(--ease);
+    .empty,
+    .composer,
+    .bottom-bar,
+    .modal,
+    .menu-drawer {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.04)),
+        var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: var(--blur);
     }
 
-    .profile-card:hover,
-    .panel:hover,
-    .app-hero:hover {
-      transform: translateY(-2px);
+    body.light .profile-card,
+    body.light .panel,
+    body.light .app-hero,
+    body.light .stat,
+    body.light .task,
+    body.light .empty,
+    body.light .composer,
+    body.light .bottom-bar,
+    body.light .modal,
+    body.light .menu-drawer {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58)),
+        var(--surface);
     }
-  }
 
-  @media (max-width: 900px) {
-    .screen {
-      padding: 16px;
+    .profile-card,
+    .panel,
+    .app-hero,
+    .menu-drawer {
+      position: relative;
+      overflow: hidden;
     }
 
-    .app-shell {
-      grid-template-columns: 1fr;
+    .profile-card::before,
+    .panel::before,
+    .app-hero::before,
+    .menu-drawer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 34%),
+        radial-gradient(circle at 100% 0%, rgba(77, 231, 255, 0.12), transparent 32%);
     }
 
-    .sidebar {
-      position: static;
-      gap: 12px;
+    .profile-card > *,
+    .panel > *,
+    .app-hero > *,
+    .menu-drawer > * {
+      position: relative;
+      z-index: 1;
     }
 
     .profile-card {
-      display: none;
+      min-height: 330px;
+      padding: 24px;
+      border-radius: var(--radius-xl);
     }
 
-    .app-main {
-      padding-bottom: 96px;
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      min-width: 0;
     }
 
-    .app-main > .topbar {
-      position: sticky;
-      top: 10px;
-      z-index: 20;
+    .profile-row > div {
+      min-width: 0;
+      flex: 1;
     }
 
-    .app-hero {
-      min-height: 260px;
-      padding: 28px;
-      border-radius: 32px;
+    .profile-row h2 {
+      font-size: 1.05rem;
+      letter-spacing: -0.04em;
     }
 
-    .app-hero h1 {
-      font-size: clamp(2.7rem, 12vw, 4.5rem);
-    }
-
-    #billingCard,
-    #upgradeCard {
-      order: 2;
-    }
-  }
-
-  @media (max-width: 520px) {
-  .composer {
-    bottom: 82px;
-    width: calc(100% - 24px);
-    padding: 8px;
-    border-radius: 24px;
-  }
-
-  .composer input {
-    height: 50px;
-    min-height: 50px;
-  }
-
-  .add-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 17px;
-  }
-}
-    .screen {
-      padding: 14px;
-    }
-
-    .loader-card {
-      padding: 28px 22px;
-    }
-
-    .topbar {
-      margin-bottom: 14px;
-    }
-
-    .brand {
-      gap: 10px;
+    .profile-row p {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .brand-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      box-shadow:
+        0 0 0 7px rgba(77, 231, 255, 0.06),
+        0 18px 38px rgba(0, 0, 0, 0.18);
+    }
+
+    .user-avatar {
       width: 42px;
       height: 42px;
-      border-radius: 15px;
+      border-radius: 999px;
+      object-fit: cover;
+      display: none;
+      border: 1px solid var(--border);
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 5px rgba(77, 231, 255, 0.08);
     }
 
-    .brand h2 {
-      font-size: 0.98rem;
+    #userEmailText {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      max-width: 230px;
     }
 
-    .brand p {
-      font-size: 0.66rem;
-      max-width: 180px;
+    .plan-pill,
+    .badge,
+    .pricing-label {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(77, 231, 255, 0.08);
+      border: 1px solid rgba(77, 231, 255, 0.18);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 1000;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
 
-    .top-actions {
-      gap: 7px;
+    .plan-pill {
+      margin-bottom: 16px;
     }
 
-    .icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 15px;
-      font-size: 0.92rem;
+    .pricing-label {
+      margin-bottom: 14px;
     }
 
-    .app-hero {
-      min-height: 250px;
+    .app-title {
+      font-size: clamp(2.7rem, 4vw, 3.65rem);
+      line-height: 0.9;
+      letter-spacing: -0.1em;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--text), rgba(77, 231, 255, 0.72));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .profile-card p,
+    .panel p {
+      color: var(--muted);
+      font-weight: 720;
+      line-height: 1.55;
+    }
+
+    .panel {
       padding: 24px;
       border-radius: 30px;
     }
 
-    .app-hero h1 {
-      font-size: clamp(2.65rem, 14vw, 4.2rem);
-      letter-spacing: -0.085em;
+    .panel h3 {
+      font-size: 1.42rem;
+      line-height: 1;
+      letter-spacing: -0.065em;
+      margin-bottom: 10px;
     }
 
-    .app-hero p,
     .panel p {
-      font-size: 0.88rem;
+      font-size: 0.92rem;
     }
 
-    .panel {
-      padding: 18px;
-      border-radius: 24px;
+    #upgradeCard {
+      background:
+        radial-gradient(circle at 100% 0%, rgba(57, 228, 166, 0.15), transparent 36%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.04)),
+        var(--surface);
     }
 
     .price-row {
-      align-items: stretch;
-      flex-direction: column;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
     }
 
-    .price-row .btn {
+    .price-row strong {
+      display: block;
+      font-size: 1.55rem;
+      letter-spacing: -0.07em;
+    }
+
+    .price-row span {
+      display: block;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .topbar {
       width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .app-main > .topbar {
+      margin-bottom: 0;
+      padding: 7px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      backdrop-filter: blur(24px);
+    }
+
+    body.light .app-main > .topbar {
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand h2 {
+      font-size: 1.08rem;
+      letter-spacing: -0.045em;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-top: 4px;
+      max-width: 280px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .icon-btn,
+    .btn,
+    .filter-btn,
+    .mini-btn,
+    .add-btn,
+    .bottom-bar button,
+    .menu-action,
+    .menu-close-btn {
+      transition:
+        transform var(--ease),
+        box-shadow var(--ease),
+        background var(--ease),
+        border-color var(--ease),
+        opacity var(--ease);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 900;
+      backdrop-filter: blur(22px);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #04232e;
+      font-weight: 1000;
+      box-shadow: 0 18px 42px rgba(77, 231, 255, 0.22);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .btn.secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .btn:hover,
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 22px 58px rgba(77, 231, 255, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .btn.secondary:hover,
+    .icon-btn:hover,
+    .filter-btn:hover,
+    .mini-btn:hover,
+    .menu-action:hover,
+    .menu-close-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .btn:active,
+    .icon-btn:active,
+    .filter-btn:active,
+    .mini-btn:active,
+    .add-btn:active,
+    .menu-action:active,
+    .menu-close-btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn:disabled,
+    .menu-action:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+    }
+
+    .hamburger-btn {
+      display: inline-grid;
+      place-items: center;
+      gap: 0;
+      position: relative;
+    }
+
+    .hamburger-lines {
+      width: 20px;
+      height: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hamburger-lines span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      transition: transform var(--ease), opacity var(--ease);
+    }
+
+    body.menu-open .hamburger-lines span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    body.menu-open .hamburger-lines span:nth-child(2) {
+      opacity: 0;
+    }
+
+    body.menu-open .hamburger-lines span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      background: rgba(0, 0, 0, 0.44);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--ease);
+    }
+
+    .menu-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu-drawer {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      bottom: 16px;
+      z-index: 130;
+      width: min(calc(100% - 32px), 380px);
+      padding: 18px;
+      border-radius: 32px;
+      transform: translateX(calc(-100% - 28px));
+      transition: transform var(--ease);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .menu-drawer.show {
+      transform: translateX(0);
+    }
+
+    .menu-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .menu-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .menu-brand img {
+      width: 48px;
+      height: 48px;
+      border-radius: 17px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 0 7px rgba(77, 231, 255, 0.06);
+    }
+
+    .menu-brand h3 {
+      font-size: 1.02rem;
+      letter-spacing: -0.045em;
+      line-height: 1;
+    }
+
+    .menu-brand p {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-top: 4px;
+      max-width: 210px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-close-btn {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 1000;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .menu-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu-action {
+      width: 100%;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.065);
+      color: var(--text);
+      padding: 12px;
+      text-align: left;
+      font-weight: 900;
+    }
+
+    .menu-icon {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(77, 231, 255, 0.10);
+      border: 1px solid rgba(77, 231, 255, 0.14);
+      color: var(--accent);
+      font-size: 0.95rem;
+    }
+
+    .menu-label {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .menu-label strong {
+      font-size: 0.92rem;
+      letter-spacing: -0.02em;
+    }
+
+    .menu-label span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 750;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-spacer {
+      flex: 1;
+    }
+
+    .menu-note {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.45;
+      font-weight: 750;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(77, 231, 255, 0.07);
+      border: 1px solid rgba(77, 231, 255, 0.13);
+    }
+
+    .app-hero {
+      min-height: 300px;
+      padding: clamp(28px, 4vw, 48px);
+      border-radius: 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .app-hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -140px;
+      top: -170px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 60%),
+        radial-gradient(circle at 30% 30%, rgba(77, 231, 255, 0.18), transparent 58%);
+      pointer-events: none;
+    }
+
+    .app-hero h1 {
+      max-width: 900px;
+      margin: 18px 0 12px;
+      font-size: clamp(3rem, 6vw, 6.3rem);
+      line-height: 0.86;
+      letter-spacing: -0.105em;
+      text-wrap: balance;
+      background:
+        linear-gradient(135deg, var(--text), rgba(240, 253, 255, 0.74), rgba(77, 231, 255, 0.76));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .app-hero p {
+      max-width: 680px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 1rem;
     }
 
     .app-stats {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
     }
 
     .stat {
-      padding: 14px 8px;
-      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+      padding: 22px 12px;
+      border-radius: 24px;
+      text-align: center;
+    }
+
+    .stat::after {
+      content: "";
+      position: absolute;
+      width: 105px;
+      height: 105px;
+      right: -48px;
+      top: -48px;
+      border-radius: 999px;
+      background: rgba(77, 231, 255, 0.13);
+    }
+
+    .stat strong,
+    .stat span {
+      position: relative;
+      z-index: 1;
     }
 
     .stat strong {
-      font-size: 1.1rem;
+      display: block;
+      font-size: 1.4rem;
+      letter-spacing: -0.05em;
     }
 
     .stat span {
-      font-size: 0.58rem;
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 1000;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
     }
 
     .filters {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .composer {
-      bottom: 82px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
       padding: 8px;
-      border-radius: 22px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      backdrop-filter: blur(22px);
     }
 
-    .composer input,
-    .modal input {
-      min-height: 48px;
-      font-size: 16px !important;
+    .filter-btn {
+      border: 1px solid transparent;
+      border-radius: 17px;
+      background: transparent;
+      color: var(--muted);
+      padding: 13px;
+      font-size: 0.82rem;
+      font-weight: 1000;
     }
 
-    .add-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
+    .filter-btn.active {
+      background:
+        linear-gradient(135deg, rgba(77, 231, 255, 0.22), rgba(255, 255, 255, 0.10));
+      border-color: rgba(77, 231, 255, 0.28);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
     }
 
     .tasks {
-      padding-bottom: 210px;
-    }
-
-    .empty {
-      margin-bottom: 210px;
+      display: grid;
+      gap: 12px;
+      padding-bottom: 190px;
     }
 
     .task {
-      padding: 13px;
-      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 16px;
+      border-radius: 22px;
+      cursor: grab;
+      animation: pop 0.22s ease both;
+    }
+
+    .task::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 14px;
+      bottom: 14px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(var(--accent), var(--accent-dark));
+      opacity: 0.58;
+    }
+
+    .task:hover {
+      transform: translateY(-2px);
+      border-color: rgba(77, 231, 255, 0.25);
+      box-shadow: var(--shadow-md);
+    }
+
+    .task.done::before {
+      background: linear-gradient(var(--green), var(--accent));
+      opacity: 0.85;
+    }
+
+    .task.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+      cursor: grabbing;
+    }
+
+    .task.drag-over {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .check {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: transparent;
+      font-weight: 1000;
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+    }
+
+    .task.done .check {
+      color: #04232e;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      box-shadow: 0 12px 28px rgba(77, 231, 255, 0.22);
+    }
+
+    .task-text {
+      flex: 1;
+      min-width: 0;
+      font-weight: 850;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .task.done .task-text {
+      color: var(--muted);
+      text-decoration: line-through;
     }
 
     .task-actions {
-      gap: 5px;
+      display: flex;
+      gap: 6px;
+      flex: 0 0 auto;
     }
 
     .mini-btn {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .mini-btn.delete {
+      color: var(--red);
+    }
+
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 34px 22px;
+      border-radius: 28px;
+      color: var(--muted);
+      font-weight: 850;
+      margin-bottom: 190px;
+    }
+
+    .empty.show {
+      display: block;
+    }
+
+    .empty .emoji {
+      display: block;
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pop {
+      from {
+        transform: translateY(8px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .composer {
+      position: fixed;
+      left: 50%;
+      bottom: 86px;
+      transform: translateX(-50%);
+      z-index: 80;
+      width: min(calc(100% - 28px), 780px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+        rgba(4, 27, 34, 0.9);
+      border: 1px solid rgba(77, 231, 255, 0.2);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    body.light .composer {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)),
+        rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 24px 70px rgba(15, 167, 194, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .composer:focus-within {
+      border-color: rgba(77, 231, 255, 0.55);
+      box-shadow:
+        0 30px 100px rgba(0, 0, 0, 0.45),
+        0 0 0 6px rgba(77, 231, 255, 0.08);
+    }
+
+    .composer input {
+      flex: 1;
+      min-width: 0;
+      height: 54px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0 12px;
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .composer input::placeholder {
+      color: var(--muted);
+    }
+
+    .add-btn {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #35d9f7, #0878d8);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      box-shadow:
+        0 16px 34px rgba(53, 217, 247, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
+    }
+
+    .add-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+      box-shadow:
+        0 22px 52px rgba(53, 217, 247, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .add-btn:active {
+      transform: scale(0.94);
+    }
+
+    .send-arrow {
+      width: 25px;
+      height: 25px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .bottom-bar {
-      bottom: 12px;
-      width: calc(100% - 24px);
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: min(calc(100% - 28px), 560px);
+      display: flex;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 26px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+        rgba(4, 27, 34, 0.86);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(30px);
+      box-shadow: var(--shadow-lg);
+      z-index: 30;
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
+    body.light .bottom-bar {
+      background: rgba(255, 255, 255, 0.88);
     }
-  }
-</style>
+
+    .bottom-bar button {
+      flex: 1;
+      border: 0;
+      border-radius: 18px;
+      padding: 12px 8px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 1000;
+    }
+
+    .bottom-bar button.active {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: end;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(14px);
+      z-index: 60;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 520px);
+      padding: 22px;
+      border-radius: 30px;
+    }
+
+    .modal h3 {
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+
+    .modal input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+      outline: 0;
+      padding: 15px;
+      font-weight: 850;
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 92px;
+      transform: translateX(-50%) translateY(20px);
+      width: min(calc(100% - 36px), 460px);
+      padding: 14px 16px;
+      border-radius: 20px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05)),
+        rgba(4, 27, 34, 0.94);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(77, 231, 255, 0.22);
+      box-shadow: var(--shadow-lg);
+      color: var(--text);
+      font-weight: 900;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s ease;
+      z-index: 160;
+    }
+
+    body.light .toast {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 901px) {
+      .app-main > .topbar {
+        position: sticky;
+        top: 26px;
+        z-index: 10;
+      }
+
+      .bottom-bar {
+        display: none !important;
+      }
+
+      .profile-card,
+      .panel,
+      .app-hero,
+      .composer,
+      .stat,
+      .task,
+      .empty {
+        transition:
+          transform var(--ease),
+          background var(--ease),
+          border-color var(--ease),
+          box-shadow var(--ease);
+      }
+
+      .profile-card:hover,
+      .panel:hover,
+      .app-hero:hover {
+        transform: translateY(-2px);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .screen {
+        padding: 16px;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        gap: 12px;
+      }
+
+      .profile-card {
+        display: none;
+      }
+
+      .app-main {
+        padding-bottom: 96px;
+      }
+
+      .app-main > .topbar {
+        position: sticky;
+        top: 10px;
+        z-index: 20;
+      }
+
+      .app-hero {
+        min-height: 260px;
+        padding: 28px;
+        border-radius: 32px;
+      }
+
+      .app-hero h1 {
+        font-size: clamp(2.7rem, 12vw, 4.5rem);
+      }
+
+      #upgradeCard {
+        order: 2;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .screen {
+        padding: 14px;
+      }
+
+      .loader-card {
+        padding: 28px 22px;
+      }
+
+      .topbar {
+        margin-bottom: 14px;
+      }
+
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+      }
+
+      .brand h2 {
+        font-size: 0.98rem;
+      }
+
+      .brand p {
+        font-size: 0.66rem;
+        max-width: 180px;
+      }
+
+      .top-actions {
+        gap: 7px;
+      }
+
+      .icon-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+        font-size: 0.92rem;
+      }
+
+      .menu-drawer {
+        top: 10px;
+        left: 10px;
+        bottom: 10px;
+        width: min(calc(100% - 20px), 380px);
+        border-radius: 28px;
+      }
+
+      .app-hero {
+        min-height: 250px;
+        padding: 24px;
+        border-radius: 30px;
+      }
+
+      .app-hero h1 {
+        font-size: clamp(2.65rem, 14vw, 4.2rem);
+        letter-spacing: -0.085em;
+      }
+
+      .app-hero p,
+      .panel p {
+        font-size: 0.88rem;
+      }
+
+      .panel {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      .price-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .price-row .btn {
+        width: 100%;
+      }
+
+      .app-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat {
+        padding: 14px 8px;
+        border-radius: 18px;
+      }
+
+      .stat strong {
+        font-size: 1.1rem;
+      }
+
+      .stat span {
+        font-size: 0.58rem;
+      }
+
+      .filters {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .composer {
+        bottom: 82px;
+        width: calc(100% - 24px);
+        padding: 8px;
+        border-radius: 24px;
+      }
+
+      .composer input,
+      .modal input {
+        height: 50px;
+        min-height: 50px;
+        font-size: 16px !important;
+      }
+
+      .add-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 17px;
+      }
+
+      .tasks {
+        padding-bottom: 210px;
+      }
+
+      .empty {
+        margin-bottom: 210px;
+      }
+
+      .task {
+        padding: 13px;
+        border-radius: 20px;
+      }
+
+      .task-actions {
+        gap: 5px;
+      }
+
+      .mini-btn {
+        width: 32px;
+        height: 32px;
+      }
+
+      .bottom-bar {
+        bottom: 12px;
+        width: calc(100% - 24px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -1390,26 +1573,6 @@ body.light .composer {
             <button class="btn" id="upgradeBtn" type="button">Upgrade 🔒</button>
           </div>
         </section>
-        <section class="panel hidden" id="billingCard">
-  <span class="pricing-label">Pro Account</span>
-
-  <h3>Manage billing</h3>
-
-  <p>
-    View your subscription, update your card, cancel your plan, or check invoices securely through Stripe.
-  </p>
-
-  <div class="price-row">
-    <div>
-      <strong>Billing</strong>
-      <span>Stripe portal</span>
-    </div>
-
-    <button class="btn secondary" id="manageBillingBtn" type="button">
-      Manage billing
-    </button>
-  </div>
-</section>
       </aside>
 
       <main class="app-main">
@@ -1424,9 +1587,13 @@ body.light .composer {
           </div>
 
           <div class="top-actions">
-            <button class="icon-btn" id="homeBtn" type="button" aria-label="Landing">⌂</button>
-            <button class="icon-btn" id="themeBtnApp" type="button" aria-label="Toggle theme">☾</button>
-            <button class="icon-btn" id="logoutBtn" type="button" aria-label="Log out">⎋</button>
+            <button class="icon-btn hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+              <span class="hamburger-lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
           </div>
         </header>
 
@@ -1454,20 +1621,20 @@ body.light .composer {
         </section>
 
         <form class="composer" id="taskForm">
-  <input
-    id="taskInput"
-    type="text"
-    placeholder="Add a high-value task..."
-    autocomplete="off"
-  />
+          <input
+            id="taskInput"
+            type="text"
+            placeholder="Add a high-value task..."
+            autocomplete="off"
+          />
 
-  <button class="add-btn" type="submit" aria-label="Add task">
-    <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 19V5"></path>
-      <path d="M6 11L12 5L18 11"></path>
-    </svg>
-  </button>
-</form>
+          <button class="add-btn" type="submit" aria-label="Add task">
+            <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 19V5"></path>
+              <path d="M6 11L12 5L18 11"></path>
+            </svg>
+          </button>
+        </form>
 
         <section class="filters">
           <button class="filter-btn active" data-filter="all" type="button">All</button>
@@ -1491,6 +1658,64 @@ body.light .composer {
     </div>
   </section>
 
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <aside class="menu-drawer" id="menuDrawer" aria-hidden="true">
+    <div class="menu-head">
+      <div class="menu-brand">
+        <img src="/index.png" alt="Coastal Flow Logo" />
+        <div>
+          <h3>Coastal Flow</h3>
+          <p id="menuUserText">Execution menu</p>
+        </div>
+      </div>
+
+      <button class="menu-close-btn" id="closeMenuBtn" type="button" aria-label="Close menu">×</button>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-actions">
+      <button class="menu-action" id="homeBtn" type="button">
+        <span class="menu-icon">⌂</span>
+        <span class="menu-label">
+          <strong>Home Button</strong>
+          <span>Go back to the landing page</span>
+        </span>
+      </button>
+
+      <button class="menu-action" id="themeBtnApp" type="button">
+        <span class="menu-icon" id="themeMenuIcon">☾</span>
+        <span class="menu-label">
+          <strong>Dark Mode</strong>
+          <span id="themeMenuText">Switch appearance</span>
+        </span>
+      </button>
+
+      <button class="menu-action hidden" id="manageBillingBtn" type="button">
+        <span class="menu-icon">💳</span>
+        <span class="menu-label">
+          <strong>Manage billing</strong>
+          <span>Update card, invoices, or cancel Pro</span>
+        </span>
+      </button>
+
+      <button class="menu-action" id="logoutBtn" type="button">
+        <span class="menu-icon">⎋</span>
+        <span class="menu-label">
+          <strong>Logout</strong>
+          <span>Sign out of your account</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="menu-spacer"></div>
+
+    <p class="menu-note">
+      Pro users can manage their Stripe subscription from here. Free users will see the upgrade card instead.
+    </p>
+  </aside>
+
   <nav class="bottom-bar hidden" id="bottomBar">
     <button class="active" data-filter="all" type="button">All</button>
     <button data-filter="active" type="button">Focus</button>
@@ -1511,291 +1736,355 @@ body.light .composer {
   </div>
 
   <div class="toast" id="toast"></div>
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-  const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  const APP_PATH = "/c/";
-  const APP_URL = `${window.location.origin}${APP_PATH}`;
-  const LANDING_URL = `${window.location.origin}/`;
+  <script>
+    const SUPABASE_URL = "https://uittiqmnvxsyrpbiphsf.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_JL0vh_j-LALVel1jgOKQCQ_jiQjJxfQ";
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      storageKey: "taskcoastal-auth-token",
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: false,
-      storage: window.localStorage,
-      flowType: "pkce"
-    }
-  });
+    const APP_PATH = "/c/";
+    const APP_URL = `${window.location.origin}${APP_PATH}`;
+    const LANDING_URL = `${window.location.origin}/`;
 
-  const FREE_TASK_LIMIT = 10;
-  const body = document.body;
-
-  const loadingScreen = document.getElementById("loadingScreen");
-  const appScreen = document.getElementById("appScreen");
-  const bottomBar = document.getElementById("bottomBar");
-
-  const themeBtnApp = document.getElementById("themeBtnApp");
-  const homeBtn = document.getElementById("homeBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  const dateText = document.getElementById("dateText");
-  const userEmailText = document.getElementById("userEmailText");
-  const mobileUserText = document.getElementById("mobileUserText");
-  const userAvatar = document.getElementById("userAvatar");
-  const greeting = document.getElementById("greeting");
-  const planPill = document.getElementById("planPill");
-
-  const taskForm = document.getElementById("taskForm");
-  const taskInput = document.getElementById("taskInput");
-  const tasksContainer = document.getElementById("tasks");
-  const emptyState = document.getElementById("emptyState");
-  const loadingState = document.getElementById("loadingState");
-
-  const totalCount = document.getElementById("totalCount");
-  const activeCount = document.getElementById("activeCount");
-  const doneCount = document.getElementById("doneCount");
-
-  const filterButtons = document.querySelectorAll("[data-filter]");
-  const clearCompletedBtn = document.getElementById("clearCompleted");
-
-  const editModal = document.getElementById("editModal");
-  const editInput = document.getElementById("editInput");
-  const saveEdit = document.getElementById("saveEdit");
-  const cancelEdit = document.getElementById("cancelEdit");
-
-  const upgradeBtn = document.getElementById("upgradeBtn");
-  const upgradeCard = document.getElementById("upgradeCard");
-
-  const billingCard = document.getElementById("billingCard");
-  const manageBillingBtn = document.getElementById("manageBillingBtn");
-
-  const toast = document.getElementById("toast");
-
-  let currentUser = null;
-  let currentProfile = null;
-  let isProUser = false;
-  let tasks = [];
-  let currentFilter = "all";
-  let editingTaskId = null;
-  let isLoadingTasks = false;
-  let hasLoadedInitialSession = false;
-  let isBooting = false;
-  let hasBootFallbackRun = false;
-
-  function withTimeout(promise, ms = 7000, label = "Request") {
-    let timeoutId;
-
-    const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => {
-        reject(new Error(`${label} timed out`));
-      }, ms);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storageKey: "taskcoastal-auth-token",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        storage: window.localStorage,
+        flowType: "pkce"
+      }
     });
 
-    return Promise.race([promise, timeoutPromise]).finally(() => {
-      clearTimeout(timeoutId);
-    });
-  }
+    const FREE_TASK_LIMIT = 10;
+    const body = document.body;
 
-  function showOnly(screen) {
-    if (loadingScreen) loadingScreen.classList.add("hidden");
-    if (appScreen) appScreen.classList.add("hidden");
-    if (bottomBar) bottomBar.classList.add("hidden");
+    const loadingScreen = document.getElementById("loadingScreen");
+    const appScreen = document.getElementById("appScreen");
+    const bottomBar = document.getElementById("bottomBar");
 
-    if (screen === "loading" && loadingScreen) {
-      loadingScreen.classList.remove("hidden");
+    const menuBtn = document.getElementById("menuBtn");
+    const menuOverlay = document.getElementById("menuOverlay");
+    const menuDrawer = document.getElementById("menuDrawer");
+    const closeMenuBtn = document.getElementById("closeMenuBtn");
+
+    const themeBtnApp = document.getElementById("themeBtnApp");
+    const themeMenuIcon = document.getElementById("themeMenuIcon");
+    const themeMenuText = document.getElementById("themeMenuText");
+    const homeBtn = document.getElementById("homeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const dateText = document.getElementById("dateText");
+    const userEmailText = document.getElementById("userEmailText");
+    const mobileUserText = document.getElementById("mobileUserText");
+    const menuUserText = document.getElementById("menuUserText");
+    const userAvatar = document.getElementById("userAvatar");
+    const greeting = document.getElementById("greeting");
+    const planPill = document.getElementById("planPill");
+
+    const taskForm = document.getElementById("taskForm");
+    const taskInput = document.getElementById("taskInput");
+    const tasksContainer = document.getElementById("tasks");
+    const emptyState = document.getElementById("emptyState");
+    const loadingState = document.getElementById("loadingState");
+
+    const totalCount = document.getElementById("totalCount");
+    const activeCount = document.getElementById("activeCount");
+    const doneCount = document.getElementById("doneCount");
+
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const clearCompletedBtn = document.getElementById("clearCompleted");
+
+    const editModal = document.getElementById("editModal");
+    const editInput = document.getElementById("editInput");
+    const saveEdit = document.getElementById("saveEdit");
+    const cancelEdit = document.getElementById("cancelEdit");
+
+    const upgradeBtn = document.getElementById("upgradeBtn");
+    const upgradeCard = document.getElementById("upgradeCard");
+
+    const manageBillingBtn = document.getElementById("manageBillingBtn");
+
+    const toast = document.getElementById("toast");
+
+    let currentUser = null;
+    let currentProfile = null;
+    let isProUser = false;
+    let tasks = [];
+    let currentFilter = "all";
+    let editingTaskId = null;
+    let isLoadingTasks = false;
+    let hasLoadedInitialSession = false;
+    let isBooting = false;
+    let hasBootFallbackRun = false;
+
+    function withTimeout(promise, ms = 7000, label = "Request") {
+      let timeoutId;
+
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`${label} timed out`));
+        }, ms);
+      });
+
+      return Promise.race([promise, timeoutPromise]).finally(() => {
+        clearTimeout(timeoutId);
+      });
     }
 
-    if (screen === "app") {
-      if (appScreen) appScreen.classList.remove("hidden");
-      if (bottomBar) bottomBar.classList.remove("hidden");
+    function openMenu() {
+      body.classList.add("menu-open");
+      if (menuOverlay) menuOverlay.classList.add("show");
+      if (menuDrawer) {
+        menuDrawer.classList.add("show");
+        menuDrawer.setAttribute("aria-hidden", "false");
+      }
+      if (menuBtn) menuBtn.setAttribute("aria-expanded", "true");
     }
 
-    window.scrollTo({
-      top: 0,
-      behavior: "auto"
-    });
-  }
-
-  function cleanUrlToDashboard() {
-    window.history.replaceState({}, document.title, APP_PATH);
-  }
-
-  function setLoadingMessage(message) {
-    const loadingText = document.querySelector(".loader-card p");
-
-    if (loadingText) {
-      loadingText.textContent = message;
-    }
-  }
-
-  function showToast(message) {
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2200);
-  }
-
-  if (dateText) {
-    dateText.textContent = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric"
-    });
-  }
-
-  function setGreeting() {
-    if (!greeting) return;
-
-    const hour = new Date().getHours();
-
-    if (hour < 12) {
-      greeting.textContent = "Morning flow. Big wins only.";
-    } else if (hour < 18) {
-      greeting.textContent = "Afternoon focus. Execute clean.";
-    } else {
-      greeting.textContent = "Evening reset. Finish strong.";
-    }
-  }
-
-  setGreeting();
-
-  function saveTheme(isLight) {
-    localStorage.setItem("coastalTheme", isLight ? "light" : "dark");
-  }
-
-  function updateThemeButton() {
-    const isLight = body.classList.contains("light");
-
-    if (themeBtnApp) {
-      themeBtnApp.textContent = isLight ? "☀" : "☾";
-    }
-  }
-
-  function toggleTheme() {
-    body.classList.toggle("light");
-    saveTheme(body.classList.contains("light"));
-    updateThemeButton();
-  }
-
-  function loadTheme() {
-    const theme = localStorage.getItem("coastalTheme");
-
-    if (theme === "light") {
-      body.classList.add("light");
+    function closeMenu() {
+      body.classList.remove("menu-open");
+      if (menuOverlay) menuOverlay.classList.remove("show");
+      if (menuDrawer) {
+        menuDrawer.classList.remove("show");
+        menuDrawer.setAttribute("aria-hidden", "true");
+      }
+      if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
     }
 
-    updateThemeButton();
-  }
-
-  loadTheme();
-
-  if (themeBtnApp) {
-    themeBtnApp.addEventListener("click", toggleTheme);
-  }
-
-  function updateUserUI() {
-    const planText = isProUser ? "Pro" : "Free";
-    const label = currentUser ? `${currentUser.email} · ${planText}` : "Not logged in";
-
-    if (userEmailText) userEmailText.textContent = label;
-    if (mobileUserText) mobileUserText.textContent = label;
-    if (planPill) planPill.textContent = isProUser ? "Pro Plan Active" : "Free Plan";
-
-    if (userAvatar) {
-      const avatarUrl =
-        currentUser?.user_metadata?.avatar_url ||
-        currentUser?.user_metadata?.picture ||
-        "";
-
-      if (avatarUrl) {
-        userAvatar.src = avatarUrl;
-        userAvatar.style.display = "block";
+    function toggleMenu() {
+      if (body.classList.contains("menu-open")) {
+        closeMenu();
       } else {
-        userAvatar.removeAttribute("src");
-        userAvatar.style.display = "none";
+        openMenu();
       }
     }
 
-    if (upgradeCard) {
-      upgradeCard.classList.toggle("hidden", Boolean(isProUser));
+    if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMenu);
+    if (menuOverlay) menuOverlay.addEventListener("click", closeMenu);
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeMenu();
+        closeEditModal();
+      }
+    });
+
+    function showOnly(screen) {
+      if (loadingScreen) loadingScreen.classList.add("hidden");
+      if (appScreen) appScreen.classList.add("hidden");
+      if (bottomBar) bottomBar.classList.add("hidden");
+
+      if (screen === "loading" && loadingScreen) {
+        loadingScreen.classList.remove("hidden");
+      }
+
+      if (screen === "app") {
+        if (appScreen) appScreen.classList.remove("hidden");
+        if (bottomBar) bottomBar.classList.remove("hidden");
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
     }
 
-    if (billingCard) {
-      billingCard.classList.toggle("hidden", !Boolean(isProUser));
+    function cleanUrlToDashboard() {
+      window.history.replaceState({}, document.title, APP_PATH);
     }
 
-    if (upgradeBtn) {
-      upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
-      upgradeBtn.disabled = Boolean(isProUser);
+    function setLoadingMessage(message) {
+      const loadingText = document.querySelector(".loader-card p");
+
+      if (loadingText) {
+        loadingText.textContent = message;
+      }
     }
 
-    if (manageBillingBtn) {
-      manageBillingBtn.disabled = false;
-      manageBillingBtn.textContent = "Manage billing";
-    }
-  }
+    function showToast(message) {
+      if (!toast) return;
 
-  function setLoadingState(isLoading) {
-    isLoadingTasks = isLoading;
-
-    if (loadingState) loadingState.classList.toggle("show", isLoading);
-    if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
-    if (emptyState && isLoading) emptyState.classList.remove("show");
-  }
-
-  function openApp() {
-    showOnly("app");
-    updateUserUI();
-    renderTasks();
-  }
-
-  async function exchangeOAuthCodeIfPresent() {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-    const authError = url.searchParams.get("error");
-    const errorDescription = url.searchParams.get("error_description");
-
-    if (authError) {
-      console.error("OAuth URL error:", authError, errorDescription);
-      setLoadingMessage(`Login error: ${errorDescription || authError}`);
-      showToast(`Login error: ${errorDescription || authError}`);
+      toast.textContent = message;
+      toast.classList.add("show");
 
       setTimeout(() => {
-        window.location.replace(LANDING_URL);
-      }, 1600);
-
-      return false;
+        toast.classList.remove("show");
+      }, 2200);
     }
 
-    if (!code) {
-      console.log("No OAuth code present, proceeding with regular session check");
-      return true;
+    if (dateText) {
+      dateText.textContent = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric"
+      });
     }
 
-    console.log("OAuth code detected, exchanging for session...");
+    function setGreeting() {
+      if (!greeting) return;
 
-    try {
-      const { data, error } = await withTimeout(
-        supabaseClient.auth.exchangeCodeForSession(code),
-        15000,
-        "OAuth exchange"
-      );
+      const hour = new Date().getHours();
 
-      if (error) {
-        console.error("OAuth exchange error:", error);
+      if (hour < 12) {
+        greeting.textContent = "Morning flow. Big wins only.";
+      } else if (hour < 18) {
+        greeting.textContent = "Afternoon focus. Execute clean.";
+      } else {
+        greeting.textContent = "Evening reset. Finish strong.";
+      }
+    }
 
-        setLoadingMessage(`Session error: ${error.message || "Could not establish session"}`);
-        showToast(`Session error: ${error.message || "Could not establish session"}`);
+    setGreeting();
+
+    function saveTheme(isLight) {
+      localStorage.setItem("coastalTheme", isLight ? "light" : "dark");
+    }
+
+    function updateThemeButton() {
+      const isLight = body.classList.contains("light");
+
+      if (themeMenuIcon) themeMenuIcon.textContent = isLight ? "☀" : "☾";
+      if (themeMenuText) themeMenuText.textContent = isLight ? "Switch to dark mode" : "Switch to light mode";
+    }
+
+    function toggleTheme() {
+      body.classList.toggle("light");
+      saveTheme(body.classList.contains("light"));
+      updateThemeButton();
+    }
+
+    function loadTheme() {
+      const theme = localStorage.getItem("coastalTheme");
+
+      if (theme === "light") {
+        body.classList.add("light");
+      }
+
+      updateThemeButton();
+    }
+
+    loadTheme();
+
+    if (themeBtnApp) {
+      themeBtnApp.addEventListener("click", () => {
+        toggleTheme();
+      });
+    }
+
+    function updateUserUI() {
+      const planText = isProUser ? "Pro" : "Free";
+      const label = currentUser ? `${currentUser.email} · ${planText}` : "Not logged in";
+
+      if (userEmailText) userEmailText.textContent = label;
+      if (mobileUserText) mobileUserText.textContent = label;
+      if (menuUserText) menuUserText.textContent = label;
+      if (planPill) planPill.textContent = isProUser ? "Pro Plan Active" : "Free Plan";
+
+      if (userAvatar) {
+        const avatarUrl =
+          currentUser?.user_metadata?.avatar_url ||
+          currentUser?.user_metadata?.picture ||
+          "";
+
+        if (avatarUrl) {
+          userAvatar.src = avatarUrl;
+          userAvatar.style.display = "block";
+        } else {
+          userAvatar.removeAttribute("src");
+          userAvatar.style.display = "none";
+        }
+      }
+
+      if (upgradeCard) {
+        upgradeCard.classList.toggle("hidden", Boolean(isProUser));
+      }
+
+      if (upgradeBtn) {
+        upgradeBtn.textContent = isProUser ? "Pro Active ✓" : "Upgrade 🔒";
+        upgradeBtn.disabled = Boolean(isProUser);
+      }
+
+      if (manageBillingBtn) {
+        manageBillingBtn.classList.toggle("hidden", !Boolean(isProUser));
+        manageBillingBtn.disabled = false;
+      }
+    }
+
+    function setLoadingState(isLoading) {
+      isLoadingTasks = isLoading;
+
+      if (loadingState) loadingState.classList.toggle("show", isLoading);
+      if (tasksContainer) tasksContainer.style.display = isLoading ? "none" : "grid";
+      if (emptyState && isLoading) emptyState.classList.remove("show");
+    }
+
+    function openApp() {
+      showOnly("app");
+      updateUserUI();
+      renderTasks();
+    }
+
+    async function exchangeOAuthCodeIfPresent() {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const authError = url.searchParams.get("error");
+      const errorDescription = url.searchParams.get("error_description");
+
+      if (authError) {
+        console.error("OAuth URL error:", authError, errorDescription);
+        setLoadingMessage(`Login error: ${errorDescription || authError}`);
+        showToast(`Login error: ${errorDescription || authError}`);
+
+        setTimeout(() => {
+          window.location.replace(LANDING_URL);
+        }, 1600);
+
+        return false;
+      }
+
+      if (!code) {
+        console.log("No OAuth code present, proceeding with regular session check");
+        return true;
+      }
+
+      console.log("OAuth code detected, exchanging for session...");
+
+      try {
+        const { data, error } = await withTimeout(
+          supabaseClient.auth.exchangeCodeForSession(code),
+          15000,
+          "OAuth exchange"
+        );
+
+        if (error) {
+          console.error("OAuth exchange error:", error);
+
+          setLoadingMessage(`Session error: ${error.message || "Could not establish session"}`);
+          showToast(`Session error: ${error.message || "Could not establish session"}`);
+
+          setTimeout(() => {
+            window.location.replace(LANDING_URL);
+          }, 2200);
+
+          return false;
+        }
+
+        console.log("✅ OAuth exchange successful", data);
+
+        cleanUrlToDashboard();
+
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        return true;
+      } catch (error) {
+        console.error("OAuth exchange exception:", error);
+
+        setLoadingMessage(`Error: ${error.message}`);
+        showToast(`Error: ${error.message}`);
 
         setTimeout(() => {
           window.location.replace(LANDING_URL);
@@ -1803,243 +2092,149 @@ body.light .composer {
 
         return false;
       }
+    }
 
-      console.log("✅ OAuth exchange successful", data);
+    async function getOrCreateProfile() {
+      if (!currentUser) return null;
+
+      const { data: existingProfile, error: selectError } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error("Profile select error:", selectError);
+        currentProfile = null;
+        isProUser = false;
+        updateUserUI();
+        return null;
+      }
+
+      if (existingProfile) {
+        currentProfile = existingProfile;
+        isProUser = Boolean(existingProfile.is_pro);
+        updateUserUI();
+        return existingProfile;
+      }
+
+      const { data: newProfile, error: insertError } = await supabaseClient
+        .from("profiles")
+        .insert([
+          {
+            id: currentUser.id,
+            email: currentUser.email,
+            is_pro: false
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Create profile error:", insertError);
+        currentProfile = null;
+        isProUser = false;
+        updateUserUI();
+        return null;
+      }
+
+      currentProfile = newProfile;
+      isProUser = Boolean(newProfile.is_pro);
+      updateUserUI();
+
+      return newProfile;
+    }
+
+    async function refreshProfile() {
+      if (!currentUser) return null;
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Refresh profile error:", error);
+        return null;
+      }
+
+      currentProfile = data;
+      isProUser = Boolean(data?.is_pro);
+      updateUserUI();
+
+      return data;
+    }
+
+    async function refreshProfileWithRetry(maxAttempts = 5) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const profile = await refreshProfile();
+
+        if (profile?.is_pro) {
+          showToast("Coastal Flow Pro activated 💎");
+          return profile;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1400));
+      }
+
+      showToast("Payment received. Pro may activate in a moment.");
+      return currentProfile;
+    }
+
+    async function handleCheckoutReturn() {
+      const params = new URLSearchParams(window.location.search);
+      const checkoutStatus = params.get("checkout");
+
+      if (!checkoutStatus) return;
 
       cleanUrlToDashboard();
 
-      await new Promise(resolve => setTimeout(resolve, 400));
-
-      return true;
-    } catch (error) {
-      console.error("OAuth exchange exception:", error);
-
-      setLoadingMessage(`Error: ${error.message}`);
-      showToast(`Error: ${error.message}`);
-
-      setTimeout(() => {
-        window.location.replace(LANDING_URL);
-      }, 2200);
-
-      return false;
-    }
-  }
-
-  async function getOrCreateProfile() {
-    if (!currentUser) return null;
-
-    const { data: existingProfile, error: selectError } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (selectError) {
-      console.error("Profile select error:", selectError);
-      currentProfile = null;
-      isProUser = false;
-      updateUserUI();
-      return null;
-    }
-
-    if (existingProfile) {
-      currentProfile = existingProfile;
-      isProUser = Boolean(existingProfile.is_pro);
-      updateUserUI();
-      return existingProfile;
-    }
-
-    const { data: newProfile, error: insertError } = await supabaseClient
-      .from("profiles")
-      .insert([
-        {
-          id: currentUser.id,
-          email: currentUser.email,
-          is_pro: false
-        }
-      ])
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error("Create profile error:", insertError);
-      currentProfile = null;
-      isProUser = false;
-      updateUserUI();
-      return null;
-    }
-
-    currentProfile = newProfile;
-    isProUser = Boolean(newProfile.is_pro);
-    updateUserUI();
-
-    return newProfile;
-  }
-
-  async function refreshProfile() {
-    if (!currentUser) return null;
-
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Refresh profile error:", error);
-      return null;
-    }
-
-    currentProfile = data;
-    isProUser = Boolean(data?.is_pro);
-    updateUserUI();
-
-    return data;
-  }
-
-  async function refreshProfileWithRetry(maxAttempts = 5) {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const profile = await refreshProfile();
-
-      if (profile?.is_pro) {
-        showToast("Coastal Flow Pro activated 💎");
-        return profile;
+      if (checkoutStatus === "success") {
+        showToast("Payment complete. Activating Pro...");
+        await refreshProfileWithRetry(5);
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      if (checkoutStatus === "cancelled") {
+        showToast("Checkout cancelled.");
+      }
     }
 
-    showToast("Payment received. Pro may activate in a moment.");
-    return currentProfile;
-  }
+    async function bootLoggedInUser(user) {
+      currentUser = user;
+      updateUserUI();
 
-  async function handleCheckoutReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const checkoutStatus = params.get("checkout");
-
-    if (!checkoutStatus) return;
-
-    cleanUrlToDashboard();
-
-    if (checkoutStatus === "success") {
-      showToast("Payment complete. Activating Pro...");
-      await refreshProfileWithRetry(5);
-    }
-
-    if (checkoutStatus === "cancelled") {
-      showToast("Checkout cancelled.");
-    }
-  }
-
-  async function bootLoggedInUser(user) {
-    currentUser = user;
-    updateUserUI();
-
-    tasks = [];
-    renderTasks();
-    openApp();
-
-    try {
-      await withTimeout(getOrCreateProfile(), 7000, "Profile");
-    } catch (error) {
-      console.error("Profile boot error:", error);
-      showToast("Profile took too long. Opening app anyway.");
-    }
-
-    try {
-      await withTimeout(loadTasks(), 9000, "Tasks");
-    } catch (error) {
-      console.error("Tasks boot error:", error);
-      setLoadingState(false);
       tasks = [];
       renderTasks();
-      showToast("Tasks took too long. Try refreshing once.");
+      openApp();
+
+      try {
+        await withTimeout(getOrCreateProfile(), 7000, "Profile");
+      } catch (error) {
+        console.error("Profile boot error:", error);
+        showToast("Profile took too long. Opening app anyway.");
+      }
+
+      try {
+        await withTimeout(loadTasks(), 9000, "Tasks");
+      } catch (error) {
+        console.error("Tasks boot error:", error);
+        setLoadingState(false);
+        tasks = [];
+        renderTasks();
+        showToast("Tasks took too long. Try refreshing once.");
+      }
+
+      try {
+        await withTimeout(handleCheckoutReturn(), 7000, "Checkout return");
+      } catch (error) {
+        console.error("Checkout return error:", error);
+      }
+
+      openApp();
     }
 
-    try {
-      await withTimeout(handleCheckoutReturn(), 7000, "Checkout return");
-    } catch (error) {
-      console.error("Checkout return error:", error);
-    }
-
-    openApp();
-  }
-
-  async function bootLoggedOutUser() {
-    currentUser = null;
-    currentProfile = null;
-    isProUser = false;
-    tasks = [];
-
-    renderTasks();
-    updateUserUI();
-
-    window.location.replace(LANDING_URL);
-  }
-
-  async function loadCurrentUser() {
-    if (isBooting) return;
-
-    isBooting = true;
-    showOnly("loading");
-
-    try {
-      console.log("Starting auth boot...");
-
-      const exchangeOk = await exchangeOAuthCodeIfPresent();
-
-      if (!exchangeOk) {
-        console.log("OAuth exchange failed");
-        return;
-      }
-
-      console.log("Getting session...");
-
-      const { data: sessionData, error: sessionError } = await withTimeout(
-        supabaseClient.auth.getSession(),
-        10000,
-        "Auth session"
-      );
-
-      hasLoadedInitialSession = true;
-
-      if (sessionError) {
-        console.error("Session error:", sessionError);
-        await bootLoggedOutUser();
-        return;
-      }
-
-      let user = sessionData?.session?.user || null;
-
-      console.log("Session check result:", user ? `User: ${user.email}` : "No user");
-
-      if (!user) {
-        console.log("No user found, retrying...");
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        const { data: retrySessionData, error: retryError } = await withTimeout(
-          supabaseClient.auth.getSession(),
-          10000,
-          "Auth session retry"
-        );
-
-        if (!retryError) {
-          user = retrySessionData?.session?.user || null;
-          console.log("Retry result:", user ? `User: ${user.email}` : "Still no user");
-        }
-      }
-
-      if (user) {
-        console.log("✅ User authenticated:", user.email);
-        await bootLoggedInUser(user);
-      } else {
-        console.log("❌ No authenticated user");
-        await bootLoggedOutUser();
-      }
-    } catch (error) {
-      console.error("Fatal boot error:", error);
-
-      hasLoadedInitialSession = true;
+    async function bootLoggedOutUser() {
       currentUser = null;
       currentProfile = null;
       isProUser = false;
@@ -2049,115 +2244,71 @@ body.light .composer {
       updateUserUI();
 
       window.location.replace(LANDING_URL);
-    } finally {
-      isBooting = false;
-    }
-  }
-
-  async function runBootFallback() {
-    if (hasBootFallbackRun) return;
-
-    const appStillHidden = appScreen && appScreen.classList.contains("hidden");
-
-    if (!appStillHidden) return;
-
-    hasBootFallbackRun = true;
-
-    console.warn("Boot fallback triggered. App was stuck on loading.");
-
-    try {
-      const { data, error } = await withTimeout(
-        supabaseClient.auth.getSession(),
-        8000,
-        "Fallback session"
-      );
-
-      if (error) {
-        console.error("Fallback session error:", error);
-        window.location.replace(LANDING_URL);
-        return;
-      }
-
-      const user = data?.session?.user || null;
-
-      if (user) {
-        currentUser = user;
-        updateUserUI();
-        showOnly("app");
-
-        try {
-          await withTimeout(getOrCreateProfile(), 6000, "Fallback profile");
-        } catch (profileError) {
-          console.error("Fallback profile error:", profileError);
-        }
-
-        try {
-          await withTimeout(loadTasks(), 8000, "Fallback tasks");
-        } catch (tasksError) {
-          console.error("Fallback load tasks error:", tasksError);
-          setLoadingState(false);
-          renderTasks();
-        }
-
-        openApp();
-      } else {
-        window.location.replace(LANDING_URL);
-      }
-    } catch (error) {
-      console.error("Fallback crash:", error);
-      window.location.replace(LANDING_URL);
-    }
-  }
-
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    const user = session?.user || null;
-
-    if (isBooting && event !== "SIGNED_OUT") {
-      return;
     }
 
-    if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
-      return;
-    }
+    async function loadCurrentUser() {
+      if (isBooting) return;
 
-    if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-      currentUser = user;
-      updateUserUI();
-      return;
-    }
+      isBooting = true;
+      showOnly("loading");
 
-    if (event === "SIGNED_IN" && user) {
-      await bootLoggedInUser(user);
-      showToast(`Logged in as ${user.email}`);
-      return;
-    }
-
-    if (event === "SIGNED_OUT") {
-      showToast("Logged out.");
-      await bootLoggedOutUser();
-    }
-  });
-
-  if (homeBtn) {
-    homeBtn.addEventListener("click", () => {
-      window.location.href = LANDING_URL;
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
       try {
-        logoutBtn.disabled = true;
-        logoutBtn.textContent = "…";
+        console.log("Starting auth boot...");
 
-        const { error } = await supabaseClient.auth.signOut();
+        const exchangeOk = await exchangeOAuthCodeIfPresent();
 
-        if (error) {
-          console.error("Logout error:", error);
-          showToast(error.message || "Logout failed.");
+        if (!exchangeOk) {
+          console.log("OAuth exchange failed");
           return;
         }
 
+        console.log("Getting session...");
+
+        const { data: sessionData, error: sessionError } = await withTimeout(
+          supabaseClient.auth.getSession(),
+          10000,
+          "Auth session"
+        );
+
+        hasLoadedInitialSession = true;
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          await bootLoggedOutUser();
+          return;
+        }
+
+        let user = sessionData?.session?.user || null;
+
+        console.log("Session check result:", user ? `User: ${user.email}` : "No user");
+
+        if (!user) {
+          console.log("No user found, retrying...");
+          await new Promise(resolve => setTimeout(resolve, 800));
+
+          const { data: retrySessionData, error: retryError } = await withTimeout(
+            supabaseClient.auth.getSession(),
+            10000,
+            "Auth session retry"
+          );
+
+          if (!retryError) {
+            user = retrySessionData?.session?.user || null;
+            console.log("Retry result:", user ? `User: ${user.email}` : "Still no user");
+          }
+        }
+
+        if (user) {
+          console.log("✅ User authenticated:", user.email);
+          await bootLoggedInUser(user);
+        } else {
+          console.log("❌ No authenticated user");
+          await bootLoggedOutUser();
+        }
+      } catch (error) {
+        console.error("Fatal boot error:", error);
+
+        hasLoadedInitialSession = true;
         currentUser = null;
         currentProfile = null;
         isProUser = false;
@@ -2167,604 +2318,722 @@ body.light .composer {
         updateUserUI();
 
         window.location.replace(LANDING_URL);
-      } catch (error) {
-        console.error("Logout crash:", error);
-        showToast("Logout failed.");
       } finally {
-        logoutBtn.disabled = false;
-        logoutBtn.textContent = "⎋";
+        isBooting = false;
       }
-    });
-  }
-
-  function getFilteredTasks() {
-    if (currentFilter === "active") return tasks.filter(task => !task.done);
-    if (currentFilter === "done") return tasks.filter(task => task.done);
-    return tasks;
-  }
-
-  function updateStats() {
-    const done = tasks.filter(task => task.done).length;
-    const active = tasks.length - done;
-
-    if (totalCount) totalCount.textContent = tasks.length;
-    if (activeCount) activeCount.textContent = active;
-    if (doneCount) doneCount.textContent = done;
-  }
-
-  function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll(".task:not(.dragging)")];
-
-    return draggableElements.reduce(
-      (closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-
-        if (offset < 0 && offset > closest.offset) {
-          return {
-            offset: offset,
-            element: child
-          };
-        }
-
-        return closest;
-      },
-      {
-        offset: Number.NEGATIVE_INFINITY,
-        element: null
-      }
-    ).element;
-  }
-
-  async function saveTaskOrder() {
-    if (!currentUser || !tasksContainer) return;
-
-    const orderedIds = [...tasksContainer.querySelectorAll(".task")].map(element => element.dataset.id);
-
-    const reorderedTasks = orderedIds
-      .map((id, index) => {
-        const task = tasks.find(item => String(item.id) === String(id));
-        if (!task) return null;
-
-        return {
-          ...task,
-          position: index
-        };
-      })
-      .filter(Boolean);
-
-    const hiddenTasks = tasks.filter(task => {
-      return !orderedIds.includes(String(task.id));
-    });
-
-    tasks = [...reorderedTasks, ...hiddenTasks];
-
-    const updates = reorderedTasks.map(task => {
-      return supabaseClient
-        .from("tasks")
-        .update({
-          position: task.position
-        })
-        .eq("id", task.id)
-        .eq("user_id", currentUser.id);
-    });
-
-    const results = await Promise.all(updates);
-    const failed = results.find(result => result.error);
-
-    if (failed) {
-      console.error("Save order error:", failed.error);
-      showToast(failed.error.message || "Could not save task order.");
-    }
-  }
-
-  function setupTaskDragEvents(taskElement, task) {
-    taskElement.draggable = true;
-
-    taskElement.addEventListener("dragstart", event => {
-      if (
-        event.target.closest(".check") ||
-        event.target.closest(".edit") ||
-        event.target.closest(".delete") ||
-        event.target.closest(".mini-btn")
-      ) {
-        event.preventDefault();
-        return;
-      }
-
-      taskElement.classList.add("dragging");
-
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", String(task.id));
-      }
-    });
-
-    taskElement.addEventListener("dragend", async () => {
-      taskElement.classList.remove("dragging");
-
-      document.querySelectorAll(".task.drag-over").forEach(element => {
-        element.classList.remove("drag-over");
-      });
-
-      await saveTaskOrder();
-    });
-
-    taskElement.addEventListener("dragover", event => {
-      event.preventDefault();
-      taskElement.classList.add("drag-over");
-    });
-
-    taskElement.addEventListener("dragleave", () => {
-      taskElement.classList.remove("drag-over");
-    });
-
-    taskElement.addEventListener("drop", event => {
-      event.preventDefault();
-      taskElement.classList.remove("drag-over");
-    });
-  }
-
-  if (tasksContainer) {
-    tasksContainer.addEventListener("dragover", event => {
-      event.preventDefault();
-
-      const dragging = document.querySelector(".task.dragging");
-      if (!dragging) return;
-
-      const afterElement = getDragAfterElement(tasksContainer, event.clientY);
-
-      if (afterElement == null) {
-        tasksContainer.appendChild(dragging);
-      } else {
-        tasksContainer.insertBefore(dragging, afterElement);
-      }
-    });
-  }
-
-  function renderTasks() {
-    if (!tasksContainer) return;
-
-    tasksContainer.innerHTML = "";
-
-    const filteredTasks = getFilteredTasks();
-
-    if (!isLoadingTasks && emptyState) {
-      emptyState.classList.toggle("show", filteredTasks.length === 0);
     }
 
-    filteredTasks.forEach(task => {
-      const taskElement = document.createElement("article");
+    async function runBootFallback() {
+      if (hasBootFallbackRun) return;
 
-      taskElement.className = `task ${task.done ? "done" : ""}`;
-      taskElement.dataset.id = task.id;
+      const appStillHidden = appScreen && appScreen.classList.contains("hidden");
 
-      taskElement.innerHTML = `
-        <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
+      if (!appStillHidden) return;
 
-        <div class="task-text"></div>
+      hasBootFallbackRun = true;
 
-        <div class="task-actions">
-          <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
-          <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
-        </div>
-      `;
-
-      taskElement.querySelector(".task-text").textContent = task.text;
-
-      setupTaskDragEvents(taskElement, task);
-
-      taskElement.querySelector(".check").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleTask(task.id);
-      });
-
-      taskElement.querySelector(".edit").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        openEditModal(task.id);
-      });
-
-      taskElement.querySelector(".delete").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        deleteTask(task.id);
-      });
-
-      tasksContainer.appendChild(taskElement);
-    });
-
-    updateStats();
-  }
-
-  async function loadTasks() {
-    if (!currentUser) return;
-
-    setLoadingState(true);
-
-    try {
-      const { data, error } = await supabaseClient
-        .from("tasks")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .order("position", { ascending: true })
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Load tasks error:", error);
-        showToast(error.message || "Could not load tasks.");
-        return;
-      }
-
-      tasks = data || [];
-      renderTasks();
-    } finally {
-      setLoadingState(false);
-    }
-  }
-
-  async function addTask(text) {
-    const cleanText = text.trim();
-    if (!cleanText) return;
-
-    if (!currentUser) {
-      showToast("Log in first to save tasks ☁️");
-      return;
-    }
-
-    try {
-      await withTimeout(refreshProfile(), 6000, "Profile refresh");
-    } catch (error) {
-      console.error("Profile refresh timeout:", error);
-    }
-
-    if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
-      showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
-      return;
-    }
-
-    const nextPosition =
-      tasks.length > 0
-        ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
-        : 0;
-
-    const { data, error } = await supabaseClient
-      .from("tasks")
-      .insert([
-        {
-          user_id: currentUser.id,
-          text: cleanText,
-          done: false,
-          position: nextPosition
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Add task error full:", error);
-      showToast(error.message || "Could not add task.");
-      return;
-    }
-
-    tasks.push(data);
-    renderTasks();
-
-    if (isProUser) {
-      showToast("Pro task saved. Unlimited mode 💎");
-    } else {
-      const remaining = FREE_TASK_LIMIT - tasks.length;
-      showToast(`Task saved. ${remaining} free tasks left.`);
-    }
-  }
-
-  async function toggleTask(id) {
-    const task = tasks.find(item => String(item.id) === String(id));
-    if (!task || !currentUser) return;
-
-    const newDoneValue = !task.done;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .update({
-        done: newDoneValue
-      })
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Toggle task error:", error);
-      showToast("Could not update task.");
-      return;
-    }
-
-    tasks = tasks.map(item => {
-      if (String(item.id) === String(id)) {
-        return {
-          ...item,
-          done: newDoneValue
-        };
-      }
-
-      return item;
-    });
-
-    renderTasks();
-  }
-
-  async function deleteTask(id) {
-    if (!currentUser) return;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Delete task error:", error);
-      showToast("Could not delete task.");
-      return;
-    }
-
-    tasks = tasks.filter(task => String(task.id) !== String(id));
-    renderTasks();
-    await saveTaskOrder();
-    showToast("Task deleted.");
-  }
-
-  function openEditModal(id) {
-    const task = tasks.find(item => String(item.id) === String(id));
-    if (!task) return;
-
-    editingTaskId = id;
-    editInput.value = task.text;
-    editModal.classList.add("show");
-
-    setTimeout(() => {
-      editInput.focus();
-    }, 80);
-  }
-
-  function closeEditModal() {
-    editingTaskId = null;
-    editInput.value = "";
-    editModal.classList.remove("show");
-  }
-
-  async function updateTask() {
-    const cleanText = editInput.value.trim();
-
-    if (!cleanText || editingTaskId === null || !currentUser) return;
-
-    const { error } = await supabaseClient
-      .from("tasks")
-      .update({
-        text: cleanText
-      })
-      .eq("id", editingTaskId)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      console.error("Update task error:", error);
-      showToast("Could not update task.");
-      return;
-    }
-
-    tasks = tasks.map(task => {
-      if (String(task.id) === String(editingTaskId)) {
-        return {
-          ...task,
-          text: cleanText
-        };
-      }
-
-      return task;
-    });
-
-    renderTasks();
-    closeEditModal();
-    showToast("Task updated.");
-  }
-
-  if (upgradeBtn) {
-    upgradeBtn.addEventListener("click", async () => {
-      if (!currentUser) {
-        showToast("Log in first before upgrading.");
-        return;
-      }
-
-      if (isProUser) {
-        showToast("You already have Coastal Flow Pro 💎");
-        return;
-      }
+      console.warn("Boot fallback triggered. App was stuck on loading.");
 
       try {
-        upgradeBtn.disabled = true;
-        upgradeBtn.textContent = "Opening Stripe...";
+        const { data, error } = await withTimeout(
+          supabaseClient.auth.getSession(),
+          8000,
+          "Fallback session"
+        );
 
-        const response = await fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: currentUser.email,
-            userId: currentUser.id
-          })
-        });
-
-        const rawText = await response.text();
-
-        let data;
-
-        try {
-          data = JSON.parse(rawText);
-        } catch {
-          console.error("Non-JSON checkout API response:", rawText);
-          throw new Error("Server returned non-JSON. Check Vercel function logs.");
-        }
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not start checkout.");
-        }
-
-        if (!data.url) {
-          throw new Error("Stripe checkout URL missing.");
-        }
-
-        window.location.href = data.url;
-      } catch (error) {
-        console.error("Checkout error:", error);
-        showToast(error.message || "Checkout failed.");
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = "Upgrade 🔒";
-      }
-    });
-  }
-
-  if (manageBillingBtn) {
-    manageBillingBtn.addEventListener("click", async () => {
-      try {
-        if (!currentUser) {
-          showToast("Please log in first.");
+        if (error) {
+          console.error("Fallback session error:", error);
+          window.location.replace(LANDING_URL);
           return;
         }
 
-        manageBillingBtn.disabled = true;
-        manageBillingBtn.textContent = "Opening billing...";
+        const user = data?.session?.user || null;
 
-        const response = await fetch("/api/create-portal-session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userId: currentUser.id
-          })
-        });
+        if (user) {
+          currentUser = user;
+          updateUserUI();
+          showOnly("app");
 
-        const rawText = await response.text();
+          try {
+            await withTimeout(getOrCreateProfile(), 6000, "Fallback profile");
+          } catch (profileError) {
+            console.error("Fallback profile error:", profileError);
+          }
 
-        let data;
+          try {
+            await withTimeout(loadTasks(), 8000, "Fallback tasks");
+          } catch (tasksError) {
+            console.error("Fallback load tasks error:", tasksError);
+            setLoadingState(false);
+            renderTasks();
+          }
 
-        try {
-          data = JSON.parse(rawText);
-        } catch {
-          console.error("Non-JSON portal API response:", rawText);
-          throw new Error("Server returned non-JSON. Check Vercel function logs.");
+          openApp();
+        } else {
+          window.location.replace(LANDING_URL);
         }
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not open billing portal.");
-        }
-
-        if (!data.url) {
-          throw new Error("Stripe billing portal URL missing.");
-        }
-
-        window.location.href = data.url;
       } catch (error) {
-        console.error("Billing portal error:", error);
-        showToast(error.message || "Could not open billing.");
-        manageBillingBtn.disabled = false;
-        manageBillingBtn.textContent = "Manage billing";
+        console.error("Fallback crash:", error);
+        window.location.replace(LANDING_URL);
+      }
+    }
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user || null;
+
+      if (isBooting && event !== "SIGNED_OUT") {
+        return;
+      }
+
+      if (event === "INITIAL_SESSION" && hasLoadedInitialSession) {
+        return;
+      }
+
+      if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        currentUser = user;
+        updateUserUI();
+        return;
+      }
+
+      if (event === "SIGNED_IN" && user) {
+        await bootLoggedInUser(user);
+        showToast(`Logged in as ${user.email}`);
+        return;
+      }
+
+      if (event === "SIGNED_OUT") {
+        showToast("Logged out.");
+        await bootLoggedOutUser();
       }
     });
-  }
 
-  if (taskForm) {
-    taskForm.addEventListener("submit", event => {
-      event.preventDefault();
+    if (homeBtn) {
+      homeBtn.addEventListener("click", () => {
+        closeMenu();
+        window.location.href = LANDING_URL;
+      });
+    }
 
-      addTask(taskInput.value);
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          logoutBtn.disabled = true;
+          closeMenu();
 
-      taskInput.value = "";
-      taskInput.focus();
-    });
-  }
+          const { error } = await supabaseClient.auth.signOut();
 
-  filterButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      if (!button.dataset.filter) return;
+          if (error) {
+            console.error("Logout error:", error);
+            showToast(error.message || "Logout failed.");
+            return;
+          }
 
-      currentFilter = button.dataset.filter;
+          currentUser = null;
+          currentProfile = null;
+          isProUser = false;
+          tasks = [];
 
-      filterButtons.forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+          renderTasks();
+          updateUserUI();
+
+          window.location.replace(LANDING_URL);
+        } catch (error) {
+          console.error("Logout crash:", error);
+          showToast("Logout failed.");
+        } finally {
+          logoutBtn.disabled = false;
+        }
+      });
+    }
+
+    function getFilteredTasks() {
+      if (currentFilter === "active") return tasks.filter(task => !task.done);
+      if (currentFilter === "done") return tasks.filter(task => task.done);
+      return tasks;
+    }
+
+    function updateStats() {
+      const done = tasks.filter(task => task.done).length;
+      const active = tasks.length - done;
+
+      if (totalCount) totalCount.textContent = tasks.length;
+      if (activeCount) activeCount.textContent = active;
+      if (doneCount) doneCount.textContent = done;
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(".task:not(.dragging)")];
+
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+
+          if (offset < 0 && offset > closest.offset) {
+            return {
+              offset: offset,
+              element: child
+            };
+          }
+
+          return closest;
+        },
+        {
+          offset: Number.NEGATIVE_INFINITY,
+          element: null
+        }
+      ).element;
+    }
+
+    async function saveTaskOrder() {
+      if (!currentUser || !tasksContainer) return;
+
+      const orderedIds = [...tasksContainer.querySelectorAll(".task")].map(element => element.dataset.id);
+
+      const reorderedTasks = orderedIds
+        .map((id, index) => {
+          const task = tasks.find(item => String(item.id) === String(id));
+          if (!task) return null;
+
+          return {
+            ...task,
+            position: index
+          };
+        })
+        .filter(Boolean);
+
+      const hiddenTasks = tasks.filter(task => {
+        return !orderedIds.includes(String(task.id));
+      });
+
+      tasks = [...reorderedTasks, ...hiddenTasks];
+
+      const updates = reorderedTasks.map(task => {
+        return supabaseClient
+          .from("tasks")
+          .update({
+            position: task.position
+          })
+          .eq("id", task.id)
+          .eq("user_id", currentUser.id);
+      });
+
+      const results = await Promise.all(updates);
+      const failed = results.find(result => result.error);
+
+      if (failed) {
+        console.error("Save order error:", failed.error);
+        showToast(failed.error.message || "Could not save task order.");
+      }
+    }
+
+    function setupTaskDragEvents(taskElement, task) {
+      taskElement.draggable = true;
+
+      taskElement.addEventListener("dragstart", event => {
+        if (
+          event.target.closest(".check") ||
+          event.target.closest(".edit") ||
+          event.target.closest(".delete") ||
+          event.target.closest(".mini-btn")
+        ) {
+          event.preventDefault();
+          return;
+        }
+
+        taskElement.classList.add("dragging");
+
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", String(task.id));
+        }
+      });
+
+      taskElement.addEventListener("dragend", async () => {
+        taskElement.classList.remove("dragging");
+
+        document.querySelectorAll(".task.drag-over").forEach(element => {
+          element.classList.remove("drag-over");
+        });
+
+        await saveTaskOrder();
+      });
+
+      taskElement.addEventListener("dragover", event => {
+        event.preventDefault();
+        taskElement.classList.add("drag-over");
+      });
+
+      taskElement.addEventListener("dragleave", () => {
+        taskElement.classList.remove("drag-over");
+      });
+
+      taskElement.addEventListener("drop", event => {
+        event.preventDefault();
+        taskElement.classList.remove("drag-over");
+      });
+    }
+
+    if (tasksContainer) {
+      tasksContainer.addEventListener("dragover", event => {
+        event.preventDefault();
+
+        const dragging = document.querySelector(".task.dragging");
+        if (!dragging) return;
+
+        const afterElement = getDragAfterElement(tasksContainer, event.clientY);
+
+        if (afterElement == null) {
+          tasksContainer.appendChild(dragging);
+        } else {
+          tasksContainer.insertBefore(dragging, afterElement);
+        }
+      });
+    }
+
+    function renderTasks() {
+      if (!tasksContainer) return;
+
+      tasksContainer.innerHTML = "";
+
+      const filteredTasks = getFilteredTasks();
+
+      if (!isLoadingTasks && emptyState) {
+        emptyState.classList.toggle("show", filteredTasks.length === 0);
+      }
+
+      filteredTasks.forEach(task => {
+        const taskElement = document.createElement("article");
+
+        taskElement.className = `task ${task.done ? "done" : ""}`;
+        taskElement.dataset.id = task.id;
+
+        taskElement.innerHTML = `
+          <button class="check" type="button" draggable="false" aria-label="Complete task">✓</button>
+
+          <div class="task-text"></div>
+
+          <div class="task-actions">
+            <button class="mini-btn edit" type="button" draggable="false" aria-label="Edit task">✎</button>
+            <button class="mini-btn delete" type="button" draggable="false" aria-label="Delete task">×</button>
+          </div>
+        `;
+
+        taskElement.querySelector(".task-text").textContent = task.text;
+
+        setupTaskDragEvents(taskElement, task);
+
+        taskElement.querySelector(".check").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleTask(task.id);
+        });
+
+        taskElement.querySelector(".edit").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openEditModal(task.id);
+        });
+
+        taskElement.querySelector(".delete").addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteTask(task.id);
+        });
+
+        tasksContainer.appendChild(taskElement);
+      });
+
+      updateStats();
+    }
+
+    async function loadTasks() {
+      if (!currentUser) return;
+
+      setLoadingState(true);
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("tasks")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("position", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Load tasks error:", error);
+          showToast(error.message || "Could not load tasks.");
+          return;
+        }
+
+        tasks = data || [];
+        renderTasks();
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    async function addTask(text) {
+      const cleanText = text.trim();
+      if (!cleanText) return;
+
+      if (!currentUser) {
+        showToast("Log in first to save tasks ☁️");
+        return;
+      }
+
+      try {
+        await withTimeout(refreshProfile(), 6000, "Profile refresh");
+      } catch (error) {
+        console.error("Profile refresh timeout:", error);
+      }
+
+      if (!isProUser && tasks.length >= FREE_TASK_LIMIT) {
+        showToast(`Free plan limit reached: ${FREE_TASK_LIMIT} tasks. Upgrade to Pro for unlimited tasks 💸`);
+        return;
+      }
+
+      const nextPosition =
+        tasks.length > 0
+          ? Math.max(...tasks.map(task => Number(task.position) || 0)) + 1
+          : 0;
+
+      const { data, error } = await supabaseClient
+        .from("tasks")
+        .insert([
+          {
+            user_id: currentUser.id,
+            text: cleanText,
+            done: false,
+            position: nextPosition
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Add task error full:", error);
+        showToast(error.message || "Could not add task.");
+        return;
+      }
+
+      tasks.push(data);
+      renderTasks();
+
+      if (isProUser) {
+        showToast("Pro task saved. Unlimited mode 💎");
+      } else {
+        const remaining = FREE_TASK_LIMIT - tasks.length;
+        showToast(`Task saved. ${remaining} free tasks left.`);
+      }
+    }
+
+    async function toggleTask(id) {
+      const task = tasks.find(item => String(item.id) === String(id));
+      if (!task || !currentUser) return;
+
+      const newDoneValue = !task.done;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          done: newDoneValue
+        })
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Toggle task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      tasks = tasks.map(item => {
+        if (String(item.id) === String(id)) {
+          return {
+            ...item,
+            done: newDoneValue
+          };
+        }
+
+        return item;
       });
 
       renderTasks();
-    });
-  });
+    }
 
-  if (clearCompletedBtn) {
-    clearCompletedBtn.addEventListener("click", async () => {
-      if (!currentUser) {
-        showToast("Log in first.");
-        return;
-      }
-
-      const completedCount = tasks.filter(task => task.done).length;
-
-      if (completedCount === 0) {
-        showToast("No completed tasks to clear yet.");
-        return;
-      }
+    async function deleteTask(id) {
+      if (!currentUser) return;
 
       const { error } = await supabaseClient
         .from("tasks")
         .delete()
-        .eq("user_id", currentUser.id)
-        .eq("done", true);
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
 
       if (error) {
-        console.error("Clear completed error:", error);
-        showToast("Could not clear completed tasks.");
+        console.error("Delete task error:", error);
+        showToast("Could not delete task.");
         return;
       }
 
-      tasks = tasks.filter(task => !task.done);
-
+      tasks = tasks.filter(task => String(task.id) !== String(id));
       renderTasks();
       await saveTaskOrder();
-      showToast("Completed tasks cleared. Clean board 🧼");
+      showToast("Task deleted.");
+    }
+
+    function openEditModal(id) {
+      const task = tasks.find(item => String(item.id) === String(id));
+      if (!task) return;
+
+      editingTaskId = id;
+      editInput.value = task.text;
+      editModal.classList.add("show");
+
+      setTimeout(() => {
+        editInput.focus();
+      }, 80);
+    }
+
+    function closeEditModal() {
+      if (!editModal) return;
+      editingTaskId = null;
+      if (editInput) editInput.value = "";
+      editModal.classList.remove("show");
+    }
+
+    async function updateTask() {
+      const cleanText = editInput.value.trim();
+
+      if (!cleanText || editingTaskId === null || !currentUser) return;
+
+      const { error } = await supabaseClient
+        .from("tasks")
+        .update({
+          text: cleanText
+        })
+        .eq("id", editingTaskId)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Update task error:", error);
+        showToast("Could not update task.");
+        return;
+      }
+
+      tasks = tasks.map(task => {
+        if (String(task.id) === String(editingTaskId)) {
+          return {
+            ...task,
+            text: cleanText
+          };
+        }
+
+        return task;
+      });
+
+      renderTasks();
+      closeEditModal();
+      showToast("Task updated.");
+    }
+
+    if (upgradeBtn) {
+      upgradeBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+          showToast("Log in first before upgrading.");
+          return;
+        }
+
+        if (isProUser) {
+          showToast("You already have Coastal Flow Pro 💎");
+          return;
+        }
+
+        try {
+          upgradeBtn.disabled = true;
+          upgradeBtn.textContent = "Opening Stripe...";
+
+          const response = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              email: currentUser.email,
+              userId: currentUser.id
+            })
+          });
+
+          const rawText = await response.text();
+
+          let data;
+
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            console.error("Non-JSON checkout API response:", rawText);
+            throw new Error("Server returned non-JSON. Check Vercel function logs.");
+          }
+
+          if (!response.ok) {
+            throw new Error(data.error || "Could not start checkout.");
+          }
+
+          if (!data.url) {
+            throw new Error("Stripe checkout URL missing.");
+          }
+
+          window.location.href = data.url;
+        } catch (error) {
+          console.error("Checkout error:", error);
+          showToast(error.message || "Checkout failed.");
+          upgradeBtn.disabled = false;
+          upgradeBtn.textContent = "Upgrade 🔒";
+        }
+      });
+    }
+
+    if (manageBillingBtn) {
+      manageBillingBtn.addEventListener("click", async () => {
+        try {
+          if (!currentUser) {
+            showToast("Please log in first.");
+            return;
+          }
+
+          closeMenu();
+          manageBillingBtn.disabled = true;
+
+          const response = await fetch("/api/create-portal-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              userId: currentUser.id
+            })
+          });
+
+          const rawText = await response.text();
+
+          let data;
+
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            console.error("Non-JSON portal API response:", rawText);
+            throw new Error("Server returned non-JSON. Check Vercel function logs.");
+          }
+
+          if (!response.ok) {
+            throw new Error(data.error || "Could not open billing portal.");
+          }
+
+          if (!data.url) {
+            throw new Error("Stripe billing portal URL missing.");
+          }
+
+          window.location.href = data.url;
+        } catch (error) {
+          console.error("Billing portal error:", error);
+          showToast(error.message || "Could not open billing.");
+          manageBillingBtn.disabled = false;
+        }
+      });
+    }
+
+    if (taskForm) {
+      taskForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        addTask(taskInput.value);
+
+        taskInput.value = "";
+        taskInput.focus();
+      });
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        if (!button.dataset.filter) return;
+
+        currentFilter = button.dataset.filter;
+
+        filterButtons.forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+        });
+
+        renderTasks();
+      });
     });
-  }
 
-  if (saveEdit) saveEdit.addEventListener("click", updateTask);
-  if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
+    if (clearCompletedBtn) {
+      clearCompletedBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+          showToast("Log in first.");
+          return;
+        }
 
-  if (editInput) {
-    editInput.addEventListener("keydown", event => {
-      if (event.key === "Enter") updateTask();
-      if (event.key === "Escape") closeEditModal();
+        const completedCount = tasks.filter(task => task.done).length;
+
+        if (completedCount === 0) {
+          showToast("No completed tasks to clear yet.");
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from("tasks")
+          .delete()
+          .eq("user_id", currentUser.id)
+          .eq("done", true);
+
+        if (error) {
+          console.error("Clear completed error:", error);
+          showToast("Could not clear completed tasks.");
+          return;
+        }
+
+        tasks = tasks.filter(task => !task.done);
+
+        renderTasks();
+        await saveTaskOrder();
+        showToast("Completed tasks cleared. Clean board 🧼");
+      });
+    }
+
+    if (saveEdit) saveEdit.addEventListener("click", updateTask);
+    if (cancelEdit) cancelEdit.addEventListener("click", closeEditModal);
+
+    if (editInput) {
+      editInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") updateTask();
+        if (event.key === "Escape") closeEditModal();
+      });
+    }
+
+    if (editModal) {
+      editModal.addEventListener("click", event => {
+        if (event.target === editModal) closeEditModal();
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadCurrentUser();
+
+      setTimeout(() => {
+        runBootFallback();
+      }, 8000);
     });
-  }
 
-  if (editModal) {
-    editModal.addEventListener("click", event => {
-      if (event.target === editModal) closeEditModal();
-    });
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {
-    loadCurrentUser();
-
-    setTimeout(() => {
-      runBootFallback();
-    }, 8000);
-  });
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(error => console.error("Service Worker failed:", error));
-    });
-  }
-</script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch(error => console.error("Service Worker failed:", error));
+      });
+    }
+  </script>
 </body>
 </html>
